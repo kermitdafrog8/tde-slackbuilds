@@ -43,6 +43,40 @@ sed -i 's|data != None|data != 0|' twin/client.cpp
 sed -i "s|konq_iconview|$VIEWMODE|" konqueror/profile_filemanagement.desktop
 ## allow for configuration files directory != /etc/trinity
 sed -i "s|/etc/trinity/|$SYS_CNF_DIR/|" tdm/kfrontend/gentdmconf.c || true
+## make default tdm screen text clearer against dark background and align login button with clickable area
+## edit color="#ffff74" and/or color="#ff0000" for your own choice
+echo $'
+--- tdm/kfrontend/themes/o2_enterprise/enterprise.xml
++++ tdm/kfrontend/themes/o2_enterprise/enterprise.xml
+@@ -12 +12 @@
+-			<normal color="#000000" font="Sans 10" />
++			<normal color="#ffff74" font="Sans 10" />
+@@ -39 +39 @@
+-			<pos width="box" x="540" y="188" anchor="c" height="box" />
++			<pos width="38" x="540" y="188" anchor="c" height="box" />
+@@ -42 +42 @@
+-					<pos x="90%" y="50%" anchor="c" />
++					<pos x="40%" y="50%" anchor="c" />
+@@ -59 +59 @@
+-								<normal color="#000000" font="Sans Condensed 10" />
++								<normal color="#ffff74" font="Sans Condensed 10" />
+@@ -64 +64 @@
+-								<normal color="#000000" font="Sans Condensed 10" />
++								<normal color="#ffff74" font="Sans Condensed 10" />
+@@ -86,2 +86,2 @@
+-				<pos x="435" y="293" anchor="s" />
+-				<normal color="#CD0000" font="Sans 10" />
++				<pos x="435" y="240" anchor="s" />
++				<normal color="#ff0000" font="Sans 11" />
+@@ -93,2 +93,2 @@
+-				<normal color="#CD0000" font="Sans 10" />
+-				<pos x="435" y="323" anchor="s" />
++				<normal color="#ff0000" font="Sans 11" />
++				<pos x="435" y="260" anchor="s" />
+' | while read line
+do
+patch -p0
+done
 
 chown_fn
 

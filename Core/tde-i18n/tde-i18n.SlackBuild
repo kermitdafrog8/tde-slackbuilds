@@ -55,10 +55,13 @@ cd $PRGNAM
 mkdir -p $PRGNAM # need -p for git builds if more than one lang
 cd $PRGNAM
 echo -e " copying $PRGNAM-$lang source files to build area ... \n"
-cp -a $BUILD_TDE_ROOT/src/cgit/tdei18n/cgit/tde-i18n/plain/tde-i18n-$lang .
-cp -a $BUILD_TDE_ROOT/src/cgit/{admin,cmake} tde-i18n-$lang/
+(cd $BUILD_TDE_ROOT/src/cgit
+cp -a tdei18n/cgit/tde-i18n/plain/tde-i18n-$lang $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
+cp -a --parents {admin,cmake}/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/tde-i18n-$lang/)
 }
 
+## language specific patches
+patch -p0 < $SRCDIR/tde-i18n-$lang-patch || true # continue if patch file doesn't exist
 
 chown_fn
 
@@ -117,16 +120,10 @@ $PRGNAM-$lang:
 
 cat <<EOINS >> $PKG/install/doinst.sh
 # Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database usr/share/applications > /dev/null 2>&1
-fi
+\$(which update-desktop-database) $INSTALL_TDE/share/applications
 
 # Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t usr/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
+\$(which gtk-update-icon-cache) -f -t $INSTALL_TDE/share/icons/hicolor
 
 EOINS
 
