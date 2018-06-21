@@ -39,6 +39,26 @@ langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po
 sed -i "s|POFILES =.*$|POFILES =$langs|" po/Makefile.am
 langs=$(echo $langs | sed "s|.po||g")
 
+[[ $TDEVERSION == R14.0.4 ]] && {
+## patch for clang from commit 3f7e19f
+echo $'
+--- src/metadata/rmff/rmff.h
++++ src/metadata/rmff/rmff.h
+@@ -35,0 +36,2 @@
++   class AudioProperties;
++
+@@ -252,3 +254 @@
+-      
+-      class TagLib::AudioProperties;
+-      
++
+' | while read line
+do
+patch -p0
+done
+}
+
+
 listdocs_fn
 
 ltoolupdate_fn
@@ -51,8 +71,8 @@ cd_builddir_fn
 LDFLAGS=$SLKLDFLAGS \
 CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
 CXXFLAGS=$SLKCFLAGS \
-CC="gcc" \
-CXX="g++" \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
    --sysconfdir=$SYS_CNF_DIR \

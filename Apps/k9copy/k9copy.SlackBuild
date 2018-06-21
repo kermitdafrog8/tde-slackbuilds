@@ -41,21 +41,37 @@ langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po
 sed -i "s|POFILES =.*$|POFILES =$langs|" po/Makefile.am
 langs=$(echo $langs | sed 's|.po||g')
 
+[[ $TDEVERSION == R14.0.4 ]] && {
+## patch for clang from commit 72845f6
+echo $'
+--- libk9copy/k9config.cpp
++++ libk9copy/k9config.cpp
+@@ -82,2 +82,2 @@
+-  m_prefButtonHiliteColor=m_config->readColorEntry("buttonHiliteColor",&TQColor(TQt::yellow));
+-  m_prefButtonTextColor=m_config->readColorEntry("buttonTextColor",&TQColor(TQt::yellow));
++  m_prefButtonHiliteColor=m_config->readColorEntry("buttonHiliteColor", &TQt::yellow);
++  m_prefButtonTextColor=m_config->readColorEntry("buttonTextColor", &TQt::yellow);
+' | while read line
+do
+patch -p0
+done
+}
+
 ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC="gcc" \
-CXX="g++" \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=${INSTALL_TDE} \
+   --prefix=$INSTALL_TDE \
    --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
+   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure \
    --enable-k3bdevices # do not activate hal/dbus support (use k3bdevice instead)

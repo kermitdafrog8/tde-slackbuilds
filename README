@@ -1,8 +1,6 @@
-Build TDE [Trinity Desktop Environment] for Slackware 14.2 and current** on i586+, x86_64, or Raspberry Pi3 [see README-Raspberry-Pi3.md].
+Build TDE [Trinity Desktop Environment] for Slackware 14.2 and current[1] on i586+, x86_64, or Raspberry Pi3 [see README-Raspberry-Pi3.md].
 
-Run ./BUILD-TDE.sh - a dialog based script with a series of screens for user input.
-
-This branch includes a beta build for the TDE development version from https://mirror.git.trinitydesktop.org/cgit/ [see README-git].
+Run ./BUILD-TDE.sh - a dialog based script with a series of screens for user input. Includes an option to build the TDE development version from https://mirror.git.trinitydesktop.org/cgit/
 
 =============================================================
 
@@ -43,10 +41,22 @@ TDM may need some manual setting up - see Core/tdebase/README, which can also be
 See https://wiki.trinitydesktop.org/How_to_Build_TDE_Core_Modules for more information
 
 =========================================================
+Building from git sources
 
-NOTE: The Misc directory contains SlackBuilds for software that might already be installed from slackbuilds.org or elsewhere.
-Please check because any misc builds selected here could overwrite them.
+The individual TDE apps can be cloned from Trinity git, so the build is set up to do that - except for individual language packs of tde-i18n. The whole tde-i18n download is ~1x10^6 bytes, so to reduce that, wget is used to download individual tde-i18n-$lang packs as they are not git repositories.
 
-** Not tested on current since the Mass Rebuild of 2018-04-19. **
+Once any git repository has been cloned, further downloads are updates only[2].
 
-***Please be sure to read the KNOWN-ISSUES file prior to building.***
+This gives the best options - only fetching what is needed, and incremental updates.
+
+The git repositories are cloned to 'src/cgit'
+
+
+KNOWN-ISSUES
+[1] Not tested on current since the Mass Rebuild of 2018-04-19.
+
+[2] The i18n downloads with wget can't be updated because cgit produces 'current' timestamps. The consequence is that if tde-i18n-$lang is a part of the build after its initial download, it will be downloaded again. As the latest update was a year ago, once built, there will probably be no need to do so again and so tde-i18n for a particular language will probably only be run once. On that basis I don't see this being a significant issue.
+
+[3] If Slackware's KDE is installed as well as TDE, there might be an issue with TDE launching the KDE4 Konsole and attempting to use it's ark. To fix, adjust the PATH so that the TDE directories come before /usr/share/bin.
+
+[4] The Misc directory contains SlackBuilds for software that might already be installed from slackbuilds.org or elsewhere. Please check because any misc builds selected here could overwrite them.

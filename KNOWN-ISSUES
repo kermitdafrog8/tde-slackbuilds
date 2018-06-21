@@ -1,6 +1,0 @@
-soundkonverter and k9copy builds fail with clang, and their SlackBuilds have been set to use gcc regardless of what is selected in BUILD-TDE.sh
-
-If you have Slackware's KDE installed and TDE as well, you might have an issue with TDE launching the KDE4 Konsole and attempting to use it's ark. To fix please adjust your PATH so that the TDE directory comes before /usr/share/bin.
-
-THE BUG REPORTS FOR EVERYTHING IF YOU'RE INTERESTED
-https://bugs.trinitydesktop.org/buglist.cgi?quicksearch=ALL
