@@ -67,21 +67,30 @@ done
 
 listdocs_fn
 
+# set support for additional language(s) as per I18N variable
+# but only for languages available with this package
+langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
+sed -i "s|POFILES =.*$|POFILES =$langs|" po/Makefile.am
+langs=$(echo $langs | sed 's|.po||g')
+#
+[[ $I18N != *ru* ]] && \
+sed -i 's| ru||' doc/Makefile.am
+
 ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=${INSTALL_TDE} \
+   --prefix=$INSTALL_TDE \
    --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
+   --mandir=$INSTALL_TDE/man \
    --disable-debug \
    --build=$ARCH-slackware-linux
 
@@ -109,24 +118,19 @@ $PRGNAM: Total Commander. It provides all the file management features you
 $PRGNAM: could possibly want.
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: 
+$PRGNAM: With language support for:
 $PRGNAM:
-$PRGNAM: 
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM: en $langs
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 cat <<EOINS >> $PKG/install/doinst.sh
 # Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
+\$(which update-desktop-database) $INSTALL_TDE/share/applications
 
 # Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
+\$(which gtk-update-icon-cache) -f -t $INSTALL_TDE/share/icons/hicolor
+
 EOINS
 
 

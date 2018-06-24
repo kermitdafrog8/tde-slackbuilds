@@ -34,29 +34,8 @@ getsource_fn
 untar_fn
 # If speex is installed, include it in the build for jingle
 [[ $(grep speex.h /var/log/packages/*speex*) ]] 2>/dev/null && SPX="ON"
-## add patch for gcc6
+## add patch for gcc6 - done in cgit but still required for R14.0.4
 sed -i 's|"functionName"|" functionName "|' kopete/libkopete/kautoconfig.cpp
-
-##Add '-pthread' for error:
-##/bin/ld: ../libtdevnc/libtdevncclient.a(tls_openssl.c.o): undefined reference to symbol 'pthread_mutexattr_settype@@GLIBC_2.2.5'
-##/lib64/libpthread.so.0: error adding symbols: DSO missing from command line
-[[ $TDEVERSION != R14.0.4 ]] && PTHRD="-pthread"
-
-##Error in git build where libtdevnc has been added as a dependency of KRDC and KRFB and openssl is being used:
-##../libtdevnc/libtdevncclient.a(tls_openssl.c.o): In function `InitializeTLS':
-##/tmp/build/tmp-tdenetwork/tdenetwork/libtdevnc/libvncclient/tls_openssl.c:153: undefined reference to `CRYPTO_num_locks'
-[[ $TDEVERSION != R14.0.4 ]] && {
-echo $'
---- libtdevnc/CMakeLists.txt
-+++ libtdevnc/CMakeLists.txt
-@@ -304 +304 @@
--    ${ADDITIONAL_LIBS} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${GNUTLS_LIBRARIES}
-+    ${ADDITIONAL_LIBS} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${GNUTLS_LIBRARIES} ${OPENSSL_LIBRARIES}
-' | while read line
-do
-patch -N -p0
-done || true # added for if/when upstream apply this patch causing it to fail
-}
 
 listdocs_fn
 
@@ -68,7 +47,7 @@ cd_builddir_fn
 ## GADU & MEANWHILE require libgadu and meanwhile installed.
   cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS ${PTHRD:-}" \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
@@ -162,21 +141,14 @@ $PRGNAM: Home: https://www.trinitydesktop.org/index.php
 
 cat <<EOINS >> $PKG/install/doinst.sh
 # Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database $INSTALL_TDE/share/applications > /dev/null 2>&1
-fi
+\$(which update-desktop-database) $INSTALL_TDE/share/applications
 
 # Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t $INSTALL_TDE/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
+\$(which gtk-update-icon-cache) -f -t $INSTALL_TDE/share/icons/hicolor
 
 # Update the mime database:
-if [ -x usr/bin/update-mime-database ]; then
-  chroot . /usr/bin/update-mime-database $INSTALL_TDE/share/mime >/dev/null 2>&1
-fi
+\$(which update-mime-database) /usr/share/mime
+
 EOINS
 
 makepkg_fn
