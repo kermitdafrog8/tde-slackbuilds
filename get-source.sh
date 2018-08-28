@@ -65,8 +65,8 @@ rm -rf $OUTPUT/{checkout,configure,make,install,error,makepkg,patch}-$PRGNAM.log
 # Where do we look for sources?
 SRCDIR=$(cd $(dirname $0); pwd)
 
-## if R14.0.4 or misc, do this:
-[[ $TDEVERSION == R14.0.4 || $TDEMIR_SUBDIR == misc ]] && \
+## if R14.0.? or misc, do this:
+[[ $TDEVERSION == R14.0.? || $TDEMIR_SUBDIR == misc ]] && \
 {
 [[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"} ]] && rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"} 2>/dev/null || true
 ln -sf $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"} $SRCDIR
@@ -102,7 +102,7 @@ fi
 
 {
 ## if not creating/updating git, nothing to do in this function for git builds
-## otherwise, now not R14.0.4 or misc, and we are creating/updating git, so [1] start with admin/cmake:
+## otherwise, now not R14.0.? or misc, and we are creating/updating git, so [1] start with admin/cmake:
 [[ $(cat $TMPVARS/CGIT) == yes ]] && {
 cd $BUILD_TDE_ROOT/src/cgit
 
@@ -204,7 +204,7 @@ umask 0022
 untar_fn ()
 {
 cd $TMP_BUILD/tmp-$PRGNAM
-[[ $TDEVERSION == R14.0.4 || $TDEMIR_SUBDIR == misc ]] && {
+[[ $TDEVERSION == R14.0.? || $TDEMIR_SUBDIR == misc ]] && {
 ## unpack R14 or misc
 echo -e " unpacking $(basename $SOURCE) ... \n"
 tar -xf $SOURCE 

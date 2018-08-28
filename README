@@ -1,6 +1,6 @@
-Build TDE [Trinity Desktop Environment] for Slackware 14.2 and current[1] on i586+, x86_64, or Raspberry Pi3 [see README-Raspberry-Pi3.md].
+Build TDE [Trinity Desktop Environment] for Slackware 14.2 or current on i586+, x86_64, or Raspberry Pi3 [see README-Raspberry-Pi3.md].
 
-Run ./BUILD-TDE.sh - a dialog based script with a series of screens for user input. Includes an option to build the TDE development version from https://mirror.git.trinitydesktop.org/cgit/
+Run ./BUILD-TDE.sh - a dialog based script with a series of screens for user input. Build the release versions R14.0.4/5 from tar archives or the development version from trinitydesktop cgit.
 
 =============================================================
 
@@ -21,7 +21,7 @@ src - to hold all the source tarballs, either pre-downloaded or downloaded durin
 Other scripts:
 get-source.sh - a chunk of common code for the SBs - used for getting the source archive, setting FLAGS, creating build directories.
 
-There is an override in the SB for non-trinity source archive URLs. Non-trinity builds have been included where a TDE package requires a dependency that is not in Slackware Current. Or, where it might be an alternative to a TDE package.
+There is an override in the Misc SlackBuilds for non-trinity source archive URLs. Non-trinity builds have been included where a TDE package requires a dependency that is not in Slackware. Or, where it might be an alternative to a TDE package.
 
 Required packages for a basic working TDE are:
   Deps/tqt3
@@ -41,11 +41,11 @@ TDM may need some manual setting up - see Core/tdebase/README, which can also be
 See https://wiki.trinitydesktop.org/How_to_Build_TDE_Core_Modules for more information
 
 =========================================================
-Building from git sources
+Building the development version from git sources
 
 The individual TDE apps can be cloned from Trinity git, so the build is set up to do that - except for individual language packs of tde-i18n. The whole tde-i18n download is ~1x10^6 bytes, so to reduce that, wget is used to download individual tde-i18n-$lang packs as they are not git repositories.
 
-Once any git repository has been cloned, further downloads are updates only[2].
+Once any git repository has been cloned, further downloads are updates only[1].
 
 This gives the best options - only fetching what is needed, and incremental updates.
 
@@ -53,10 +53,8 @@ The git repositories are cloned to 'src/cgit'
 
 
 KNOWN-ISSUES
-[1] Not tested on current since the Mass Rebuild of 2018-04-19.
+[1] The i18n downloads with wget can't be updated because cgit produces 'current time' timestamps. The consequence is that if tde-i18n-$lang is a part of the build after its initial download, it will be downloaded again. As the latest update was a year ago, once built, there will probably be no need to do so again and so tde-i18n for a particular language will probably only be run once. On that basis I don't see this being a significant issue.
 
-[2] The i18n downloads with wget can't be updated because cgit produces 'current' timestamps. The consequence is that if tde-i18n-$lang is a part of the build after its initial download, it will be downloaded again. As the latest update was a year ago, once built, there will probably be no need to do so again and so tde-i18n for a particular language will probably only be run once. On that basis I don't see this being a significant issue.
+[2] If Slackware's KDE is installed as well as TDE, there might be an issue with TDE launching the KDE4 Konsole and attempting to use it's ark. To fix, adjust the PATH so that the TDE directories come before /usr/share/bin.
 
-[3] If Slackware's KDE is installed as well as TDE, there might be an issue with TDE launching the KDE4 Konsole and attempting to use it's ark. To fix, adjust the PATH so that the TDE directories come before /usr/share/bin.
-
-[4] The Misc directory contains SlackBuilds for software that might already be installed from slackbuilds.org or elsewhere. Please check because any misc builds selected here could overwrite them.
+[3] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.

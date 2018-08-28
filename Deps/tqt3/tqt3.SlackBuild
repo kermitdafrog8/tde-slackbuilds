@@ -36,8 +36,16 @@ getsource_fn
 
 untar_fn
 
+## don't waste time building tutorial and examples which won't be installed
+## as the release version is being built
+sed -i 's|sub-tutorial sub-examples||' Makefile
+
 ## add -march and -mtune options to CFLAGS where they've been set in BUILD-TDE.sh
 sed -i "s|^QMAKE_CFLAGS[^_].*$|& $SET_march|" mkspecs/linux-g++/qmake.conf
+
+## $ORIGIN/../lib is to be added to RPATH, so don't need absolute libs directory built in:
+sed -i "s|QMAKE_RPATH.*$|QMAKE_RPATH =|" mkspecs/linux-g++/qmake.conf
+
 ## allow building with clang
 [[ ! $(grep COMPILER mkspecs/linux-g++/qmake.conf) ]] && {
 echo $'--- mkspecs/linux-g++/qmake.conf
@@ -94,16 +102,31 @@ echo "yes" | CFLAGS="$SLKCFLAGS" CXXFLAGS="$SLKCFLAGS" \
  -plugin-style-motifplus \
  -plugin-style-platinum \
  -plugin-style-sgi \
- -plugin-style-windows
+ -plugin-style-windows \
+ -fast \
+ -R-Wl,-rpath,\'\\\$\$ORIGIN/../lib\'
 
+## using relative RPATH enables packaging before installation
 make -i $NUMJOBS || exit 1
-QTDIR=$PKG$TQTDIR-$VERSION
-LD_LIBRARY_PATH=$QTDIR/lib make install INSTALL_ROOT=$PKG || exit 1
-
-make -i $NUMJOBS symlinks sub-src sub-tools || exit 1
 make install INSTALL_ROOT=$PKG || exit 1
 
-[[ $TQT_DOCS == "no" ]] && rm -rf $PKG$TQTDIR-$VERSION/doc
+[[ $TQT_OPTS == *nodocs* ]] && rm -rf $PKG$TQTDIR-$VERSION/doc
+[[ $TQT_OPTS == *minimal* ]] && {
+(cd $PKG$TQTDIR-$VERSION/
+rm lib/libtqt[de]*
+[[ $TQT_OPTS != *tdevel* ]] && rm lib/libtqas*
+[[ $TQT_OPTS != *pim_ksq* ]] && rm lib/libtqui*
+rm bin/???????*
+rm bin/tqm2ts
+rm -rf plugins/designer
+rm -rf phrasebooks
+rm -rf templates
+(cd mkspecs
+mv linux-g++ ../
+rm -rf *
+mv ../linux-g++ .
+ln -s linux-g++ default
+))}
 
 # Link the shared libraries
 ( cd $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX
@@ -126,9 +149,7 @@ strip_fn
 # Put a ton of links to more "normal" places.
 mkdir -p $PKG$INSTALL_TDE/bin
 ( cd $PKG$INSTALL_TDE/bin
-  for file in tqassistant tqdesigner tqlinguist tqlrelease tqlupdate tqmoc tqm2ts tqmake tqtconfig tquic ; do
-    ln -sf $TQTDIR-$VERSION/bin/$file .
-  done
+  ln -sf ../lib$LIBDIRSUFFIX/$PRGNAM-$VERSION/bin/* .
 )
 
 mkdir -p $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig
@@ -136,12 +157,14 @@ mkdir -p $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig
   ln -sf $TQTDIR-$VERSION/lib/pkgconfig/tqt-mt.pc .
 )
 
+[[ ! $TQT_OPTS == *minimal* ]] && {
 # Add desktop files to launch some programs:
 mkdir -p $PKG$INSTALL_TDE/share/applications/tde
 cp -a $SRCDIR/apps/tqtconfig.desktop $PKG$INSTALL_TDE/share/applications/tde/tqtconfig.desktop
 cp -a $SRCDIR/apps/tqlinguist.desktop $PKG$INSTALL_TDE/share/applications/tde/tqlinguist.desktop
 cp -a $SRCDIR/apps/tqdesigner.desktop $PKG$INSTALL_TDE/share/applications/tde/tqdesigner.desktop
 cp -a $SRCDIR/apps/tqassistant.desktop $PKG$INSTALL_TDE/share/applications/tde/tqassistant.desktop
+}
 
 # Symlink tqt3 includes to qt3, to provide it for non-tde software as well =]
 mkdir -p $PKG$INSTALL_TDE/include
@@ -160,7 +183,7 @@ echo "
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
 
-    |-----handy-ruler------------------------------------------------------|
+$PRGNAM|-----handy-ruler------------------------------------------------------|
 $PRGNAM: $PRGNAM (C++ GUI application framework)
 $PRGNAM:
 $PRGNAM: Qt is a multiplatform C++ GUI application framework
@@ -171,7 +194,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: https://wiki.trinitydesktop.org/Trinity_Desktop_Environment
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 # Add this to the doinst.sh:

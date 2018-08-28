@@ -109,6 +109,15 @@ cd_builddir_fn
     -Wno-dev \
     ..
 
+## CPLUS_INCLUDE_PATH=$TQTDIR/include:${CPLUS_INCLUDE_PATH:-};export CPLUS_INCLUDE_PATH
+## set in BUILD-TDE.sh is causing a build error with Slackware current:
+## libvncserver/main.h:26:3: error: ‘rfbScreenInfoPtr’ does not name a type; did you mean ‘rfbServerInitMsg’?
+##    rfbScreenInfoPtr d;
+##    ^~~~~~~~~~~~~~~~
+## It doesn't have any use here, so unset it
+## TODO: What in $TQTDIR/include is causing this error
+export CPLUS_INCLUDE_PATH=""
+
 make_fn
 
 installdocs_fn

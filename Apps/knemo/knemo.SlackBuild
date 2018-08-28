@@ -53,6 +53,14 @@ echo $'
 @@ -38 +38 @@
 -class KNotifyClient::Instance;
 +namespace KNotifyClient { class Instance; }
+--- src/knemod/interfacestatusdialog.cpp
++++ src/knemod/interfacestatusdialog.cpp
+@@ -215 +215 @@
+-        textLabelSpeedSend->setText( TDEIO::convertSize( bytesPerSecond  ) + i18n( "/s" ) );
++        textLabelSpeedSend->setText( ( bytesPerSecond  ) + i18n( "/s" ) );
+@@ -217 +217 @@
+-        textLabelSpeedReceived->setText( TDEIO::convertSize( bytesPerSecond ) + i18n( "/s" ) );
++        textLabelSpeedReceived->setText( ( bytesPerSecond ) + i18n( "/s" ) );
 ' | while read line
 do
 patch -p0

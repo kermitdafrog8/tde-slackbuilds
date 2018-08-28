@@ -103,6 +103,64 @@ rm share/templates/*.*.*
 mv $TEMP_DIR/* share/templates/
 } || true
 
+## https://gitlab.com/inkscape/inkscape/commit/a600c6438fef2f4c06f9a4a7d933d99fb054a973
+## Fix compilation with poppler 0.64
+echo $'--- src/extension/internal/pdfinput/pdf-parser.cpp
++++ src/extension/internal/pdfinput/pdf-parser.cpp
+@@ -2585,1 +2585,1 @@
+-void PdfParser::doShowText(GooString *s) {
++void PdfParser::doShowText(const GooString *s) {
+@@ -2604,1 +2604,1 @@
+-  builder->beginString(state, s);
++  builder->beginString(state);
+@@ -2634,1 +2634,1 @@
+-    p = s->getCString();
++    p = g_strdup(s->getCString());
+@@ -2689,1 +2689,1 @@
+-    p = s->getCString();
++    p = g_strdup(s->getCString());
+@@ -2735,1 +2735,1 @@
+-  char *name = args[0].getName();
++  char *name = g_strdup(args[0].getName());
+--- src/extension/internal/pdfinput/pdf-parser.h
++++ src/extension/internal/pdfinput/pdf-parser.h
+@@ -290,1 +290,1 @@
+-  void doShowText(GooString *s);
++  void doShowText(const GooString *s);
+--- src/extension/internal/pdfinput/svg-builder.cpp
++++ src/extension/internal/pdfinput/svg-builder.cpp
+@@ -1023,1 +1023,1 @@
+-        _font_specification = font->getName()->getCString();
++        _font_specification = g_strdup(font->getName()->getCString());
+@@ -1364,1 +1364,1 @@
+-void SvgBuilder::beginString(GfxState *state, GooString * /*s*/) {
++void SvgBuilder::beginString(GfxState *state) {
+--- src/extension/internal/pdfinput/svg-builder.h
++++ src/extension/internal/pdfinput/svg-builder.h
+@@ -32,1 +32,0 @@
+-class GooString;
+@@ -139,1 +138,1 @@
+-    void beginString(GfxState *state, GooString *s);
++    void beginString(GfxState *state);
+' | while read line
+do
+patch -p0
+done
+
+## https://gitlab.com/inkscape/inkscape/commit/10e8ae0ff522d3a9caeed9a7f137cdfd795ba0a3
+## Fix compilation with poppler 0.65.0
+## replace unused includes with one that is actually used
+echo $'--- src/extension/internal/pdfinput/pdf-parser.cpp
++++ src/extension/internal/pdfinput/pdf-parser.cpp
+@@ -40,2 +40,1 @@
+-#include "goo/GooTimer.h"
+-#include "goo/GooHash.h"
++#include "goo/GooString.h"
+' | while read line
+do
+patch -p0
+done
+
 chown_fn
 
 listdocs_fn

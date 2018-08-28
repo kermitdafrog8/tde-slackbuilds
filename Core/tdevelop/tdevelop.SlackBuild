@@ -71,18 +71,18 @@ echo "
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
 
-        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (TDE development programs)
+$PRGNAM|-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM
 $PRGNAM:
-$PRGNAM: TDE development programs
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: An Integrated Development Environment providing a graphical front end
+$PRGNAM: to a wide range of development tools.
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: http://www.trinitydesktop.org/
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 cat <<EOINS >> $PKG/install/doinst.sh

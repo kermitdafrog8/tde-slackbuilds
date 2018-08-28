@@ -35,7 +35,7 @@ getsource_fn
 ## extract, build, and remove source for each language package one at a time
 
 cd $TMP_BUILD/tmp-$PRGNAM
-[[ $TDEVERSION == R14.0.4 ]] && {
+[[ $TDEVERSION == R14.0.? ]] && {
 # extract the cmake source once only
 echo -e "\033[39;1m"
 echo "Extracting the cmake source from the $PRGNAM archive ..."
@@ -44,7 +44,7 @@ tar xf $SOURCE $PRGNAM/cmake
 }
 for lang in $I18N
 do
-[[ $TDEVERSION == R14.0.4 ]] && {
+[[ $TDEVERSION == R14.0.? ]] && {
 # extract the source for one language at a time for each iteration of the loop
 echo -e "\033[39;1m"
 echo "Extracting the $PRGNAM-$lang source from the $PRGNAM archive ..."

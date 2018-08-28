@@ -63,6 +63,37 @@ do
 patch -N -p0
 done || true
 
+## TDE bug 2821
+## patch to enable tdecmshell to find TDE .desktop file in the event of a duplication in file names
+echo $'--- tdecmshell/main.cpp
++++ tdecmshell/main.cpp
+@@ -106,2 +106,2 @@
+-    if ( module.left( 4 ) != "kde-" && service->library().isEmpty() )
+-        return locateModule( "kde-" + module );
++    if ( module.left( 4 ) != "tde-" && service->library().isEmpty() )
++        return locateModule( "tde-" + module );
+' | while read line
+do
+patch -N -p0
+done || true
+## further patch to make error message more user friendly
+echo $'--- tdecmshell/main.cpp
++++ tdecmshell/main.cpp
+@@ -98,0 +99,6 @@
++
++    if (path.left(4) == "tde-")
++        path.replace(0,4,"tde/");
++    else
++        path.prepend("tde/");
++
+@@ -101 +107 @@
+-        kdWarning(780) << "Could not find module \'" << module << "\'." << endl;
++        kdError(780) << "Could not find \'" << path << "\'." << endl;
+' | while read line
+do
+patch -N -p0
+done || true
+
 listdocs_fn
 
 chown_fn
@@ -135,7 +166,7 @@ $PRGNAM: Home: https://www.trinitydesktop.org/index.php
 cat <<EOINS >> $PKG/install/doinst.sh
 # Update the desktop database:
 if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database $INSTALL_TDE/share//applications > /dev/null 2>&1
+  chroot . /usr/bin/update-desktop-database $INSTALL_TDE/share/applications > /dev/null 2>&1
 fi
 
 # Update hicolor theme cache:

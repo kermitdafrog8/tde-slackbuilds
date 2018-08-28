@@ -20,4 +20,4 @@
 2017-07-13 Issue 40 - koffice.SB, build 3. Fixed karbon build failure caused by configure options used for Sl14.2 ImageMagick build.
 07/18/2017 Added avahi-tqt as an optional dep for users with avahi on their system already
 
-No longer maintained
+No longer maintained - see the git log for commit comments

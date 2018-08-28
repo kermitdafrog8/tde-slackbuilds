@@ -39,8 +39,6 @@ listdocs_fn
 
 ## patch for gcc7 twin/client.cpp:2978:38: error: ISO C++ forbids comparison between pointer and integer [-fpermissive]
 sed -i 's|data != None|data != 0|' twin/client.cpp
-## part 1/2 of setting konqueror filemanagement default view mode
-sed -i "s|konq_iconview|$VIEWMODE|" konqueror/profile_filemanagement.desktop
 ## allow for configuration files directory != /etc/trinity
 sed -i "s|/etc/trinity/|$SYS_CNF_DIR/|" tdm/kfrontend/gentdmconf.c || true
 ## make default tdm screen text clearer against dark background and align login button with clickable area
@@ -73,6 +71,37 @@ echo $'
 -				<pos x="435" y="323" anchor="s" />
 +				<normal color="#ff0000" font="Sans 11" />
 +				<pos x="435" y="260" anchor="s" />
+' | while read line
+do
+patch -p0
+done
+
+## enable konqueror filemanagement ViewMode to be set - TDE bug 1963
+echo $'
+--- konqueror/listview/konq_detailedlistview.desktop
++++ konqueror/listview/konq_detailedlistview.desktop
+@@ -86,0 +87 @@
++X-TDE-BrowserView-Built-Into=konqueror
+--- konqueror/iconview/konq_iconview.desktop
++++ konqueror/iconview/konq_iconview.desktop
+@@ -87,0 +88 @@
++X-TDE-BrowserView-Built-Into=konqueror
+--- konqueror/iconview/konq_multicolumnview.desktop
++++ konqueror/iconview/konq_multicolumnview.desktop
+@@ -87,0 +88 @@
++X-TDE-BrowserView-Built-Into=konqueror
+--- konqueror/listview/konq_infolistview.desktop
++++ konqueror/listview/konq_infolistview.desktop
+@@ -84,0 +85 @@
++X-TDE-BrowserView-Built-Into=konqueror
+--- konqueror/listview/konq_textview.desktop
++++ konqueror/listview/konq_textview.desktop
+@@ -87,0 +88 @@
++X-TDE-BrowserView-Built-Into=konqueror
+--- konqueror/listview/konq_treeview.desktop
++++ konqueror/listview/konq_treeview.desktop
+@@ -87,0 +88 @@
++X-TDE-BrowserView-Built-Into=konqueror
 ' | while read line
 do
 patch -p0
@@ -199,14 +228,6 @@ echo "
 sed -i 's|id:[1-5]|id:4|' etc/inittab
 " >> $PKG/install/doinst.sh
 }
-## part 2/2 of setting konqueror filemanagement default view mode
-## add [MainView Settings] ViewMode to konquerorrc
-[[ $SYS_CNF_DIR == /etc/tde ]] && TSUFF=tde
-echo "mkdir -p .\$HOME/.${TSUFF:-trinity}/share/config/
-echo '[MainView Settings]
-ViewMode=$VIEWMODE' >> .\$HOME/.${TSUFF:-trinity}/share/config/konquerorrc
-" >> $PKG/install/doinst.sh
-
 ## set TDEHOME and TDEROOTHOME variables - defaults ~/.trinity and /root/.trinity
 [[ $SYS_CNF_DIR == /etc/tde ]] && {
 echo "# upgradepkg runs installpkg twice, so firstly remove any previous TDE*HOME entries

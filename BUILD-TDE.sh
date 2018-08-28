@@ -89,9 +89,10 @@ dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Version " --menu 
 Set the version of TDE to be built.
  
 " \
-12 75 2 \
-"R14.0.4" "the latest released version" \
+13 75 3 \
+"R14.0.5" "the latest released version" \
 "cgit" "development source from Trinity git" \
+"R14.0.4" "the previous release" \
 2> $TMPVARS/TDEVERSION
 
 
@@ -103,7 +104,7 @@ Select the directory that TDE is to be installed in.
 Any other option will have to be edited into BUILD-TDE.sh 
  
 " \
-14 75 3 \
+15 75 3 \
 "/opt/trinity" "" \
 "/opt/tde" "" \
 "/usr" "" \
@@ -266,7 +267,7 @@ $(xzless Core/tde-i18n/langcodes.xz |sed 's|\t\+|\t|g'|cut -f 1,3-| tr "\n" X | 
 26 75
 done
 
-
+<<'comment'
 rm -f $TMPVARS/TQT_DOCS
 dialog --cr-wrap --no-shadow --colors --defaultno --title " TQt html Documentation " --yesno \
 "
@@ -277,6 +278,7 @@ Include it in the package?
 9 75
 [[ $? == 0 ]] && echo yes > $TMPVARS/TQT_DOCS
 [[ $? == 1 ]] && echo no > $TMPVARS/TQT_DOCS
+comment
 
 
 rm -f $TMPVARS/EXIT_FAIL
@@ -439,7 +441,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/kvkbd" "A virtual keyboard for TDE" off "\Zb\Z6   \Zn" \
 "Apps/kvpnc" "TDE frontend for various vpn clients" off "\Zb\Z6 Miscellaneous documentation will be in $(cat $TMPVARS/INSTALL_TDE)/doc/kvpnc-$(cat $TMPVARS/TDEVERSION)  \Zn" \
 "Apps/piklab" "IDE for PIC microcontrollers" off "\Zb\Z6   \Zn" \
-" Misc/potrace" "For tracing bitmaps to a vector graphics format" off "\Zb\Z6 Required for potracegui \Zn" \
+" Misc/potrace" "For tracing bitmaps to a vector graphics format" off "\Zb\Z6 Required for potracegui, optional for inkscape \Zn" \
 "Apps/potracegui" "A GUI for potrace" off "\Zb\Z6 Requires potrace \Zn" \
 "Apps/rosegarden" "Audio sequencer and musical notation editor" off "\Zb\Z6 Requires jack-audio-connection-kit liblo and dssi for proper funtionality \Zn" \
 "Apps/soundkonverter" "frontend to various audio converters" off "\Zb\Z6   \Zn" \
@@ -451,16 +453,36 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/twin-style-crystal" "twin theme" off "\Zb\Z6   \Zn" \
 "Apps/yakuake" "Quake-style terminal emulator" off "\Zb\Z6   \Zn" \
 " Misc/lxml" "Python bindings for libxml2 and libxslt" off "\Zb\Z6 Required to use Inkscape online help \Zn" \
-" Misc/inkscape" "SVG editor - an alternative to potrace, potracegui [and GraphicsMagick]." off "\Zb\Z6 Requires lxml if online help facility is required. \Zn" \
+" Misc/inkscape" "SVG editor - an alternative to potrace, potracegui [and GraphicsMagick]." off "\Zb\Z6 Requires lxml if online help facility is required, potrace is a build-time option. \Zn" \
 2> $TMPVARS/TDEbuilds
 # successful builds are removed from the TDEbuilds list by '$dir ' so add a space to the last entry
 # and the " needs to be removed because the Misc entries are double-quoted
 sed -i -e 's|$| |' -e 's|"||g' $TMPVARS/TDEbuilds
 
 
+## only run this if tqt3 has been selected
+rm -f $TMPVARS/TQT_OPTS
+[[ $(grep -o tqt3 $TMPVARS/TDEbuilds) ]] && {
+dialog --cr-wrap --nocancel --no-shadow --colors --title " TQt options " --item-help --checklist \
+"
+A minimal build of tqt3 will install only the run-time library required for TDE, and the headers and binaries required to build most of TDE.
+
+But tdepim, ksquirrel, and tdevelop need additional libraries. If you select a minimal build and intend to build any of those at any time, select building their required libs now.
+
+TQt html documentation is ~21M, and can be excluded from the package.
+ 
+" \
+21 75 4 \
+" minimal" "Minimal build" off "\Zb\Z6 Exclude libs and binaries not required for TDE \Zn" \
+" pim_ksq" "Build lib for tdepim and/or ksquirrel" off "\Zb\Z6 Only required if minimal build selected \Zn" \
+" tdevel" "Build lib for tdevelop - also needs pim_ksq" off "\Zb\Z6 Only required if minimal build selected \Zn" \
+" nodocs" "Exclude html documentation" on "\Zb\Z6  \Zn" \
+2> $TMPVARS/TQT_OPTS
+}
+
 ## only run this if tdebase has been selected
-[[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && {
 rm $TMPVARS/RUNLEVEL
+[[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && {
 EXITVAL=2
 until [[ $EXITVAL -lt 2 ]] ; do
 dialog --cr-wrap --no-shadow --yes-label "4" --no-label "3" --help-button --help-label "README" --colors --defaultno --title " TDM " --yesno \
@@ -483,24 +505,6 @@ $(cat Core/tdebase/README|sed "s|/{TDE_installation_dir}|$(cat $TMPVARS/INSTALL_
 " \
 30 75
 done
-
-rm -f $TMPVARS/VIEWMODE
-dialog --cr-wrap --nocancel --no-shadow --colors --title " Konqueror file manager " --menu \
-"
-Konqueror file manager defaults to 'Icon View'. Setting 'another View' and saving that view profile should, but doesn't, override this.
-
-Until this is fixed [bug 2881], set the default view mode here.
- 
-" \
-20 75 7 \
-"Icon" "konq_iconview" \
-"Multi Column" "konq_multicolumnview" \
-"Tree" "konq_treeview" \
-"Info List" "konq_infolistview" \
-"Detailed List" "konq_detailedlistview" \
-"Text" "konq_textview" \
-"File Size" "fsview_part" \
-2> $TMPVARS/VIEWMODE
 }
 
 
@@ -568,8 +572,9 @@ $(cat $TMPVARS/READMEs)" \
 }
 
 
-[[ $(cat $TMPVARS/TDEVERSION) == cgit ]] && {
-rm -f $TMPVARS/CGIT
+rm -f $TMPVARS/CGIT  # place this here to facilitate testing for summary screen
+[[ $(cat $TMPVARS/TDEVERSION) == cgit ]] && \
+[[ $(grep -o [ACDLM][a-z]*/ $TMPVARS/TDEbuilds | sort | head -n1) != Misc/ ]] && {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " TDE development build " --yesno \
 "
 This routine creates and updates the git repositories local copies.
@@ -578,7 +583,7 @@ If this is a first run, answer 'yes' - be patient, downloads from git are slowww
 
 For subsequent runs, 'yes' will update only.
 
-Local repositories are created/updated as for the single downloads for R14.0.4 builds.
+Local repositories are created/updated as for the single downloads for R14.0.4/5 builds.
 If the current build list includes new apps, and you don't want the existing repos updated, the new apps should be run as a new group initially as selective updating is not supported.
 
 Do you want to create or update the git repositories?
@@ -627,12 +632,11 @@ export ARCH=$(cat $TMPVARS/ARCH)	# set again for the 'continue' option
 export TDE_MIRROR=mirror.ppa.trinitydesktop.org/trinity
 export NUMJOBS=$(cat $TMPVARS/NUMJOBS)
 export I18N=$(cat $TMPVARS/I18N)
-export TQT_DOCS=$(cat $TMPVARS/TQT_DOCS)
+export TQT_OPTS=$(cat $TMPVARS/TQT_OPTS)
 export EXIT_FAIL=$(cat $TMPVARS/EXIT_FAIL)
 export KEEP_BUILD=$(cat $TMPVARS/KEEP_BUILD)
 export PREPEND=$(cat $TMPVARS/PREPEND)
 export RUNLEVEL=$(cat $TMPVARS/RUNLEVEL)
-export VIEWMODE=$(grep "$(cat $TMPVARS/VIEWMODE)" $0 | grep -o "[a-z]*_[a-z]*")
 # these exports are for koffice.SB
 [[ $(cat $TMPVARS/Krita_OPTS) == *krita* ]] && export REVERT=yes
 [[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && export USE_PNG14=yes
@@ -668,7 +672,7 @@ export ARM_FABI=$(readelf -Ah $(which bash)|grep -oE "soft|hard")
 ## Action on failure
 AOF=$(echo $EXIT_FAIL|cut -d" " -f1)
 ## if tdebase selected
-[[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && TDMRL=\\Zb\\Z6$RUNLEVEL\\Zn && V_MODE=\\Zb\\Z6$(cat $TMPVARS/VIEWMODE)\\Zn && SHADERL=" "
+[[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && TDMRL=\\Zb\\Z6$RUNLEVEL\\Zn && SHADERL=" "
 ## koffice - only if it is being built
 [[ $(sed 's|koffice-||' $TMPVARS/TDEbuilds | grep -o Apps/koffice) ]] && {
 [[ $REVERT == yes ]] && RVT=\\Zb\\Z6yes\\Zn || RVT=\\Zb\\Z6no\\Zn
@@ -676,6 +680,13 @@ AOF=$(echo $EXIT_FAIL|cut -d" " -f1)
 [[ $USE_PNG14 == yes ]] && USE_PNG=\\Zb\\Z6yes\\Zn || USE_PNG=\\Zb\\Z6no\\Zn
 SHADEKO=" "
 }
+## tqt3 options, if tqt3 is being built
+[[ $(grep -o tqt3 $TMPVARS/TDEbuilds) ]] && {
+TQT_BLD=yes && [[ $TQT_OPTS != *minimal* ]] && TQT_BLD=no
+TQT_DOCS=no && [[ $TQT_OPTS != *nodocs* ]] && TQT_DOCS=yes
+}
+## whether cloning or updating cgit
+CLONE=$(cat $TMPVARS/CGIT)
 ## start dialog
 EXITVAL=2
 until [[ $EXITVAL -lt 2 ]] ; do
@@ -685,19 +696,19 @@ Setup is complete - these are the build options:
 
 New build list                          \Zb\Z6$NEW_BUILD\Zn
 TDE version                             \Zb\Z6$TDEVERSION\Zn
+Clone/update cgit local repositories    \Zb\Z6${CLONE:-\Z0\Zbn/a}\Zn
 TDE installation directory              \Zb\Z6$INSTALL_TDE\Zn
 TDE system configuration directory      \Zb\Z6$SYS_CNF_DIR\Zn
 Compiler                                \Zb\Z6$COMPILER\Zn
 gcc cpu optimization                    \Zb\Z6$SET_march\Zn
 Number of parallel jobs                 \Zb\Z6$(echo $NUMJOBS|sed 's|-j||')\Zn
 Additional languages                    \Zb\Z6${I18N:-\Z0\Zbnone}\Zn
-Include tqt html docs                   \Zb\Z6$TQT_DOCS\Zn
+Minimal tqt build                       \Zb\Z6${TQT_BLD:-\Z0\Zbn/a}\Zn
+Include tqt html docs                   \Zb\Z6${TQT_DOCS:-\Z0\Zbn/a}\Zn
 Action on failure                       \Zb\Z6${AOF:-continue}\Zn
 Keep the temporary build files          \Zb\Z6$KEEP_BUILD\Zn
-Pre-select required [\Zb\Zr\Z4R\Zn] builds          \Zb\Z6$(cat $TMPVARS/SELECT|sed 's|off|no|;s|on|yes|')\Zn
 Prepend TDE libs paths                  \Zb\Z6${PREPEND:-no}\Zn${SHADERL:-\Z0\Zb}
-Runlevel for TDM                        ${TDMRL:-n/a}
-Konqueror file manager view mode        ${V_MODE:-n/a}\Zn${SHADEKO:-\Z0\Zb}
+Runlevel for TDM                        ${TDMRL:-n/a}\Zn${SHADEKO:-\Z0\Zb}
 koffice:
  revert chalk to krita                  ${RVT:-n/a}
  build with libpng14                    ${USE_PNG:-n/a}
