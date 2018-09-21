@@ -70,7 +70,7 @@ build_core()
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # These need to be set here:
-export INST=1
+export INST=${INST:-1}
 TMP=${TMP:-/tmp}
 export LIBPNG_TMP=$TMP
 export BUILD_TDE_ROOT=$(pwd)

@@ -33,15 +33,28 @@ getsource_fn
 
 untar_fn
 
-## for cgit - bug 2957
-echo $'
---- config.h.cmake
-+++ config.h.cmake
-@@ -3,0 +4 @@
-+#cmakedefine HAVE_POPPLER_064
---- tdefile-plugins/dependencies/poppler-tqt/ConfigureChecks.cmake
+## for R14* - bug 2957
+[[ $TDEVERSION == R14.0.? ]] && {
+echo $'--- tdefile-plugins/dependencies/poppler-tqt/ConfigureChecks.cmake
 +++ tdefile-plugins/dependencies/poppler-tqt/ConfigureChecks.cmake
-@@ -36,0 +37,11 @@
+@@ -27,5 +27,5 @@
+-if( NOT DEFINED HAVE_POPPLER_060 )
+-  message( STATUS "Performing Test HAVE_POPPLER_060" )
+-  if( NOT POPPLER_VERSION VERSION_LESS "0.60" )
+-    set( HAVE_POPPLER_060 1 CACHE INTERNAL "" FORCE )
+-    message( STATUS "Performing Test HAVE_POPPLER_060 - Success" )
++if( NOT DEFINED HAVE_POPPLER_058 )
++  message( STATUS "Performing Test HAVE_POPPLER_058" )
++  if( NOT POPPLER_VERSION VERSION_LESS "0.58" )
++    set( HAVE_POPPLER_058 1 CACHE INTERNAL "" FORCE )
++    message( STATUS "Performing Test HAVE_POPPLER_058 - Success" )
+@@ -33,2 +33,13 @@
+-    set( HAVE_POPPLER_060 "" CACHE INTERNAL "" FORCE )
+-    message( STATUS "Performing Test HAVE_POPPLER_060 - Failed" )
++    set( HAVE_POPPLER_058 "" CACHE INTERNAL "" FORCE )
++    message( STATUS "Performing Test HAVE_POPPLER_058 - Failed" )
++  endif( )
++endif( )
 +
 +if( NOT DEFINED HAVE_POPPLER_064 )
 +  message( STATUS "Performing Test HAVE_POPPLER_064" )
@@ -51,122 +64,57 @@ echo $'
 +  else( )
 +    set( HAVE_POPPLER_064 "" CACHE INTERNAL "" FORCE )
 +    message( STATUS "Performing Test HAVE_POPPLER_064 - Failed" )
-+  endif( )
-+endif( )
---- tdefile-plugins/dependencies/poppler-tqt/poppler-document.cc
-+++ tdefile-plugins/dependencies/poppler-tqt/poppler-document.cc
-@@ -179,0 +180,3 @@
-+#   if defined(HAVE_POPPLER_064)
-+    s1 = (GooString *)obj.getString();
-+#   else
-@@ -180,0 +184 @@
-+#   endif
-@@ -251,0 +256,3 @@
-+#   if defined(HAVE_POPPLER_064)
-+    TQString s = UnicodeParsedString((GooString *)obj.getString());
-+#   else
-@@ -252,0 +260 @@
-+#   endif
-@@ -322,0 +331,3 @@
-+#   if defined(HAVE_POPPLER_064)
-+  GooList * items = (GooList *)outline->getItems();
-+#   else
-@@ -323,0 +335 @@
-+#   endif
---- tdefile-plugins/dependencies/poppler-tqt/poppler-private.cc
-+++ tdefile-plugins/dependencies/poppler-tqt/poppler-private.cc
-@@ -98,0 +99,3 @@
-+#   if defined(HAVE_POPPLER_064)
-+        Unicode * uniChar = (Unicode *)outlineItem->getTitle();
-+#   else
-@@ -99,0 +103 @@
-+#   endif
-@@ -108,0 +113,3 @@
-+#   if defined(HAVE_POPPLER_064)
-+        ::LinkAction * a = (::LinkAction *)outlineItem->getAction();
-+#   else
-@@ -109,0 +117 @@
-+#   endif
-@@ -113,0 +122,3 @@
-+#   if defined(HAVE_POPPLER_064)
-+            LinkDest * destination = (LinkDest *)g->getDest();
-+#   else
-@@ -114,0 +126 @@
-+#   endif
-@@ -119,0 +132,3 @@
-+#   if defined(HAVE_POPPLER_064)
-+                GooString *s = (GooString *)g->getNamedDest();
-+#   else
-@@ -120,0 +136 @@
-+#   endif
-@@ -140,0 +157,3 @@
-+#   if defined(HAVE_POPPLER_064)
-+        GooList * children = (GooList *)outlineItem->getKids();
-+#   else
-@@ -141,0 +161 @@
-+#   endif
-' | while read line
-do
-patch -p0
-done
-## more for bug 2957 - for 60->58
-echo $'
 --- config.h.cmake
 +++ config.h.cmake
-@@ -5 +5 @@
+@@ -4 +4,2 @@
 -#cmakedefine HAVE_POPPLER_060
++#cmakedefine HAVE_POPPLER_064
 +#cmakedefine HAVE_POPPLER_058
---- tdefile-plugins/dependencies/poppler-tqt/ConfigureChecks.cmake
-+++ tdefile-plugins/dependencies/poppler-tqt/ConfigureChecks.cmake
-@@ -27,3 +27,3 @@
--if( NOT DEFINED HAVE_POPPLER_060 )
--  message( STATUS "Performing Test HAVE_POPPLER_060" )
--  if( NOT POPPLER_VERSION VERSION_LESS "0.60" )
-+if( NOT DEFINED HAVE_POPPLER_058 )
-+  message( STATUS "Performing Test HAVE_POPPLER_058" )
-+  if( NOT POPPLER_VERSION VERSION_LESS "0.58" )
-@@ -30,2 +30,2 @@
--    set( HAVE_POPPLER_060 1 CACHE INTERNAL "" FORCE )
--    message( STATUS "Performing Test HAVE_POPPLER_060 - Success" )
-+    set( HAVE_POPPLER_058 1 CACHE INTERNAL "" FORCE )
-+    message( STATUS "Performing Test HAVE_POPPLER_058 - Success" )
-@@ -33,2 +33,2 @@
--    set( HAVE_POPPLER_060 "" CACHE INTERNAL "" FORCE )
--    message( STATUS "Performing Test HAVE_POPPLER_060 - Failed" )
-+    set( HAVE_POPPLER_058 "" CACHE INTERNAL "" FORCE )
-+    message( STATUS "Performing Test HAVE_POPPLER_058 - Failed" )
 --- tdefile-plugins/dependencies/poppler-tqt/poppler-document.cc
 +++ tdefile-plugins/dependencies/poppler-tqt/poppler-document.cc
 @@ -156 +156 @@
 -# if defined(HAVE_POPPLER_060)
 +# if defined(HAVE_POPPLER_058)
+@@ -166 +166 @@
+-  GooString *s1;
++  CONST_064 GooString *s1;
 @@ -173 +173 @@
 -#   if defined(HAVE_POPPLER_060)
 +#   if defined(HAVE_POPPLER_058)
-@@ -209 +209 @@
+@@ -205 +205 @@
 -#   if !defined(HAVE_POPPLER_060)
 +#   if !defined(HAVE_POPPLER_058)
-@@ -215 +215 @@
+@@ -211 +211 @@
 -# if !defined(HAVE_POPPLER_060)
 +# if !defined(HAVE_POPPLER_058)
-@@ -230 +230 @@
+@@ -226 +226 @@
 -# if defined(HAVE_POPPLER_060)
 +# if defined(HAVE_POPPLER_058)
-@@ -236 +236 @@
+@@ -232 +232 @@
 -#   if !defined(HAVE_POPPLER_060)
 +#   if !defined(HAVE_POPPLER_058)
-@@ -249 +249 @@
+@@ -245 +245 @@
 -#   if defined(HAVE_POPPLER_060)
 +#   if defined(HAVE_POPPLER_058)
-@@ -267 +267 @@
+@@ -259 +259 @@
 -#	if !defined(HAVE_POPPLER_060)
 +#	if !defined(HAVE_POPPLER_058)
-@@ -275 +275 @@
+@@ -267 +267 @@
 -# if !defined(HAVE_POPPLER_060)
 +# if !defined(HAVE_POPPLER_058)
-@@ -362 +362 @@
+@@ -323 +323 @@
+-  GooList * items = outline->getItems();
++  CONST_064 GooList * items = outline->getItems();
+@@ -350 +350 @@
 -#if defined(HAVE_POPPLER_060) || defined(HAVE_POPPLER_030)
 +#if defined(HAVE_POPPLER_058) || defined(HAVE_POPPLER_030)
+--- tdefile-plugins/dependencies/poppler-tqt/poppler-link.cc
++++ tdefile-plugins/dependencies/poppler-tqt/poppler-link.cc
+@@ -33,2 +33,2 @@
+-		LinkDest *ld = data.ld;
+-		
++		CONST_064 LinkDest *ld = data.ld;
++
 --- tdefile-plugins/dependencies/poppler-tqt/poppler-page.cc
 +++ tdefile-plugins/dependencies/poppler-tqt/poppler-page.cc
 @@ -132 +132 @@
@@ -181,10 +129,67 @@ echo $'
 @@ -215 +215 @@
 -#   if !defined(HAVE_POPPLER_060)
 +#   if !defined(HAVE_POPPLER_058)
+--- tdefile-plugins/dependencies/poppler-tqt/poppler-private.cc
++++ tdefile-plugins/dependencies/poppler-tqt/poppler-private.cc
+@@ -34 +34 @@
+-TQString unicodeToTQString(Unicode* u, int len)
++TQString unicodeToTQString(CONST_064 Unicode* u, int len)
+@@ -44 +44 @@
+-TQString UnicodeParsedString(GooString *s1)
++TQString UnicodeParsedString(CONST_064 GooString *s1)
+@@ -89 +89 @@
+-void DocumentData::addTocChildren( TQDomDocument * docSyn, TQDomNode * parent, GooList * items )
++void DocumentData::addTocChildren( TQDomDocument * docSyn, TQDomNode * parent, CONST_064 GooList * items )
+@@ -99 +99 @@
+-        Unicode * uniChar = outlineItem->getTitle();
++        CONST_064 Unicode * uniChar = outlineItem->getTitle();
+@@ -109 +109 @@
+-        ::LinkAction * a = outlineItem->getAction();
++        CONST_064 ::LinkAction * a = outlineItem->getAction();
+@@ -113,2 +113,2 @@
+-            LinkGoTo * g = static_cast< LinkGoTo * >( a );
+-            LinkDest * destination = g->getDest();
++            CONST_064 LinkGoTo * g = static_cast< CONST_064 LinkGoTo * >( a );
++            CONST_064 LinkDest * destination = g->getDest();
+@@ -120 +120 @@
+-                GooString *s = g->getNamedDest();
++                CONST_064 GooString *s = g->getNamedDest();
+@@ -134 +134 @@
+-                    LinkGoToR * g2 = static_cast< LinkGoToR * >( a );
++                    CONST_064 LinkGoToR * g2 = static_cast< CONST_064 LinkGoToR * >( a );
+@@ -141 +141 @@
+-        GooList * children = outlineItem->getKids();
++        CONST_064 GooList * children = outlineItem->getKids();
+--- tdefile-plugins/dependencies/poppler-tqt/poppler-private.h
++++ tdefile-plugins/dependencies/poppler-tqt/poppler-private.h
+@@ -36,0 +37,5 @@
++#if defined(HAVE_POPPLER_064)
++#define CONST_064 const
++#else
++#define CONST_064
++#endif
+@@ -42 +47 @@
+-TQString unicodeToTQString(Unicode* u, int len);
++TQString unicodeToTQString(CONST_064 Unicode* u, int len);
+@@ -44 +49 @@
+-TQString UnicodeParsedString(GooString *s1);
++TQString UnicodeParsedString(CONST_064 GooString *s1);
+@@ -50 +55 @@
+-     LinkDestinationData( LinkDest *l, GooString *nd, Poppler::DocumentData *pdfdoc ) : ld(l), namedDest(nd), doc(pdfdoc)
++     LinkDestinationData( CONST_064 LinkDest *l, GooString *nd, Poppler::DocumentData *pdfdoc ) : ld(l), namedDest(nd), doc(pdfdoc)
+@@ -53,2 +58,2 @@
+-	
+-     LinkDest *ld;
++
++     CONST_064 LinkDest *ld;
+@@ -87 +92 @@
+-    void addTocChildren( TQDomDocument * docSyn, TQDomNode * parent, GooList * items );
++    void addTocChildren( TQDomDocument * docSyn, TQDomNode * parent, CONST_064 GooList * items );
 ' | while read line
 do
 patch -p0
 done
+}
 
 listdocs_fn
 
