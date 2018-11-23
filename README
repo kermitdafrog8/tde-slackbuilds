@@ -4,6 +4,9 @@ Run ./BUILD-TDE.sh - a dialog based script with a series of screens for user inp
 
 The default is to install the built packages which is necessary initially for the required packages and for some interdependencies [example tdesdk requires tdepim] -> run 'INST=0 ./BUILD-TDE.sh' to build only.
 
+NEW:
+There is a work-in-progress for cross compiling TDE for the Raspberry Pi3 based on these scripts - see the html page in the gh-pages branch or @ https://ray-v.github.io/tde-slackbuilds/cross-compiling-TDE-for-the-RPi3.html
+
 =============================================================
 
 Any package, or set of packages, can be built by running BUILD-TDE.sh and selecting them from the 'TDE Packages Selection' screen.

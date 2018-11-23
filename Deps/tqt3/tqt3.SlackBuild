@@ -36,10 +36,6 @@ getsource_fn
 
 untar_fn
 
-## don't waste time building tutorial and examples which won't be installed
-## as the release version is being built
-sed -i 's|sub-tutorial sub-examples||' Makefile
-
 ## add -march and -mtune options to CFLAGS where they've been set in BUILD-TDE.sh
 sed -i "s|^QMAKE_CFLAGS[^_].*$|& $SET_march|" mkspecs/linux-g++/qmake.conf
 
@@ -106,8 +102,8 @@ echo "yes" | CFLAGS="$SLKCFLAGS" CXXFLAGS="$SLKCFLAGS" \
  -fast \
  -R-Wl,-rpath,\'\\\$\$ORIGIN/../lib\'
 
-## using relative RPATH enables packaging before installation
-make -i $NUMJOBS || exit 1
+## don't build tutorial and examples which won't be installed because the release version is being built
+make $NUMJOBS symlinks src-qmake src-moc sub-src sub-tools || exit 1
 make install INSTALL_ROOT=$PKG || exit 1
 
 [[ $TQT_OPTS == *nodocs* ]] && rm -rf $PKG$TQTDIR-$VERSION/doc
@@ -154,7 +150,7 @@ mkdir -p $PKG$INSTALL_TDE/bin
 
 mkdir -p $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig
 ( cd $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig
-  ln -sf $TQTDIR-$VERSION/lib/pkgconfig/tqt-mt.pc .
+  ln -sf ../$PRGNAM-$VERSION/lib/pkgconfig/tqt-mt.pc .
 )
 
 [[ ! $TQT_OPTS == *minimal* ]] && {
