@@ -73,8 +73,8 @@ echo $'
 +				<pos x="435" y="260" anchor="s" />
 ' | while read line
 do
-patch -p0
-done
+patch -N -p0
+done || true
 
 ## enable konqueror filemanagement ViewMode to be set - TDE bug 1963
 echo $'
@@ -104,8 +104,62 @@ echo $'
 +X-TDE-BrowserView-Built-Into=konqueror
 ' | while read line
 do
-patch -p0
-done
+patch -N -p0
+done || true
+
+## linux/stat.h:56:8: error: redefinition of struct statx_timestamp
+## glibc-2.28 issue - commit de4afaaf00
+echo $'--- kdesktop/lock/lockprocess.cc
++++ kdesktop/lock/lockprocess.cc
+@@ -82,3 +81,0 @@
+-#ifdef __linux__
+-#include <linux/stat.h>
+-#endif
+' | while read line
+do
+patch -N -p0
+done || true
+
+## commit f6a5cd3e - rpc functions
+echo $'
+--- tdeioslave/ConfigureChecks.cmake
++++ tdeioslave/ConfigureChecks.cmake
+@@ -26,0 +27,18 @@
++
++# rpc/rpc.h, originally was shipped with glibc ...
++check_include_file( rpc/rpc.h HAVE_RPC_H )
++# ... but later might be not present (deprecated from 2.26)
++if( NOT HAVE_RPC_H )
++  pkg_search_module( TIRPC libtirpc )
++  if( NOT TIRPC_FOUND )
++    tde_message_fatal( "rpc/rpc.h is required, please check your glibc or libtirpc package" )
++  endif( )
++endif( )
++
++message( STATUS "Looking for rpcgen" )
++find_program( RPCGEN_BINARY rpcgen )
++if( RPCGEN_BINARY )
++  message( STATUS "Looking for rpcgen - ${RPCGEN_BINARY}" )
++else( RPCGEN_BINARY )
++  tde_message_fatal( "rpcgen is required, but not found on your system" )
++endif( RPCGEN_BINARY )
+--- tdeioslave/nfs/CMakeLists.txt
++++ tdeioslave/nfs/CMakeLists.txt
+@@ -17,0 +18 @@
++  ${TIRPC_INCLUDE_DIRS}
+@@ -35 +36 @@
+-  COMMAND rpcgen -c -o mount_xdr.c ${CMAKE_CURRENT_SOURCE_DIR}/mount.x
++  COMMAND ${RPCGEN_BINARY} -c -o mount_xdr.c ${CMAKE_CURRENT_SOURCE_DIR}/mount.x
+@@ -39 +40 @@
+-  COMMAND rpcgen -c -o nfs_prot_xdr.c ${CMAKE_CURRENT_SOURCE_DIR}/nfs_prot.x
++  COMMAND ${RPCGEN_BINARY} -c -o nfs_prot_xdr.c ${CMAKE_CURRENT_SOURCE_DIR}/nfs_prot.x
+@@ -44 +45 @@
+-  LINK tdeio-shared
++  LINK tdeio-shared ${TIRPC_LIBRARIES}
+' | while read line
+do
+patch -N -p0
+done || true
 
 chown_fn
 

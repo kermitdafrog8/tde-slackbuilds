@@ -62,6 +62,20 @@ patch -p0
 done
 }
 
+## don't install html docs if 'nodocs' has been selected
+[[ $TQT_OPTS == *nodocs* ]] && sed -i '/htmldocs/d' src/qt_install.pri
+
+## for a minimal build
+[[ $TQT_OPTS == *minimal* ]] && {
+sed -i '/translations/d' src/qt_install.pri
+sed -i '/phrasebooks/d' tools/linguist/linguist/linguist.pro
+sed -i '/templates/d' tools/designer/designer/designer.pro
+## only need linux-g++
+mv mkspecs/linux-g++ ../
+rm -rf mkspecs/*
+mv ../linux-g++ mkspecs/
+}
+
 listdocs_fn
 
 chown_fn
@@ -103,24 +117,20 @@ echo "yes" | CFLAGS="$SLKCFLAGS" CXXFLAGS="$SLKCFLAGS" \
  -R-Wl,-rpath,\'\\\$\$ORIGIN/../lib\'
 
 ## don't build tutorial and examples which won't be installed because the release version is being built
-make $NUMJOBS symlinks src-qmake src-moc sub-src sub-tools || exit 1
+make -i $NUMJOBS symlinks src-qmake src-moc sub-src sub-tools || exit 1
 make install INSTALL_ROOT=$PKG || exit 1
 
-[[ $TQT_OPTS == *nodocs* ]] && rm -rf $PKG$TQTDIR-$VERSION/doc
+## for a minimal build
 [[ $TQT_OPTS == *minimal* ]] && {
 (cd $PKG$TQTDIR-$VERSION/
 rm lib/libtqt[de]*
-[[ $TQT_OPTS != *tdevel* ]] && rm lib/libtqas*
+[[ $TQT_OPTS != *tdevel* ]] && rm lib/libtqas* && {
 [[ $TQT_OPTS != *pim_ksq* ]] && rm lib/libtqui*
+}
 rm bin/???????*
 rm bin/tqm2ts
 rm -rf plugins/designer
-rm -rf phrasebooks
-rm -rf templates
 (cd mkspecs
-mv linux-g++ ../
-rm -rf *
-mv ../linux-g++ .
 ln -s linux-g++ default
 ))}
 

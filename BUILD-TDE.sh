@@ -36,7 +36,7 @@ Select \Zr\Z4\ZbNew\Zn if:
 Selecting <\Z1R\Zb\Z0e-use\Zn> avoids having to create the build list again when re-running the build for any SlackBuilds that failed." \
 13 75
 [[ $? == 0 ]] && echo no > $TMPVARS/build-new
-[[ $? == 1 ]] && rm $TMPVARS/TDEbuilds
+[[ $? == 1 ]] && rm -f $TMPVARS/TDEbuilds
 
 
 build_core()
@@ -267,19 +267,6 @@ $(xzless Core/tde-i18n/langcodes.xz |sed 's|\t\+|\t|g'|cut -f 1,3-| tr "\n" X | 
 26 75
 done
 
-<<'comment'
-rm -f $TMPVARS/TQT_DOCS
-dialog --cr-wrap --no-shadow --colors --defaultno --title " TQt html Documentation " --yesno \
-"
-TQt html documentation is ~21M.
-
-Include it in the package?
-" \
-9 75
-[[ $? == 0 ]] && echo yes > $TMPVARS/TQT_DOCS
-[[ $? == 1 ]] && echo no > $TMPVARS/TQT_DOCS
-comment
-
 
 rm -f $TMPVARS/EXIT_FAIL
 dialog --cr-wrap --defaultno --yes-label "Continue" --no-label "Stop" --no-shadow --colors --title " Action on failure " --yesno \
@@ -329,7 +316,7 @@ Select \Zr\Zb\Z4No\Zn here if they have already been built and installed and you
 export SELECT=$(cat $TMPVARS/SELECT)
 
 
-rm $TMPVARS/PREPEND
+rm -f $TMPVARS/PREPEND
 EXITVAL=2
 until [[ $EXITVAL -lt 2 ]] ; do
 dialog --cr-wrap --no-shadow --yes-label "Prepend" --help-button --help-label "README" --no-label "Default" --colors --defaultno --title " Libraries Search Path " --yesno \
@@ -466,23 +453,23 @@ rm -f $TMPVARS/TQT_OPTS
 [[ $(grep -o tqt3 $TMPVARS/TDEbuilds) ]] && {
 dialog --cr-wrap --nocancel --no-shadow --colors --title " TQt options " --item-help --checklist \
 "
-A minimal build of tqt3 will install only the run-time library required for TDE, and the headers and binaries required to build most of TDE.
+A minimal packaging of tqt3 will install only the run-time library required for TDE, and the headers and binaries required to build most of TDE.
 
-But tdepim, ksquirrel, and tdevelop need additional libraries. If you select a minimal build and intend to build any of those at any time, select building their required libs now.
+But tdepim, ksquirrel, and tdevelop need additional libraries. If you select minimal packaging and intend to build any of those at any time, select keeping their required libs now.
 
 TQt html documentation is ~21M, and can be excluded from the package.
  
 " \
 21 75 4 \
-" minimal" "Minimal build" off "\Zb\Z6 Exclude libs and binaries not required for TDE \Zn" \
-" pim_ksq" "Build lib for tdepim and/or ksquirrel" off "\Zb\Z6 Only required if minimal build selected \Zn" \
-" tdevel" "Build lib for tdevelop - also needs pim_ksq" off "\Zb\Z6 Only required if minimal build selected \Zn" \
+" minimal" "Minimal packaging" off "\Zb\Z6 Exclude libs and binaries not required for TDE \Zn" \
+" pim_ksq" "Keep lib for tdepim and/or ksquirrel" off "\Zb\Z6 Only required if minimal build selected \Zn" \
+" tdevel" "Keep libs for tdevelop" off "\Zb\Z6 Only required if minimal build selected \Zn" \
 " nodocs" "Exclude html documentation" on "\Zb\Z6  \Zn" \
 2> $TMPVARS/TQT_OPTS
 }
 
 ## only run this if tdebase has been selected
-rm $TMPVARS/RUNLEVEL
+rm -f $TMPVARS/RUNLEVEL
 [[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && {
 EXITVAL=2
 until [[ $EXITVAL -lt 2 ]] ; do

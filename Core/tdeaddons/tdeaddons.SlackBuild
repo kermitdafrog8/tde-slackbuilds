@@ -103,13 +103,13 @@ done
 
 chown_fn
 
-#check for tdegames
-[[ $(ls /var/log/packages/tdegames-*) ]] && ATLANTIKDESIGNER="ON"
+# check for libatlantic [tdegames]
+[[ $(ls $INSTALL_TDE/lib/libatlantic.so.*) ]] && ATLANTIKDESIGNER="ON"
 
-#check for tdepim
-[[ $(ls /var/log/packages/tdepim-*) ]] && KADDRESSBOOK_PLUGINS="ON"
+# check for kaddressbook in tdepim
+[[ $(ls $INSTALL_TDE/share/cmake/kaddressbook.cmake) ]] && KADDRESSBOOK_PLUGINS="ON"
 
-# Check for tdemultimedia
+# check for tdemultimedia
 [[ $(ls $INSTALL_TDE/include/arts/artsmodules.h) ]] && NOATUN_PLUGINS="ON"
 
 cd_builddir_fn
