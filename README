@@ -60,6 +60,7 @@ Cross compiling for RPi3
 There is a work-in-progress for cross compiling TDE for the Raspberry Pi3 based on these scripts - see the html page in the gh-pages branch:
 
 git clone https://github.com/Ray-V/tde-slackbuilds.git
+cd tde-slackbuilds
 git checkout gh-pages
 
 or @ https://ray-v.github.io/tde-slackbuilds/cross-compiling-TDE-for-the-RPi3.html
