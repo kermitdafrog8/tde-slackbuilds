@@ -1,11 +1,9 @@
-Build TDE [Trinity Desktop Environment] for Slackware 14.2 or current on i586+, x86_64, or Raspberry Pi3 [see README-Raspberry-Pi3.md].
+Build TDE [Trinity Desktop Environment] for Slackware 14.2 or current on i586+, x86_64, or Raspberry Pi3 [see README-Raspberry-Pi3.md or 'Cross compiling for RPi3'].
 
 Run ./BUILD-TDE.sh - a dialog based script with a series of screens for user input. Build the release versions R14.0.4/5 from tar archives or the development version from trinitydesktop cgit.
 
-The default is to install the built packages which is necessary initially for the required packages and for some interdependencies [example tdesdk requires tdepim] -> run 'INST=0 ./BUILD-TDE.sh' to build only.
-
-NEW:
-There is a work-in-progress for cross compiling TDE for the Raspberry Pi3 based on these scripts - see the html page in the gh-pages branch or @ https://ray-v.github.io/tde-slackbuilds/cross-compiling-TDE-for-the-RPi3.html
+The default is to install the built packages - which is necessary initially for the required packages and for some interdependencies [example tdesdk requires tdepim].
+Run 'INST=0 ./BUILD-TDE.sh' to build only.
 
 =============================================================
 
@@ -41,25 +39,47 @@ Required packages for a basic working TDE are:
 
 i18n support [locale and html/help docs] in the packages is restricted to whatever is selected in BUILD-TDE.sh and, of that, to whatever is available in the package source.
 
-TDM may need some manual setting up - see Core/tdebase/README, which can also be viewed while running BUILD-TDE.sh if tdebase is selected.
-
 See https://wiki.trinitydesktop.org/How_to_Build_TDE_Core_Modules for more information
 
 =========================================================
+
 Building the development version from git sources
 
 The individual TDE apps can be cloned from Trinity git, so the build is set up to do that - except for individual language packs of tde-i18n. The whole tde-i18n download is ~1x10^6 bytes, so to reduce that, wget is used to download individual tde-i18n-$lang packs as they are not git repositories.
 
-Once any git repository has been cloned, further downloads are updates only[1].
+Once any git repository has been cloned, further downloads are updates only[2].
 
 This gives the best options - only fetching what is needed, and incremental updates.
 
 The git repositories are cloned to 'src/cgit'
 
+=============================================================
 
-KNOWN-ISSUES
-[1] The i18n downloads with wget can't be updated because cgit produces 'current time' timestamps. The consequence is that if tde-i18n-$lang is a part of the build after its initial download, it will be downloaded again. As the latest update was a year ago, once built, there will probably be no need to do so again and so tde-i18n for a particular language will probably only be run once. On that basis I don't see this being a significant issue.
+Cross compiling for RPi3
 
-[2] If Slackware's KDE is installed as well as TDE, there might be an issue with TDE launching the KDE4 Konsole and attempting to use it's ark. To fix, adjust the PATH so that the TDE directories come before /usr/share/bin.
+There is a work-in-progress for cross compiling TDE for the Raspberry Pi3 based on these scripts - see the html page in the gh-pages branch:
 
-[3] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.
+git clone https://github.com/Ray-V/tde-slackbuilds.git
+git checkout gh-pages
+
+or @ https://ray-v.github.io/tde-slackbuilds/cross-compiling-TDE-for-the-RPi3.html
+
+Includes:
+* Setting parameters for a 32-bit hard float, or 64-bit aarch, build
+* Building a cross compiler toolchain based on gcc-8.3.0
+* Building a 64-bit kernel which can be used for the 32-bit system
+* Building qemu to run the TDE binaries built and used during compilation
+* The required TDE apps
+* and a few other TDE and non-TDE apps
+
+=============================================================
+
+Known issues
+
+[1] TDM may need some manual setting up - see Core/tdebase/README, which can also be viewed while running BUILD-TDE.sh if tdebase is selected.
+
+[2] The i18n downloads with wget can't be updated because cgit produces 'current time' timestamps. The consequence is that if tde-i18n-$lang is a part of the build after its initial download, it will be downloaded again. As the latest update was a year ago, once built, there will probably be no need to do so again and so tde-i18n for a particular language will probably only be run once. On that basis I don't see this being a significant issue.
+
+[3] If Slackware's KDE is installed as well as TDE, there might be an issue with TDE launching the KDE4 Konsole and attempting to use it's ark. To fix, adjust the PATH so that the TDE directories come before /usr/share/bin.
+
+[4] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.
