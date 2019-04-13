@@ -65,14 +65,35 @@ rm -rf $OUTPUT/{checkout,configure,make,install,error,makepkg,patch}-$PRGNAM.log
 # Where do we look for sources?
 SRCDIR=$(cd $(dirname $0); pwd)
 
-## if R14.0.? or misc, do this:
-[[ $TDEVERSION == R14.0.? || $TDEMIR_SUBDIR == misc ]] && \
+## if snapshot, need to change some variables:
+[[ $TDEVERSION == r14.0.6 && ! $TDEMIR_SUBDIR == misc ]] && \
+ARCHIVE_TYPE=tar.gz && \
+SRCURL=https://git.trinitydesktop.org/cgit/$PRGNAM/snapshot/$PRGNAM-$TDEVERSION.$ARCHIVE_TYPE && \
+(
+## download admin/cmake/libltdl/libtdevnc as prerequisites
+cd $SRCDIR/../../src/
+echo 'admin
+cmake
+libltdl
+libtdevnc' | while read line
+do
+[[ ! -s $line-$TDEVERSION.$ARCHIVE_TYPE && ! $line == libtdevnc ]] && \
+wget https://git.trinitydesktop.org/cgit/$line/snapshot/$line-$TDEVERSION.$ARCHIVE_TYPE
+[[ ! -s $line-r14.0.1.$ARCHIVE_TYPE && $line == libtdevnc ]] && \
+wget https://git.trinitydesktop.org/cgit/$line/snapshot/$line-r14.0.1.$ARCHIVE_TYPE
+done
+)
+
+## if [rR]14.0.? or misc, download archive:
+[[ $TDEVERSION == [rR]14.0.? || $TDEMIR_SUBDIR == misc ]] && \
 {
-[[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"} ]] && rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"} 2>/dev/null || true
+## check for and remove any zero byte archive files
+[[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"} ]] && \
+rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"} 2>/dev/null || true
 ln -sf $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"} $SRCDIR
 SOURCE=$SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"}
 # SRCURL for non-TDE archives, set in the SB, will override the Trinity default *tar.bz2 URL
-SRCURL=${SRCURL:-"http://$TDE_MIRROR/releases/$VERSION$TDEMIR_SUBDIR/$PRGNAM-$VERSION.tar.bz2"}
+SRCURL=${SRCURL:-"https://$TDE_MIRROR/releases/$VERSION$TDEMIR_SUBDIR/$PRGNAM-$VERSION.tar.bz2"}
 # Source file availability:
 if ! [ -f $SOURCE ]; then
   echo "Source '$(basename $SOURCE)' not available yet..."
@@ -204,12 +225,39 @@ umask 0022
 untar_fn ()
 {
 cd $TMP_BUILD/tmp-$PRGNAM
+##
+## [1] firstly test for R14 or misc ..
+##
 [[ $TDEVERSION == R14.0.? || $TDEMIR_SUBDIR == misc ]] && {
 ## unpack R14 or misc
 echo -e " unpacking $(basename $SOURCE) ... \n"
 tar -xf $SOURCE 
 [[ $TDEMIR_SUBDIR != misc ]] && cd ./$(echo $TDEMIR_SUBDIR | cut -d / -f 2) || true
 } || {
+##
+## [2] not R14 nor misc - is it r14 snapshot?
+##
+[[ $TDEVERSION == r14.0.? ]] && {
+## unpack r14
+echo -e " unpacking $(basename $SOURCE) ... \n"
+tar -xf $SOURCE 
+## unpack all needed common sources ..
+(cd $PRGNAM-$TDEVERSION
+echo 'admin
+cmake
+libltdl
+libtdevnc' | while read line
+do
+[[ -d $line && ! $line == libtdevnc ]] && tar xf $SRCDIR/../../src/$line-$TDEVERSION.$ARCHIVE_TYPE --strip-components=1 -C $line
+[[ -d $line && $line == libtdevnc ]] && tar xf $SRCDIR/../../src/$line-r14.0.1.tar.gz --strip-components=1 -C $line
+done
+true # don't go on to [3] if this fails
+)
+}
+} || {
+##
+## [3] not [rR]14 nor misc, so must be cgit ..
+##
 ## copy git repo but don't copy .git directory:
 echo -e " copying $PRGNAM source files to build area ... \n"
 (cd $BUILD_TDE_ROOT/src/cgit
@@ -217,7 +265,12 @@ cp -a --parents $PRGNAM/* $TMP_BUILD/tmp-$PRGNAM/
 cp -a --parents {admin,cmake}/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
 [[ " arts tdelibs " == *$PRGNAM* ]] && cp -a --parents libltdl/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/ || true
 [[ " tdenetwork " == *$PRGNAM* ]] && cp -a --parents libtdevnc/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/ || true)
-} && cd $PRGNAM 2>/dev/null || cd $PRGNAM-$VERSION
+} && {
+##
+## [4] finally, cd into source directory
+##
+cd $PRGNAM*
+}
 [[ $TDEVERSION == R14.0.4 ]] && {
 ## patch to allow automake 1.16.x
 [[ -s admin/cvs.sh ]] && echo $'

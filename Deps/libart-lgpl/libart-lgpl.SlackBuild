@@ -27,7 +27,6 @@ PRGNAM=libart-lgpl
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
-PKGNAM=libart_lgpl
 
 source ../../get-source.sh
 getsource_fn
@@ -59,7 +58,6 @@ strip_fn
 
 mkdir_install_fn
 
-PRGNAM=$PKGNAM
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line

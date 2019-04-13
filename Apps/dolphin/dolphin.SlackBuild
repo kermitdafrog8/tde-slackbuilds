@@ -35,7 +35,7 @@ untar_fn
 
 listdocs_fn
 
-
+[[ $TDEVERSION == R14.0.[45] ]] && {
 ## Patches to edit/create CMakeLists.txt for documentation and locales support
 sed -i 's|src )|src )\nadd_subdirectory( po )\nadd_subdirectory( doc )|' CMakeLists.txt
 
@@ -74,7 +74,7 @@ else(NOT GETTEXT_MSGFMT_EXECUTABLE)
     endforeach(_poFile ${PO_FILES})
 endif(NOT GETTEXT_MSGFMT_EXECUTABLE)
 ' > po/CMakeLists.txt
-
+}
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 cd po

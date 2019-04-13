@@ -1,7 +1,8 @@
 Build TDE [Trinity Desktop Environment] for Slackware 14.2 or current on i586+, x86_64, or Raspberry Pi3 [see README-Raspberry-Pi3.md or 'Cross compiling for RPi3'].
 
-Run ./BUILD-TDE.sh - a dialog based script with a series of screens for user input. Build the release versions R14.0.4/5 from tar archives or the development version from trinitydesktop cgit.
+Build the release versions R14.0.4/5, or pre-release snapshot r14.0.6, from tar archives or the development version from trinitydesktop cgit.
 
+Run ./BUILD-TDE.sh - a dialog based script with a series of screens for user input.
 The default is to install the built packages - which is necessary initially for the required packages and for some interdependencies [example tdesdk requires tdepim].
 Run 'INST=0 ./BUILD-TDE.sh' to build only.
 
@@ -11,7 +12,7 @@ Any package, or set of packages, can be built by running BUILD-TDE.sh and select
 The TDE mandatory packages can be pre-selected.
 Some packages also require other packages to be pre-installed - see notes at the bottom of the dialog screen.
 
-The directory structure for the SlackBuild scripts is in line with the Trinity source repositories:
+The directory structure for the SlackBuild scripts is in line with the Trinity release source repositories:
 Deps [dependencies/]
 Core []
 Libs [libraries/]
@@ -24,7 +25,7 @@ src - to hold all the source tarballs, either pre-downloaded or downloaded durin
 Other scripts:
 get-source.sh - a chunk of common code for the SBs - used for getting the source archive, setting FLAGS, creating build directories.
 
-There is an override in the Misc SlackBuilds for non-trinity source archive URLs. Non-trinity builds have been included where a TDE package requires a dependency that is not in Slackware. Or, where it might be an alternative to a TDE package.
+There is an override in the Misc SlackBuilds for non-trinity source archive URLs. Non-trinity builds have been included where a TDE package requires a dependency that is not in Slackware, or where it's an alternative to a TDE package.
 
 Required packages for a basic working TDE are:
   Deps/tqt3
@@ -33,13 +34,19 @@ Required packages for a basic working TDE are:
   Deps/dbus-tqt
   Deps/dbus-1-tqt
   Deps/tqca-tls
-  Deps/libart_lgpl
+  Deps/libart-lgpl
   Core/tdelibs
   Core/tdebase
 
-i18n support [locale and html/help docs] in the packages is restricted to whatever is selected in BUILD-TDE.sh and, of that, to whatever is available in the package source.
+i18n support [locale and html/help docs] in the packages is restricted to whatever is selected in the BUILD-TDE.sh 'Select Additional Languages' screen and, of that, to whatever is available in any individual package source.
 
 See https://wiki.trinitydesktop.org/How_to_Build_TDE_Core_Modules for more information
+
+=========================================================
+
+Building a pre-release from snapshot sources
+
+This is similar to the build for a release version, but the sources are taken from the TDE cgit repository @ https://git.trinitydesktop.org/cgit/<package>.
 
 =========================================================
 

@@ -30,7 +30,7 @@ tqtinterface            4:26                   3:43                   2:11
 arts                    6:47                   6:07                   5:37
 dbus-tqt                  24                     26                     23
 dbus-1-tqt                51                     45                     40
-libart_lgpl               35                     35                     30
+libart-lgpl               35                     35                     30
 tqca-tls                  22                     21                     18
 tdelibs                52:12                  49:32                  42:59
 tdebase                54:47                  49:01                  44:02
