@@ -74,7 +74,7 @@ or @ https://ray-v.github.io/tde-slackbuilds/cross-compiling-TDE-for-the-RPi3.ht
 
 Includes:
 * Setting parameters for a 32-bit hard float, or 64-bit aarch, build
-* Building a cross compiler toolchain based on gcc-8.3.0
+* Building a cross compiler toolchain
 * Building a 64-bit kernel which can be used for the 32-bit system
 * Building qemu to run the TDE binaries built and used during compilation
 * The required TDE apps
