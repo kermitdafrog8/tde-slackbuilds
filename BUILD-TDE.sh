@@ -89,11 +89,10 @@ dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Version " --menu 
 Set the version of TDE to be built.
  
 " \
-14 75 4 \
-"R14.0.5" "the latest release from source archives" \
-"r14.0.6" "snapshot of the next release" \
-"cgit" "development source from Trinity git" \
-"R14.0.4" "the previous release" \
+14 75 3 \
+"14.0.6" "the R14.0.6 release - source from archives" \
+"cgit" "R14.1.0 development - source from Trinity git" \
+"r14.0.6" "snapshot" \
 2> $TMPVARS/TDEVERSION
 
 
@@ -572,7 +571,7 @@ If this is a first run, answer 'yes' - be patient, downloads from git are slowww
 
 For subsequent runs, 'yes' will update only.
 
-Local repositories are created/updated as for the single downloads for R14.0.4/5 builds.
+Local repositories are created/updated as for the single downloads for 14.0.6 builds.
 If the current build list includes new apps, and you don't want the existing repos updated, the new apps should be run as a new group initially as selective updating is not supported.
 
 Do you want to create or update the git repositories?

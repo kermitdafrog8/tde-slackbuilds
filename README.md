@@ -3,9 +3,10 @@
 
 ---
 ***Build TDE [Trinity Desktop Environment]***  
-for Slackware 14.2 or current on i586+, x86_64, or for Raspberry Pi3 [see [README-Raspberry-Pi3.md](./README-Raspberry-Pi3.md)], or cross compile for RPi3 armv7/aarch64 [see 'Cross compiling for RPi3'].
+for Slackware 14.2 or current on i586+ and x86_64.  
+Native building for Raspberry Pi3 [see [README-Raspberry-Pi3.md](./README-Raspberry-Pi3.md)] is now rather dated and cross compiling is preferred - see 'Cross compiling for RPi3' for armv7/aarch64 builds.
 
-Build the release versions R14.0.4/5, or pre-release snapshot r14.0.6, from tar archives; or the development version from trinitydesktop cgit.
+Build the release version R14.0.6 from tar archives; or the development version R14.1.0 from trinitydesktop cgit.
 
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input.  
 The default is to install the packages as they are built, which is necessary initially for the required packages and for some interdependencies [for example, tdesdk requires tdepim].  
@@ -14,6 +15,8 @@ Run **INST=0 ./BUILD-TDE.sh** to build only.
 Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.
 The TDE mandatory packages can be pre-selected.
 Notes at the bottom of the dialog screen have been added for information about dependencies for some packages.
+
+Source archives can be stored locally pre-build, or will be downloaded during the build from a geoIP located mirror site. Development [cgit] sources are downloaded, with the option to update, during the build.
 
 The directory structure for the SlackBuild scripts is in line with the Trinity release source repositories:  
 ```
@@ -52,11 +55,7 @@ See https://wiki.trinitydesktop.org/How_to_Build_TDE_Core_Modules for more infor
 
 ---
 
-***Building a pre-release from snapshot sources***
-
-This is similar to the build for a release version, but the sources are taken from the TDE cgit repository @ https://git.trinitydesktop.org/cgit/{package}.
-
----
+[<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png)
 
 ***Building the development version from git sources***
 
@@ -68,9 +67,16 @@ The git repositories are cloned to 'src/cgit'
 
 ---
 
+***Building a pre-release from snapshot sources***
+
+This option has been retained for updating any builds already based on these sources.  
+New builds should use the R14.0.6 archives.
+
+---
+
 ***Cross compiling for RPi3***
 
-There is a work-in-progress for cross compiling TDE for the Raspberry Pi3 based on these scripts - see the html page in the gh-pages branch:
+Cross compiling a number of packages for the Raspberry Pi3 based on these scripts is detailed in the html page in the gh-pages branch:
 ```
 git clone https://github.com/Ray-V/tde-slackbuilds.git  
 cd tde-slackbuilds  

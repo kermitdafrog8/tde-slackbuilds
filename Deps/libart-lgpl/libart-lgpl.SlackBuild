@@ -39,16 +39,31 @@ chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="$SLKLDFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-CFLAGS="$SLKCFLAGS" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+[[ $TDEVERSION == *14.0.6 ]] && {
+
+LDFLAGS=$SLKLDFLAGS \
+CXXFLAGS=$SLKCFLAGS \
+CFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
   --prefix=/usr \
-  --libdir=/usr/lib${LIBDIRSUFFIX} \
-  --disable-static \
-  --build=$ARCH-slackware-linux \
+  --libdir=/usr/lib$LIBDIRSUFFIX \
+  --disable-static
+
+} || {
+
+  cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    ..
+
+}
 
 make_fn
 

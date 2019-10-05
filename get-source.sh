@@ -68,7 +68,7 @@ SRCDIR=$(cd $(dirname $0); pwd)
 ## if snapshot, need to change some variables:
 [[ $TDEVERSION == r14.0.6 && ! $TDEMIR_SUBDIR == misc ]] && \
 ARCHIVE_TYPE=tar.gz && \
-SRCURL=https://git.trinitydesktop.org/cgit/$PRGNAM/snapshot/$PRGNAM-$TDEVERSION.$ARCHIVE_TYPE && \
+SRCURL=https://mirror.git.trinitydesktop.org/cgit/$PRGNAM/snapshot/$PRGNAM-$TDEVERSION.$ARCHIVE_TYPE && \
 (
 ## download admin/cmake/libltdl/libtdevnc as prerequisites
 cd $SRCDIR/../../src/
@@ -78,22 +78,22 @@ libltdl
 libtdevnc' | while read line
 do
 [[ ! -s $line-$TDEVERSION.$ARCHIVE_TYPE && ! $line == libtdevnc ]] && \
-wget https://git.trinitydesktop.org/cgit/$line/snapshot/$line-$TDEVERSION.$ARCHIVE_TYPE
+wget https://mirror.git.trinitydesktop.org/cgit/$line/snapshot/$line-$TDEVERSION.$ARCHIVE_TYPE
 [[ ! -s $line-r14.0.1.$ARCHIVE_TYPE && $line == libtdevnc ]] && \
-wget https://git.trinitydesktop.org/cgit/$line/snapshot/$line-r14.0.1.$ARCHIVE_TYPE
+wget https://mirror.git.trinitydesktop.org/cgit/$line/snapshot/$line-r14.0.1.$ARCHIVE_TYPE
 done
 )
 
-## if [rR]14.0.? or misc, download archive:
-[[ $TDEVERSION == [rR]14.0.? || $TDEMIR_SUBDIR == misc ]] && \
+## if [r]14.0.? or misc, download archive:
+[[ $TDEVERSION == *14.0.? || $TDEMIR_SUBDIR == misc ]] && \
 {
 ## check for and remove any zero byte archive files
-[[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"} ]] && \
-rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"} 2>/dev/null || true
-ln -sf $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"} $SRCDIR
-SOURCE=$SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.bz2"}
-# SRCURL for non-TDE archives, set in the SB, will override the Trinity default *tar.bz2 URL
-SRCURL=${SRCURL:-"https://$TDE_MIRROR/releases/$VERSION$TDEMIR_SUBDIR/$PRGNAM-$VERSION.tar.bz2"}
+[[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} ]] && \
+rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} 2>/dev/null || true
+ln -sf $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} $SRCDIR
+SOURCE=$SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"}
+# SRCURL for non-TDE archives, set in the SB, will override the Trinity default *tar.xz URL
+SRCURL=${SRCURL:-"https://$TDE_MIRROR/releases/R$VERSION/main$TDEMIR_SUBDIR/$PRGNAM-trinity-$VERSION.tar.xz"}
 # Source file availability:
 if ! [ -f $SOURCE ]; then
   echo "Source '$(basename $SOURCE)' not available yet..."
@@ -228,11 +228,11 @@ cd $TMP_BUILD/tmp-$PRGNAM
 ##
 ## [1] firstly test for R14 or misc ..
 ##
-[[ $TDEVERSION == R14.0.? || $TDEMIR_SUBDIR == misc ]] && {
+[[ $TDEVERSION == 14.0.? || $TDEMIR_SUBDIR == misc ]] && {
 ## unpack R14 or misc
 echo -e " unpacking $(basename $SOURCE) ... \n"
 tar -xf $SOURCE 
-[[ $TDEMIR_SUBDIR != misc ]] && cd ./$(echo $TDEMIR_SUBDIR | cut -d / -f 2) || true
+#[[ $TDEMIR_SUBDIR != misc ]] && cd ./$(echo $TDEMIR_SUBDIR | cut -d / -f 2) || true
 } || {
 ##
 ## [2] not R14 nor misc - is it r14 snapshot?
@@ -271,19 +271,6 @@ cp -a --parents {admin,cmake}/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
 ##
 cd $PRGNAM*
 }
-[[ $TDEVERSION == R14.0.4 ]] && {
-## patch to allow automake 1.16.x
-[[ -s admin/cvs.sh ]] && echo $'
---- admin/cvs.sh
-+++ admin/cvs.sh
-@@ -59 +59 @@
--  automake*1.6.* | automake*1.7* | automake*1.8* | automake*1.9* | automake*1.10* | automake*1.11* | automake*1.12* | automake*1.13* | automake*1.14* | automake*1.15* )
-+  automake*1.6.* | automake*1.[7-9]* | automake*1.1[0-6]* )
-' | while read line
-do
-patch -p0
-done
-} || true # avoid exit 1 if patch n/a
 }
 
 listdocs_fn ()

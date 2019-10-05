@@ -30,6 +30,8 @@ BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
 SRCURL="https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${PRGNAM}/${PRGNAM}-${VERSION}.tar.bz2"
+ARCHIVE_TYPE="tar.bz2"
+
 source ../../get-source.sh
 getsource_fn
 

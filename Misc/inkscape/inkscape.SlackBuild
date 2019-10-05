@@ -28,6 +28,8 @@ VERSION=${VERSION:-0.92.3}
 BUILD=${BUILD:-1}
 
 SRCURL="https://media.inkscape.org/dl/resources/file/inkscape-$VERSION.tar.bz2"
+ARCHIVE_TYPE="tar.bz2"
+
 source ../../get-source.sh
 getsource_fn
 
