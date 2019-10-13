@@ -571,7 +571,7 @@ If this is a first run, answer 'yes' - be patient, downloads from git are slowww
 
 For subsequent runs, 'yes' will update only.
 
-Local repositories are created/updated as for the single downloads for 14.0.6 builds.
+Local repositories are created/updated as each package is built.
 If the current build list includes new apps, and you don't want the existing repos updated, the new apps should be run as a new group initially as selective updating is not supported.
 
 Do you want to create or update the git repositories?

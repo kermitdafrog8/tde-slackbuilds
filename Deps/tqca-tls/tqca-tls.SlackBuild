@@ -41,11 +41,12 @@ chown_fn
 
 # This configure script doesn't accept crap for arguments see ./configure --help to verify
 [[ ! -d /usr/include/tqt ]] && sed -i "s|/usr/include/tqt|$INSTALL_TDE/include/tqt|g" configure || true
+unset CT && [[ $TDEVERSION == cgit ]] && CT=t
 LDFLAGS=$SLKLDFLAGS \
 CXXFLAGS=$SLKCFLAGS \
 CFLAGS=$SLKCFLAGS \
 ./configure  \
---qtdir=$TQTDIR-$VERSION
+--${CT:-}qtdir=$TQTDIR-$VERSION
 
 ## configure uses the installed tqt for it's flags - if this is a re-build of this package only,
 ## it may pick up the wrong march/mtune flags, or none at all - use SET_march as set up in BUILD-TDE.sh
