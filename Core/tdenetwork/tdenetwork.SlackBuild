@@ -47,7 +47,7 @@ cd_builddir_fn
 ## GADU & MEANWHILE require libgadu and meanwhile installed.
   cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
@@ -80,7 +80,6 @@ cd_builddir_fn
     -DBUILD_KOPETE="ON" \
     -DBUILD_KOPETE_PROTOCOL_TESTBED="ON" \
     -DBUILD_KOPETE_PROTOCOL_GROUPWISE="ON" \
-    -DBUILD_KOPETE_PROTOCOL_MSN="ON" \
     -DBUILD_KOPETE_PROTOCOL_IRC="ON" \
     -DBUILD_KOPETE_PROTOCOL_OSCAR="ON" \
     -DBUILD_KOPETE_PROTOCOL_YAHOO="ON" \
@@ -115,7 +114,7 @@ cd_builddir_fn
 ##    rfbScreenInfoPtr d;
 ##    ^~~~~~~~~~~~~~~~
 ## It doesn't have any use here, so unset it
-## TODO: What in $TQTDIR/include is causing this error
+## and add $TQT_INCLUDE_PATH to CMAKE_CXX_FLAGS for subsequent ntqglobal.h not found error
 export CPLUS_INCLUDE_PATH=""
 
 make_fn

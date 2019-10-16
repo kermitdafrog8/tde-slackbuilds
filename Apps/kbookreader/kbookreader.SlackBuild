@@ -35,21 +35,52 @@ untar_fn
 
 listdocs_fn
 
+# set support for additional language(s) as per I18N variable
+# but only for languages available with this package
+[[ $TDEVERSION == cgit ]] && {
+langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
+## output list of available locales ...
+(cd po
+ls -1 *.po | while read line
+do
+## ... and compare to selected locales & remove those not required
+[[ $langs != *$line* ]] && rm -rf $line
+:
+done)
+[[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs|sed "s|.po||g")
+}
+
 chown_fn
 
-ltoolupdate_fn
+[[ $TDEVERSION == *14.0.6 ]] && ltoolupdate_fn
 
 cd_builddir_fn
 
-LDFLAGS="$SLKLDFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-CFLAGS="$SLKCFLAGS" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+[[ $TDEVERSION == *14.0.6 ]] && {
+
+LDFLAGS=$SLKLDFLAGS \
+CXXFLAGS=$SLKCFLAGS \
+CFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
-  --prefix=${INSTALL_TDE} \
-  --libdir=${INSTALL_TDE}/lib${LIBDIRSUFFIX} \
-  --build=$ARCH-slackware-linux
+  --prefix=$INSTALL_TDE \
+  --libdir=$INSTALL_TDE/lib$LIBDIRSUFFIX
+
+} || {
+
+  cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
+    ..
+
+}
 
 make_fn
 
@@ -67,18 +98,19 @@ echo "
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
 
-           |-----handy-ruler------------------------------------------------------|
-kbookreader: kbookreader (book reader)
-kbookreader:
-kbookreader: kbookreader
-kbookreader:
-kbookreader:
-kbookreader:
-kbookreader:
-kbookreader:
-kbookreader:
-kbookreader:
-kbookreader: Home: https://www.trinitydesktop.org/ 
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: $PRGNAM (book reader)
+$PRGNAM:
+$PRGNAM: $PRGNAM
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM:
+$PRGNAM: en ${langs:-}
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: Home: https://www.trinitydesktop.org/ 
 
 " > $PKG/install/slack-desc
 
