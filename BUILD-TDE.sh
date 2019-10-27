@@ -273,7 +273,7 @@ dialog --cr-wrap --defaultno --yes-label "Continue" --no-label "Stop" --no-shado
 "
 Do you want the build to \Zr\Z4\ZbStop\Zn at a failure or <\Z1C\Zb\Z0ontinue\Zn> to the next SlackBuild?
 
-Build logs are $TMP/'program'-build-log, and configure/cmake error logs will be in $TMP/build/tmp-'program'.
+Build logs are $TMP/'program'-*-build-log, and configure/cmake error logs will be in $TMP/build/tmp-'program'.
 
 A practical build method could be:
 
@@ -412,6 +412,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/kdbg" "GUI for gdb using TDE" off "\Zb\Z6   \Zn" \
 "Apps/kdbusnotification" "A DBUS notification to TDE interface" off "\Zb\Z6   \Zn" \
 "Apps/kile" "A TEX and LATEX source editor and shell" off "\Zb\Z6   \Zn" \
+"Apps/kkbswitch" "A keyboard layout indicator" off "\Zb\Z6   \Zn" \
 "Apps/knemo" "The TDE Network Monitor" off "\Zb\Z6   \Zn" \
 "Apps/knetstats" "A network monitor that shows rx/tx LEDs" off "\Zb\Z6   \Zn" \
 "Apps/knights" "A graphical chess interface" off "\Zb\Z6   \Zn" \
@@ -750,11 +751,11 @@ do
   build=$(cat $package.SlackBuild | grep "BUILD:" | cut -d "-" -f2 | rev | cut -c 2- | rev)
 
   # The real build starts here
-  script -c "sh $package.SlackBuild" $TMP/$package-build-log || ${EXIT_FAIL:-"true"}
+  script -c "sh $package.SlackBuild" $TMP/$package-$TDEVERSION-$ARCH-build-log || ${EXIT_FAIL:-"true"}
 
 # remove colorizing escape sequences from build-log
 # Re: http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
-  sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$package-build-log || ${EXIT_FAIL:-"true"}
+  sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$package-$TDEVERSION-$ARCH-build-log || ${EXIT_FAIL:-"true"}
 
 checkinstall ()
 {
@@ -774,7 +775,7 @@ sed -i "s|$dir ||" $TMPVARS/TDEbuilds || \
 {
 echo "
       Error:  $package package build failed
-      Check the build log $TMP/$package-build-log
+      Check the build log $TMP/$package-$TDEVERSION-$ARCH-build-log
       "
 ## if koffice was building with libpng14, restore the libpng16 headers for any following builds
 [[ ${USE_PNG14:-} == yes ]] && source $BUILD_TDE_ROOT/get-source.sh && libpng16_fn || true

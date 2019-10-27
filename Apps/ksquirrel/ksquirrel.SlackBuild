@@ -55,15 +55,15 @@ chown_fn
 
 #cd_builddir_fn - don't use
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ./configure \
-   --prefix=${INSTALL_TDE} \
+   --prefix=$INSTALL_TDE \
    --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
+   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 
@@ -87,7 +87,7 @@ echo "
          |-----handy-ruler------------------------------------------------------|
 ksquirrel: KSquirrel is an image viewer for TDE.
 ksquirrel:
-ksquirrel: Image decoding is based on it's own decoders (ksquirrel-libs)
+ksquirrel: Image decoding is based on its own decoders (ksquirrel-libs)
 ksquirrel:
 ksquirrel: With OpenGL and KIPI support.
 ksquirrel:

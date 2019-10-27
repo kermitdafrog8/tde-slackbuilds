@@ -23,7 +23,7 @@
 #   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 #   SUCH DAMAGE.
 
-PRGNAM=knemo
+PRGNAM=kkbswitch
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -33,28 +33,19 @@ getsource_fn
 
 untar_fn
 
-# rename knemo icons to avoid conflict with those in tdeartwork
-rename network_ knemo_network_ src/knemod/pics/*png
-sed -i -e 's|network_|knemo_network_|g' src/{knemod/interfaceicon,kcm/configdialog}.cpp
-# widen text area in Tooltips box to avoid text wrapping
-sed -i 's|<tr><td>|<tr><td width=70%>|g' src/knemod/interfacetooltip.cpp
-# patch
-sed -i 's|Default Gateway" ), LINK_QUALITY|Default Gateway" ), GATEWAY|' src/knemod/interfacetooltip.cpp
-
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-[[ $TDEVERSION == cgit ]] && LANG_SUFF=/messages/kcm_knemo.po
-langs="";for Lang in $I18N;do [[ -d translations/$Lang ]] && langs="$langs $Lang${LANG_SUFF:-}";done
-## convoluted method to work around cmake 'add_custom_target' seeing duplicate files
-[[ $TDEVERSION == cgit ]] && LANG_SUFF=/messages/knemod.po && langs2="" && \
-for Lang in $I18N;do [[ -d translations/$Lang ]] && langs2="$langs2 $Lang${LANG_SUFF:-}";done && \
-langs="$langs $langs2" && \
-sed -i "s|\${po_files}|$langs|" translations/CMakeLists.txt && \
-langs=$(echo $langs2|sed "s|$LANG_SUFF||g") || \
-sed -i "s|SUBDIRS=.*$|SUBDIRS=$langs|" translations/Makefile.am
-[[ $langs != "" ]] && TRANS=ON
-
-[[ $TDEVERSION == *14.0.6 ]] && ltoolupdate_fn
+langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
+## output list of available locales ...
+(cd po
+ls -1 *.po | while read line
+do
+## ... and compare to selected locales & remove those not required
+[[ $langs != *$line* ]] && rm -rf $line
+:
+done)
+[[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs|sed "s|.po||g")
+[[ $langs == *ru* || $langs == *uk* ]] && RU_UA=ON
 
 listdocs_fn
 
@@ -62,23 +53,7 @@ chown_fn
 
 cd_builddir_fn
 
-[[ $TDEVERSION == *14.0.6 ]] && {
-
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
-   --disable-rpath \
-   --enable-closure
-
-} || {
-
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_COMPILER=$COMPILER \
@@ -87,10 +62,9 @@ CXX=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
+    -DWITH_RU_UA_LAYOUT=${RU_UA:-OFF} \
     -DCMAKE_SKIP_RPATH=ON \
     ..
-
-}
 
 make_fn
 
@@ -108,19 +82,18 @@ echo "
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
 
-     |-----handy-ruler------------------------------------------------------|
-knemo: knemo (The TDE Network Monitor) offers a network monitor similar to
-knemo: the one found in that other operating system.  Supports Ethernet
-knemo: (including wireless) and PPP connections, showing both incoming and
-knemo: outgoing traffic. For every network interface it displays an icon in
-knemo: the Panel.
-knemo:
-knemo: With language support for:
-knemo: en $langs
-knemo:
-knemo: IMPORTANT: KNemo has to be started using
-knemo: Trinity Control Center|Internet & Network|Network Monitor.
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: KKBSwitch is a keyboard layout indicator which displays an icon in
+$PRGNAM: the system tray that indicates which layout is currently active.
+$PRGNAM:
+$PRGNAM: Switch keyboard groups by clicking the icon or selecting the desired
+$PRGNAM: group from the icon's menu
+$PRGNAM: Toggle between the two most recently used groups.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: en $langs
+$PRGNAM:
 " > $PKG/install/slack-desc
-
 
 makepkg_fn

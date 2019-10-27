@@ -35,19 +35,20 @@ untar_fn
 
 listdocs_fn
 
-ltoolupdate_fn
-
 chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
-../configure \
-   --prefix=${INSTALL_TDE}
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DCMAKE_SKIP_RPATH=ON \
+    ..
 
 make_fn
 

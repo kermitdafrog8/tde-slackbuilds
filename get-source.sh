@@ -90,6 +90,12 @@ done
 ## check for and remove any zero byte archive files
 [[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} ]] && \
 rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} 2>/dev/null || true
+## R14.0.6 archive names include -trinity.
+## To maintain compatibility with the previous naming convention,
+## rename any pre-downloaded R14.0.6 archives
+[[ $TDEVERSION == 14.0.6 ]] && [[ -s $SRCDIR/../../src/$PRGNAM-trinity-$VERSION.tar.xz ]] && \
+mv $SRCDIR/../../src/$PRGNAM-trinity-$VERSION.tar.xz $SRCDIR/../../src/$PRGNAM-$VERSION.tar.xz
+
 ln -sf $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} $SRCDIR
 SOURCE=$SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"}
 # SRCURL for non-TDE archives, set in the SB, will override the Trinity default *tar.xz URL
@@ -195,6 +201,8 @@ true # stop the following i18n download (attempts) if this routine fails and i18
 for lang in $I18N
 do
 cd tdei18n
+## remove the previous repo to avoid build failures caused by any unused old files
+rm -rf cgit/tde-i18n/plain/tde-i18n-$lang
 wget -m --no-parent --no-host-directories https://mirror.git.trinitydesktop.org/cgit/tde-i18n/plain/tde-i18n-$lang/
 ##will download the tde-i18n-$lang files to:
 ##$BUILD_TDE_ROOT/src/cgit/tdei18n/cgit/tde-i18n/plain/tde-i18n-$lang/*
@@ -310,7 +318,7 @@ installdocs_fn ()
 {
 [[ $TDEMIR_SUBDIR == misc || $PRGNAM == libart-lgpl ]] && INSTALL_TDE=/usr
 mkdir -p $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
-(cd $DOCDIR;cp -a --parents ${DOCS:-} $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION) || true
+(cd ${DOCDIR:-};cp -a --parents ${DOCS:-} $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION) || true # DOCDIR might not exist
 cat $SRCDIR/$(basename $0) > $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 chown -R root:root $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
 find $PKG$INSTALL_TDE/doc -type f -exec chmod 644 {} \;

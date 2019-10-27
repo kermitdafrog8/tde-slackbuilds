@@ -35,10 +35,11 @@ untar_fn
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -d translations/$Lang ]] && langs="$langs $Lang";done
-sed -i "s|SUBDIRS=.*$|SUBDIRS=$langs|" translations/Makefile.am
-
-ltoolupdate_fn
+LANG_SUFF=/messages/$PRGNAM.po
+langs="";for Lang in $I18N;do [[ -d translations/$Lang ]] && langs="$langs $Lang${LANG_SUFF:-}";done
+sed -i "s|\${po_files}|$langs|" translations/CMakeLists.txt && \
+langs=$(echo $langs|sed "s|$LANG_SUFF||g")
+[[ $langs != "" ]] && TRANS=ON
 
 listdocs_fn
 
@@ -46,17 +47,17 @@ chown_fn
 
 cd_builddir_fn
 
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
-   --disable-rpath \
-   --enable-closure
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
+    -DCMAKE_SKIP_RPATH=ON \
+    ..
 
 make_fn
 
@@ -82,7 +83,7 @@ knetstats:
 knetstats:
 knetstats:
 knetstats: With language support for:
-knetstats: en$langs
+knetstats: en $langs
 knetstats:
 knetstats:
 knetstats:
