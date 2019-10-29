@@ -147,8 +147,8 @@ git checkout -- *
 git pull)
 
 ## if admin and cmake don't exist, clone them
-[[ ! -d admin ]] && git clone https://mirror.git.trinitydesktop.org/cgit/tde-common-admin admin
-[[ ! -d cmake ]] && git clone https://mirror.git.trinitydesktop.org/cgit/tde-common-cmake cmake
+[[ ! -d admin ]] && git clone https://mirror.git.trinitydesktop.org/cgit/admin admin
+[[ ! -d cmake ]] && git clone https://mirror.git.trinitydesktop.org/cgit/cmake cmake
 
 ## place a marker so that admin/cmake update or clone only once per run of BUILD-TDE.sh
 touch $TMPVARS/admin-cmake-done

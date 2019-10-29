@@ -35,11 +35,13 @@ untar_fn
 
 listdocs_fn
 
-ltoolupdate_fn
+[[ $TDEVERSION == *14.0.6 ]] && ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
+
+[[ $TDEVERSION == *14.0.6 ]] && {
 
 LDFLAGS=$SLKLDFLAGS \
 CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
@@ -47,9 +49,19 @@ CXXFLAGS=$SLKCFLAGS \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=$INSTALL_TDE \
-   --disable-debug \
-   --build=$ARCH-slackware-linux
+   --prefix=$INSTALL_TDE
+
+} || {
+
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    ..
+
+}
 
 make_fn
 
@@ -59,8 +71,8 @@ strip_fn
 
 # Add desktop file
 mkdir -p $PKG/$INSTALL_TDE/share/applications
-cp -a $SRCDIR/kdbusnotification-autostart.desktop \
-$PKG/$INSTALL_TDE/share/applications/kdbusnotification-autostart.desktop
+(cd $PKG/$INSTALL_TDE/share/applications
+ln -s ../autostart/kdbusnotification-autostart.desktop .)
 
 mkdir_install_fn
 

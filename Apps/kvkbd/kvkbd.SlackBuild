@@ -35,23 +35,17 @@ untar_fn
 
 listdocs_fn
 
-ltoolupdate_fn
-
 chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
-../configure \
-   --prefix=${INSTALL_TDE} \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
-   --disable-debug \
-   --build=$ARCH-slackware-linux
+cmake \
+    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    ..
 
 make_fn
 
@@ -72,14 +66,14 @@ echo "
 $PRGNAM: $PRGNAM (A virtual keyboard for TDE)
 $PRGNAM:
 $PRGNAM: A virtual keyboard for TDE
-$PRGNAM: 
-$PRGNAM: loginhelper: Stand alone version for use with TDM or XDM.
-$PRGNAM: You should Add : HOME=/root kvkbd --loginhelper & 
-$PRGNAM: to Xsetup to run in xdm/tdm  
 $PRGNAM:
-$PRGNAM:  Taken from main.cpp ^^^^^^
+$PRGNAM: Re: kvkbd --help
+$PRGNAM: loginhelper   Stand alone version for use with TDM or XDM.
+$PRGNAM:               You should Add : HOME=/root kvkbd --loginhelper &
+$PRGNAM:               to Xsetup to run in xdm/tdm
 $PRGNAM:
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
 $PRGNAM: Home: https://www.trinitydesktop.org/index.php
 " > $PKG/install/slack-desc
 
