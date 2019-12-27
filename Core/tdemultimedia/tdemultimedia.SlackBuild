@@ -28,71 +28,93 @@ VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
-# This is one of the builds that Trinity 'How to Build' advises may not build if greater than -j1
-# if so, set NUMJOBS="-j1"
-NUMJOBS=$NUMJOBS
-# cmake only builds 'kmix' - comment out to use cmake
-# otherwise using automake/configure to be able to build all options
-USECMAKE="no"
-
 source ../../get-source.sh
 getsource_fn
 
 untar_fn
 
-## patch for building with clang
-echo $'
---- noatun/library/noatunarts/StereoVolumeControl_impl.cpp
-+++ noatun/library/noatunarts/StereoVolumeControl_impl.cpp
-@@ -74,1 +74,1 @@
--	void calculateBlock(unsigned long samples)
-+	void calculateBlock(unsigned long samples) __attribute__((noinline))
-' | while read line
-do
-patch -p0
-done
-
 listdocs_fn
 
-chown_fn
+## There are issues building with cmake - see README
+USE_CMAKE_MM=${USE_CMAKE_MM:-no}
 
-if [ ! "${USECMAKE:-}" == "no" ]
-then
-# Ummm...so this just builds kmix....? lmao
-cd_builddir_fn
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=${INSTALL_TDE}/man \
-    -DBUILD_ALL="ON" \
-    ..
-else
+[[ $USE_CMAKE_MM == no ]] && {
+
 ltoolupdate_fn
+
+chown_fn
 
 cd_builddir_fn
 
 # change hard-coded tqt headers directory:
 [[ ! -d /usr/include/tqt ]] && sed -i "s|/usr/include/tqt|${INSTALL_TDE}/include/tqt|g" ../configure
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=${INSTALL_TDE} \
+   --prefix=$INSTALL_TDE \
    --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
+   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --disable-debug \
    --enable-closure
-fi
+
+} || {
+
+chown_fn
+
+cd_builddir_fn
+
+## akode is required for ARTS_AKODE
+AKODE=OFF && [[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && AKODE=ON
+## JUK requires musicbrainz and akode - ** to be completed for musicbrainz test **
+JUK=OFF && [[ $AKODE == ON ]] && :
+
+cmake \
+    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DWITH_ALSA="ON" \
+    -DWITH_ARTS_AKODE="$AKODE" \
+    -DWITH_ARTS_AUDIOFILE="ON" \
+    -DWITH_ARTS_MPEGLIB="ON" \
+    -DWITH_ARTS_XINE="ON" \
+    -DWITH_CDPARANOIA="ON" \
+    -DWITH_FLAC="ON" \
+    -DWITH_GSTREAMER="ON" \
+    -DWITH_KSCD_CDDA="ON" \
+    -DWITH_LAME="ON" \
+    -DWITH_MUSICBRAINZ="ON" \
+    -DWITH_TAGLIB="ON" \
+    -DWITH_THEORA="ON" \
+    -DWITH_VORBIS="ON" \
+    -DBUILD_ARTS="ON" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_JUK="$JUK" \
+    -DBUILD_KABOODLE="ON" \
+    -DBUILD_KAPPFINDER_DATA="ON" \
+    -DBUILD_KAUDIOCREATOR="ON" \
+    -DBUILD_KMIX="ON" \
+    -DBUILD_KREC="ON" \
+    -DBUILD_KSCD="ON" \
+    -DBUILD_LIBKCDDB="ON" \
+    -DBUILD_MPEGLIB="ON" \
+    -DBUILD_NOATUN="ON" \
+    -DBUILD_TDEFILE_PLUGINS="ON" \
+    -DBUILD_TDEIOSLAVE="ON" \
+    -DBUILD_TDEMID="ON" \
+    ..
+
+}
 
 make_fn
 

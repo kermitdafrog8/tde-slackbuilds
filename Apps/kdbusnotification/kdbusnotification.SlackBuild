@@ -35,23 +35,9 @@ untar_fn
 
 listdocs_fn
 
-[[ $TDEVERSION == *14.0.6 ]] && ltoolupdate_fn
-
 chown_fn
 
 cd_builddir_fn
-
-[[ $TDEVERSION == *14.0.6 ]] && {
-
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE
-
-} || {
 
 cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
@@ -60,8 +46,6 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     ..
-
-}
 
 make_fn
 

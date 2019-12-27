@@ -43,18 +43,14 @@ sed -i 's|Default Gateway" ), LINK_QUALITY|Default Gateway" ), GATEWAY|' src/kne
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-[[ $TDEVERSION == cgit ]] && LANG_SUFF=/messages/kcm_knemo.po
-langs="";for Lang in $I18N;do [[ -d translations/$Lang ]] && langs="$langs $Lang${LANG_SUFF:-}";done
+langs="";for Lang in $I18N;do [[ -d translations/$Lang ]] && langs="$langs $Lang/messages/kcm_knemo.po";done
 ## convoluted method to work around cmake 'add_custom_target' seeing duplicate files
-[[ $TDEVERSION == cgit ]] && LANG_SUFF=/messages/knemod.po && langs2="" && \
-for Lang in $I18N;do [[ -d translations/$Lang ]] && langs2="$langs2 $Lang${LANG_SUFF:-}";done && \
+langs2="" && \
+for Lang in $I18N;do [[ -d translations/$Lang ]] && langs2="$langs2 $Lang/messages/knemod.po";done && \
 langs="$langs $langs2" && \
 sed -i "s|\${po_files}|$langs|" translations/CMakeLists.txt && \
-langs=$(echo $langs2|sed "s|$LANG_SUFF||g") || \
-sed -i "s|SUBDIRS=.*$|SUBDIRS=$langs|" translations/Makefile.am
+langs=$(echo $langs2|sed "s|/messages/knemod.po||g")
 [[ $langs != "" ]] && TRANS=ON
-
-[[ $TDEVERSION == *14.0.6 ]] && ltoolupdate_fn
 
 listdocs_fn
 
@@ -62,23 +58,7 @@ chown_fn
 
 cd_builddir_fn
 
-[[ $TDEVERSION == *14.0.6 ]] && {
-
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
-   --disable-rpath \
-   --enable-closure
-
-} || {
-
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_COMPILER=$COMPILER \
@@ -89,8 +69,6 @@ CXX=$COMPILER_CXX \
     -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
     -DCMAKE_SKIP_RPATH=ON \
     ..
-
-}
 
 make_fn
 

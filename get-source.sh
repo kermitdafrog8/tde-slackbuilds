@@ -90,11 +90,12 @@ done
 ## check for and remove any zero byte archive files
 [[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} ]] && \
 rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} 2>/dev/null || true
-## R14.0.6 archive names include -trinity.
+## R14.0.6+ archive names include -trinity.
 ## To maintain compatibility with the previous naming convention,
-## rename any pre-downloaded R14.0.6 archives
-[[ $TDEVERSION == 14.0.6 ]] && [[ -s $SRCDIR/../../src/$PRGNAM-trinity-$VERSION.tar.xz ]] && \
-mv $SRCDIR/../../src/$PRGNAM-trinity-$VERSION.tar.xz $SRCDIR/../../src/$PRGNAM-$VERSION.tar.xz
+## sym-link any pre-downloaded R14.0.6+ archives
+[[ $TDEVERSION == 14.0.[6-9] ]] && [[ -s $SRCDIR/../../src/$PRGNAM-trinity-$VERSION.tar.xz ]] && \
+(cd $SRCDIR/../../src/
+ln -sf $PRGNAM-trinity-$VERSION.tar.xz $PRGNAM-$VERSION.tar.xz)
 
 ln -sf $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} $SRCDIR
 SOURCE=$SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"}
@@ -126,7 +127,6 @@ if [ "$P1" == "--download" ]; then
   exit 0
 fi
 } || \
-
 {
 ## if not creating/updating git, nothing to do in this function for git builds
 ## otherwise, now not R14.0.? or misc, and we are creating/updating git, so [1] start with admin/cmake:
@@ -212,7 +212,6 @@ done
 }
 }
 
-
 # Set CFLAGS/CXXFLAGS and LIBDIRSUFFIX:
    { [[ $ARCH == x86_64 ]]  && SLKCFLAGS="-O2 -fPIC ${SET_march:-}" \
                                SLKLDFLAGS="-L$INSTALL_TDE/lib$LIBDIRSUFFIX -L/usr/lib64"; } \
@@ -239,8 +238,8 @@ cd $TMP_BUILD/tmp-$PRGNAM
 [[ $TDEVERSION == 14.0.? || $TDEMIR_SUBDIR == misc ]] && {
 ## unpack R14 or misc
 echo -e " unpacking $(basename $SOURCE) ... \n"
-tar -xf $SOURCE 
-#[[ $TDEMIR_SUBDIR != misc ]] && cd ./$(echo $TDEMIR_SUBDIR | cut -d / -f 2) || true
+tar -xf $SOURCE
+true # if this fails, go to [4] and let SlackBuild fail from there
 } || {
 ##
 ## [2] not R14 nor misc - is it r14 snapshot?
@@ -248,7 +247,7 @@ tar -xf $SOURCE
 [[ $TDEVERSION == r14.0.? ]] && {
 ## unpack r14
 echo -e " unpacking $(basename $SOURCE) ... \n"
-tar -xf $SOURCE 
+tar -xf $SOURCE
 ## unpack all needed common sources ..
 (cd $PRGNAM-$TDEVERSION
 echo 'admin
@@ -259,13 +258,12 @@ do
 [[ -d $line && ! $line == libtdevnc ]] && tar xf $SRCDIR/../../src/$line-$TDEVERSION.$ARCHIVE_TYPE --strip-components=1 -C $line
 [[ -d $line && $line == libtdevnc ]] && tar xf $SRCDIR/../../src/$line-r14.0.1.tar.gz --strip-components=1 -C $line
 done
-true # don't go on to [3] if this fails
+true # if this fails, go to [4] and let SlackBuild fail from there
 )
 }
 } || {
 ##
 ## [3] not [rR]14 nor misc, so must be cgit ..
-##
 ## copy git repo but don't copy .git directory:
 echo -e " copying $PRGNAM source files to build area ... \n"
 (cd $BUILD_TDE_ROOT/src/cgit
@@ -280,6 +278,7 @@ cp -a --parents {admin,cmake}/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
 cd $PRGNAM*
 }
 }
+
 
 listdocs_fn ()
 {

@@ -35,21 +35,80 @@ untar_fn
 
 listdocs_fn
 
+## There are issues building with cmake - see README
+USE_CMAKE_EDU=${USE_CMAKE_EDU:-no}
+
+[[ $USE_CMAKE_EDU == no ]] && {
+
+## include all keyboards for ktouch
+(cd ktouch/keyboards/
+sed -i '/keyboard_DATA/q' Makefile.am
+echo $(ls *keyboard) >> Makefile.am)
+
 ltoolupdate_fn
 
 chown_fn
 
-#cd_builddir_fn - do not use
-
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ./configure \
-   --prefix=${INSTALL_TDE} \
+   --prefix=$INSTALL_TDE \
    --disable-rpath \
    --enable-closure
+
+} || {
+
+chown_fn
+
+cd_builddir_fn
+
+## KALZIUM won't build without ocamlc
+KALZIUM=OFF
+
+cmake \
+    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DWITH_ALL_OPTIONS="OFF" \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_ARTS="ON" \
+    -DWITH_OCAML_SOLVER="ON" \
+    -DWITH_LIBUSB="ON" \
+    -DWITH_V4L="ON" \
+    -DBUILD_ALL="OFF" \
+    -DBUILD_BLINKEN="ON" \
+    -DBUILD_KALZIUM="$KALZIUM" \
+    -DBUILD_KANAGRAM="ON" \
+    -DBUILD_KBRUCH="ON" \
+    -DBUILD_KEDUCA="ON" \
+    -DBUILD_KGEOGRAPHY="ON" \
+    -DBUILD_KHANGMAN="ON" \
+    -DBUILD_KIG="ON" \
+    -DBUILD_KITEN="ON" \
+    -DBUILD_KLATIN="ON" \
+    -DBUILD_KLETTRES="ON" \
+    -DBUILD_KMPLOT="ON" \
+    -DBUILD_KPERCENTAGE="ON" \
+    -DBUILD_KSTARS="ON" \
+    -DBUILD_KTOUCH="ON" \
+    -DBUILD_KTURTLE="ON" \
+    -DBUILD_KVERBOS="ON" \
+    -DBUILD_KVOCTRAIN="ON" \
+    -DBUILD_KWORDQUIZ="ON" \
+    -DBUILD_DOC="ON" \
+    ..
+
+}
 
 make_fn
 
@@ -72,8 +131,8 @@ $PRGNAM:
 $PRGNAM: Many pieces of software for education.
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

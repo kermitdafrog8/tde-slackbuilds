@@ -23,8 +23,7 @@
 #   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 #   SUCH DAMAGE.
 
-PKGNAM=tdektorrent
-PRGNAM=ktorrent
+PRGNAM=akode
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -34,76 +33,65 @@ getsource_fn
 
 untar_fn
 
-listdocs_fn
-
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -e translations/$Lang ]] && langs="$langs $Lang";done
-sed -i "s|SUBDIRS=.*$|SUBDIRS=$langs|" translations/Makefile.am
-
-ltoolupdate_fn
+## edit headers locations for Slackware package - but see README
+sed -i 's|ffmpeg/avcodec.h|libavcodec/avcodec.h|' akode/plugins/ffmpeg_decoder/ffmpeg_decoder.cpp
+sed -i 's|ffmpeg/avformat.h|libavformat/avformat.h|' akode/plugins/ffmpeg_decoder/ffmpeg_decoder.cpp
+sed -i 's|ffmpeg/avio.h|libavformat/avio.h|' akode/plugins/ffmpeg_decoder/ffmpeg_decoder.cpp
 
 chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
-../configure \
-   --prefix=${INSTALL_TDE} \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
-   --disable-rpath \
-   --enable-torrent-mimetype \
-   --enable-closure
+## see README for cmake options
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_LIBLTDL="ON" \
+    -DWITH_ALSA_SINK="ON" \
+    -DWITH_JACK_SINK="OFF" \
+    -DWITH_PULSE_SINK="ON" \
+    -DWITH_OSS_SINK="OFF" \
+    -DWITH_SUN_SINK="OFF" \
+    -DWITH_FFMPEG_DECODER="OFF" \
+    -DWITH_MPC_DECODER="ON" \
+    -DWITH_MPEG_DECODER="ON" \
+    -DWITH_SRC_RESAMPLER="OFF" \
+    -DWITH_XIPH_DECODER="OFF" \
+    ..
 
 make_fn
-
-installdocs_fn
 
 strip_fn
 
 mkdir_install_fn
 
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-EOINS
-
-PRGNAM=$PKGNAM
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
-# up the first '|' above the ':' following the base package name, and the '|' on
-# the right side marks the last column you can put a character in.  You must make
-# exactly 11 lines for the formatting to be correct.  It's also customary to
-# leave one space after the ':'.
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (A TDE BitTorrent client)
-$PRGNAM:
-$PRGNAM: A BitTorrent client for TDE
+$PRGNAM: $PRGNAM - player and plugins for aRts music formats
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: With language support for:
 $PRGNAM:
-$PRGNAM: en$langs
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

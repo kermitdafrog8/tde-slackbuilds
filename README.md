@@ -6,14 +6,16 @@
 for Slackware 14.2 or current on i586+ and x86_64.  
 Native building for Raspberry Pi3 [see [README-Raspberry-Pi3.md](./README-Raspberry-Pi3.md)] is now rather dated and cross compiling is preferred - see 'Cross compiling for RPi3' for armv7/aarch64 builds.
 
-Build the release version R14.0.6 from tar archives; or the development version R14.1.0 from trinitydesktop cgit.
-
+Build the release version R14.0.7 from tar archives; or the development version R14.1.0 from trinitydesktop cgit.  
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input.  
+
+[<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png)
+
 The default is to install the packages as they are built, which is necessary initially for the required packages and for some interdependencies [for example, tdesdk requires tdepim].  
 Run **INST=0 ./BUILD-TDE.sh** to build only.
 
-Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.
-The TDE mandatory packages can be pre-selected.
+Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.  
+The TDE mandatory packages can be pre-selected.  
 Notes at the bottom of the dialog screen have been added for information about dependencies for some packages.
 
 Source archives can be stored locally pre-build, or will be downloaded during the build from a geoIP located mirror site. Development [cgit] sources are downloaded, with the option to update, during the build.
@@ -51,11 +53,11 @@ Core/tdebase
 ```
 i18n support [locale and html/help docs] in the packages is restricted to whatever is selected in the BUILD-TDE.sh 'Select Additional Languages' screen and, of that, to whatever is available in any individual package source.
 
-See https://wiki.trinitydesktop.org/How_to_Build_TDE_Core_Modules for more information
+There is an option in tde-i18n.SlackBuild to include a user created language specific patch file in the build.  
+It needs to be named tde-i18n-{lang}-patch and will then automatically be included for the build for that language.  
+Because of its position in the Slackbuild and the patch -p0 option, the path to the patched file must start with 'tde-i18n-{lang}' - see tde-i18n-en_GB-patch for an example.
 
 ---
-
-[<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png)
 
 ***Building the development version from git sources***
 
@@ -64,13 +66,6 @@ The individual TDE apps can be cloned from Trinity git, so the build is set up t
 Once any git repository has been cloned, further downloads are updates only[2], giving the best options - only fetching what is needed, and incremental updates.
 
 The git repositories are cloned to 'src/cgit'
-
----
-
-***Building a pre-release from snapshot sources***
-
-This option has been retained for updating any builds already based on these sources.  
-New builds should use the R14.0.6 archives.
 
 ---
 
@@ -86,12 +81,16 @@ git checkout gh-pages
 or @ https://ray-v.github.io/tde-slackbuilds/cross-compiling-TDE-for-the-RPi3.html
 
 Includes:
-* Setting parameters for a 32-bit [armv7] hard float, or 64-bit [aarch64], build
+* Setting parameters for a 32-bit [armv7 hard float], or 64-bit [aarch64], build
 * Building a cross compiler toolchain
 * Building a 64-bit kernel which can be used for the 32-bit system
 * Building qemu to run the TDE binaries built and used during compilation
 * The required TDE apps
-* ... and a few other TDE and non-TDE apps
+* ... and a few other TDE and non-TDE apps to provide a basic, but useful, TDE desktop.
+
+---
+
+See https://wiki.trinitydesktop.org/How_to_Build_TDE_Core_Modules for more information
 
 ---
 

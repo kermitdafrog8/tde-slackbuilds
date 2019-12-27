@@ -1,0 +1,25 @@
+There are issues building with cmake, so until they are resolved, the preference is an autotools build.
+If you DO want to build with cmake, run 'USE_CMAKE_EDU=yes ./BUILD-TDE.sh'
+kalzium won't build at all with cmake; it will with autotools, with limitations:
+
+Re: configure output:
+"""
+The Kalzium Chemical Equation Solver has been disabled. Possible reasons of that:
+
+* OCaml was not found. In order to have the Solver, you have to install OCaml. You can get OCaml from http://pauillac.inria.fr/ocaml/.
+
+* The FaCiLe module for OCaml was not found. In order to have the Solver, you have to install the FaCiLe module. You can get it from http://www.recherche.enac.fr/opti/facile/.
+
+
+Kig Python scripting support has been disabled, because you are missing the necessary headers and/or libraries.
+In order to use Kig Python scripting, you need to have Python installed, along with its development package ( e.g. libpython-dev ), and also the Boost.Python library, along with its development package ( e.g. libboost-python-dev ).
+
+Kig will continue to function without Python scripting support, but you will not be able to created Python scripted objects, or load Kig files that use them.
+
+Installing the libraries:
+The python development libraries themselves are almost certainly packaged by your favourite distribution.
+Look for a package name like libpython-dev, with possibly a version number inserted somewhere in the name..
+For the Boost.Python libs, check this documentation: "http://boost.org/more/download.html" and "http://boost.org/more/download.html#Installation"  or look for a package like libboost-python-dev or libboost-dev..
+
+"""
+ 

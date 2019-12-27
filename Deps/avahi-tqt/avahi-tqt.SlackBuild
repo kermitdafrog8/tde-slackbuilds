@@ -37,25 +37,19 @@ listdocs_fn
 
 chown_fn
 
-#cd_builddir_fn -do not use
+cd_builddir_fn
 
-# This has a CmakeList.txt so this can be converted to cmake at any time.
-LDFLAGS="$SLKLDFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-CFLAGS="$SLKCFLAGS" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
-./autogen.sh \
-  --prefix=${INSTALL_TDE} \
-  --libdir=${INSTALL_TDE}/lib${LIBDIRSUFFIX} \
-  --sysconfdir=$SYS_CNF_DIR \
-  --mandir=${INSTALL_TDE}/man \
-  --docdir=${INSTALL_TDE}/doc/$PRGNAM-$VERSION \
-  --with-distro=slackware \
-  --enable-introspection=auto \
-  --disable-static \
-  --enable-shared \
-  --build=$ARCH-slackware-linux \
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DWITH_GCC_VISIBILITY="OFF" \
+..
 
 make_fn
 

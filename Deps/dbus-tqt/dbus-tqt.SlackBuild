@@ -47,9 +47,8 @@ cd_builddir_fn
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
     -DLIB_SUFFIX=${LIBDIRSUFFIX} \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=${INSTALL_TDE}/man \
     ..
+
 make_fn
 
 installdocs_fn

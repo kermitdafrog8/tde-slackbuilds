@@ -35,39 +35,18 @@ untar_fn
 
 listdocs_fn
 
-[[ $TDEVERSION == *14.0.6 ]] && ltoolupdate_fn
-
 chown_fn
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-[[ $TDEVERSION == cgit ]] && LANG_SUFF=/$PRGNAM.po
-langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang${LANG_SUFF:-}";done
-[[ $TDEVERSION == cgit ]] && \
+langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang/$PRGNAM.po";done
 sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt && \
-langs=$(echo $langs|sed "s|$LANG_SUFF||g") || \
-sed -i "s|SUBDIRS =.*$|SUBDIRS =$langs|" po/Makefile.am
+langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
 [[ $langs != "" ]] && TRANS=ON
 
 cd_builddir_fn 
 
-[[ $TDEVERSION == *14.0.6 ]] && {
-
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
-   --disable-rpath \
-   --enable-closure
-
-} || {
-
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_COMPILER=$COMPILER \
@@ -78,8 +57,6 @@ CXX=$COMPILER_CXX \
     -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
     -DCMAKE_SKIP_RPATH=ON \
     ..
-
-}
 
 make_fn
 

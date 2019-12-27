@@ -40,20 +40,6 @@ listdocs_fn
 langs="";for Lang in $I18N;do [[ -e translations/$Lang ]] && langs="$langs $Lang";done
 sed -i "s|SUBDIRS=.*$|SUBDIRS=$langs|" translations/Makefile.am
 
-[[ $TDEVERSION == R14.0.4 ]] && {
-## patch for clang
-echo $'
---- src/kile/kileprojectview.h
-+++ src/kile/kileprojectview.h
-@@ -28 +28 @@
--class KileDocument::Info;
-+namespace KileDocument { class Info; }
-' | while read line
-do
-patch -p0
-done
-}
-
 ltoolupdate_fn
 
 chown_fn

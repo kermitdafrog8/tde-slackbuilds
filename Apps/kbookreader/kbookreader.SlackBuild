@@ -37,7 +37,6 @@ listdocs_fn
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-[[ $TDEVERSION == cgit ]] && {
 langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
 ## output list of available locales ...
 (cd po
@@ -48,28 +47,13 @@ do
 :
 done)
 [[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs|sed "s|.po||g")
-}
+
 
 chown_fn
 
-[[ $TDEVERSION == *14.0.6 ]] && ltoolupdate_fn
-
 cd_builddir_fn
 
-[[ $TDEVERSION == *14.0.6 ]] && {
-
-LDFLAGS=$SLKLDFLAGS \
-CXXFLAGS=$SLKCFLAGS \
-CFLAGS=$SLKCFLAGS \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-  --prefix=$INSTALL_TDE \
-  --libdir=$INSTALL_TDE/lib$LIBDIRSUFFIX
-
-} || {
-
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_COMPILER=$COMPILER \
@@ -79,8 +63,6 @@ CXX=$COMPILER_CXX \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
     ..
-
-}
 
 make_fn
 

@@ -89,10 +89,9 @@ dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Version " --menu 
 Set the version of TDE to be built.
  
 " \
-14 75 3 \
-"14.0.6" "the R14.0.6 release - source from archives" \
+12 75 2 \
+"14.0.7" "the R14.0.7 release - source from archives" \
 "cgit" "R14.1.0 development - source from Trinity git" \
-"r14.0.6" "snapshot" \
 2> $TMPVARS/TDEVERSION
 
 
@@ -362,7 +361,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Deps/libart-lgpl" "\Zb\Zr\Z4R\Zn The LGPL'd component of libart" ${SELECT:-off} "\Zb\Z6   \Zn" \
 "Deps/tqca-tls" "\Zb\Zr\Z4R\Zn Plugin to provide SSL/TLS capability" ${SELECT:-off} "\Zb\Z6   \Zn" \
 "Deps/avahi-tqt" "Avahi support" off "\Zb\Z6 Requires Avahi. Optional for tdelibs and used by default if installed. \Zn" \
-"Core/tdelibs" "\Zb\Zr\Z4R\Zn TDE libraries" ${SELECT:-off} "\Zb\Z6   \Zn" \
+"Core/tdelibs" "\Zb\Zr\Z4R\Zn TDE libraries" ${SELECT:-off} "\Zb\Z6 Will build with Avahi support if avahi/avahi-tqt are installed. \Zn" \
 "Core/tdebase" "\Zb\Zr\Z4R\Zn TDE base" ${SELECT:-off} "\Zb\Z6   \Zn" \
 "Core/tde-i18n" "Additional language support for TDE" off "\Zb\Z6 Required when \Zb\Z3Additional language support\Zb\Z6 has been selected \Zn" \
 "Core/tdeaccessibility" "Accessibility programs" off "\Zb\Z6  \Zn" \
@@ -372,6 +371,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Core/tdegames" "Games for TDE - atlantik, kasteroids, katomic, etc." off "\Zb\Z6   \Zn" \
 " Misc/imlib" "An image loading and rendering library" off "\Zb\Z6 Build-time option for tdegraphics - needed for kuickshow \Zn" \
 "Core/tdegraphics" "Misc graphics apps" off "\Zb\Z6   \Zn" \
+"Deps/akode" "A player and plugins for aRts music formats" off "\Zb\Z6 For tdemultimedia - aRts-plugin and Juk \Zn" \
 "Core/tdemultimedia" "Multimedia packages for TDE" off "\Zb\Z6   \Zn" \
 " Misc/speex" "Audio compression format designed for speech" off "\Zb\Z6 Buildtime option for tdenetwork and amarok. Requires l/speexdsp  \Zn" \
 "Core/tdenetwork" "Networking applications for TDE" off "\Zb\Z6 Optional build-time dependency - speex \Zn" \
@@ -751,11 +751,11 @@ do
   build=$(cat $package.SlackBuild | grep "BUILD:" | cut -d "-" -f2 | rev | cut -c 2- | rev)
 
   # The real build starts here
-  script -c "sh $package.SlackBuild" $TMP/$package-$TDEVERSION-$ARCH-build-log || ${EXIT_FAIL:-"true"}
+  script -c "sh $package.SlackBuild" $TMP/$package-$TDEVERSION-$ARCH-$build-build-log || ${EXIT_FAIL:-"true"}
 
 # remove colorizing escape sequences from build-log
 # Re: http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
-  sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$package-$TDEVERSION-$ARCH-build-log || ${EXIT_FAIL:-"true"}
+  sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$package-$TDEVERSION-$ARCH-$build-build-log || ${EXIT_FAIL:-"true"}
 
 checkinstall ()
 {
@@ -775,7 +775,7 @@ sed -i "s|$dir ||" $TMPVARS/TDEbuilds || \
 {
 echo "
       Error:  $package package build failed
-      Check the build log $TMP/$package-$TDEVERSION-$ARCH-build-log
+      Check the build log $TMP/$package-$TDEVERSION-$ARCH-$build-build-log
       "
 ## if koffice was building with libpng14, restore the libpng16 headers for any following builds
 [[ ${USE_PNG14:-} == yes ]] && source $BUILD_TDE_ROOT/get-source.sh && libpng16_fn || true
