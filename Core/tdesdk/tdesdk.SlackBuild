@@ -32,28 +32,50 @@ source ../../get-source.sh
 getsource_fn
 
 untar_fn
+
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
+
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=${INSTALL_TDE}/man \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_DBSEARCHENGINE="ON" \
     -DWITH_KCAL="ON" \
-    -DBUILD_ALL="ON" \
+    -DBUILD_CERVISIA="ON" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_KAPPTEMPLATE="ON" \
+    -DBUILD_KBABEL="ON" \
+    -DBUILD_KBUGBUSTER="ON" \
+    -DBUILD_KDEACCOUNTS_PLUGIN="ON" \
+    -DBUILD_KMTRACE="ON" \
+    -DBUILD_KOMPARE="ON" \
+    -DBUILD_KPROFILEMETHOD="ON" \
+    -DBUILD_KSPY="ON" \
+    -DBUILD_KSTARTPERF="ON" \
+    -DBUILD_KUIVIEWER="ON" \
+    -DBUILD_POXML="ON" \
+    -DBUILD_SCHECK="ON" \
+    -DBUILD_SCRIPTS="ON" \
+    -DBUILD_TDECACHEGRIND="ON" \
+    -DBUILD_TDEFILE_PLUGINS="ON" \
+    -DBUILD_TDEIOSLAVE="ON" \
+    -DBUILD_TDEUNITTEST="ON" \
+    -DBUILD_UMBRELLO="ON" \
     -Wno-dev \
     ..
+
 make_fn
 
 installdocs_fn
@@ -64,6 +86,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -71,38 +95,20 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
-      |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (tools used by TDE developers)
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: A collection of applications and tools used by TDE developers
 $PRGNAM:
-$PRGNAM: This is a collection of applications and tools used by TDE
-$PRGNAM: developers. It also has example code for use in learning TDE
-$PRGNAM: programming or starting a new TDE application.
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: Home: http://www.trinitydesktop.org/ 
+$PRGNAM: * cervisia: CVS client part
+$PRGNAM: * kapptemplate: shell script to help starting new apps
+$PRGNAM: * kbabel: an editor for *.po files
+$PRGNAM: * kbugbuster: a gui for the TDE bug reporting system
+$PRGNAM: * kmtrace: converts glibc's mtrace log into a full backtrace
+$PRGNAM: * kstartperf: startup time measurement
+$PRGNAM: * kuiviewer: a KPart for viewing .ui files.
+$PRGNAM: * umbrello: a UML modeller.
+$PRGNAM: * kompare: a diff gui
+$PRGNAM: * tdecachegrind: a profile data visualization tool
+$PRGNAM: * .. and more
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-# Update the mime database:
-if [ -x usr/bin/update-mime-database ]; then
-  chroot . /usr/bin/update-mime-database ${INSTALL_TDE}/share/mime >/dev/null 2>&1
-fi
-EOINS
 
 makepkg_fn

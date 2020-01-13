@@ -74,10 +74,14 @@ strip_fn
 mkdir_install_fn
 
 echo "
-$PRGNAM: $PRGNAM (shut down utility for TDE)
-$PRGNAM:
+# HOW TO EDIT THIS FILE:
+# The 'handy ruler' below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+       |-----handy-ruler------------------------------------------------------|
 $PRGNAM: KShutDown is an advanced shut down utility for TDE
-$PRGNAM:
 $PRGNAM:
 $PRGNAM: With language support for:
 $PRGNAM: en $langs
@@ -86,7 +90,8 @@ $PRGNAM: and help documentation for:
 $PRGNAM: $(echo $langdoc | sed 's|kshutdown|en|;s| man||')
 $PRGNAM:
 $PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
-
 
 makepkg_fn

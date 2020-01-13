@@ -36,6 +36,7 @@ TAG=${TAG:-}
 
 SRCURL="https://ftp.osuosl.org/pub/xiph/releases/speex/speex-$VERSION.tar.gz"
 ARCHIVE_TYPE="tar.gz"
+
 source ../../get-source.sh
 getsource_fn
 
@@ -50,9 +51,9 @@ chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="$SLKLDFLAGS" \
-CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS=$SLKCFLAGS \
+CXXFLAGS=$SLKCFLAGS \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
@@ -60,9 +61,8 @@ CXX=$COMPILER_CXX \
   --libdir=/usr/lib$LIBDIRSUFFIX \
   --mandir=/usr/man \
   --enable-static=no \
-  --enable-binaries \
-  --build=$ARCH-slackware-linux
-  
+  --enable-binaries
+
 make_fn
 
 installdocs_fn
@@ -83,19 +83,18 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (patent-free audio compression format designed for speech)
+$PRGNAM: speex (patent-free audio compression format designed for speech)
 $PRGNAM:
 $PRGNAM: Speex is an Open Source/Free Software patent-free audio compression
 $PRGNAM: format designed for speech. The Speex Project aims to lower
 $PRGNAM: the barrier of entry for voice applications by providing a free
 $PRGNAM: alternative to expensive proprietary speech codecs.
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
 $PRGNAM: Home: http://www.speex.org/
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

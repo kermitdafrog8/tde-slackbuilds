@@ -32,85 +32,31 @@ source ../../get-source.sh
 getsource_fn
 
 untar_fn
+
 listdocs_fn
 
-[[ $TDEVERSION == R14.0.4 ]] && {
-# patch for TDE bug 2043
+## enable 'ar' compression in Compress As menu
 echo $'
 --- konq-plugins/arkplugin/arkplugin.cpp
 +++ konq-plugins/arkplugin/arkplugin.cpp
-@@ -307 +306,0 @@
--        {
-@@ -309,2 +307,0 @@
--            m_archiveMimeTypes << "application/x-tbz2";
--        }
-@@ -382 +379 @@
--        m_archiveMimeTypes << "application/x-lzma";
-+        m_extractMimeTypes << "application/x-lzma";
-@@ -389 +386 @@
--        m_archiveMimeTypes << "application/x-xz";
-+        m_extractMimeTypes << "application/x-xz";
-@@ -398 +394,0 @@
--        {
-@@ -400,2 +395,0 @@
--            m_extractMimeTypes << "application/x-tbz2";
--        }
-@@ -405 +399 @@
--            m_extractMimeTypes << "application/x-lzma";
-+            m_extractMimeTypes << "application/x-tlz";
-' | while read line
-do
-patch -p0
-done
-
-echo $'
---- konq-plugins/arkplugin/arkplugin.cpp
-+++ konq-plugins/arkplugin/arkplugin.cpp
-@@ -328 +328 @@
--        m_archiveMimeTypes << "application/x-rar" << "application/x-rar-compressed";
-+        m_archiveMimeTypes << "application/x-rar";
-' | while read line
-do
-patch -p0
-done
-
-## Set the default compression as tar.xz
-## enable jar & ar compression in Compress As menu
-## remove application/x-rar-compressed
-echo $'
---- konq-plugins/arkplugin/arkplugin.cpp
-+++ konq-plugins/arkplugin/arkplugin.cpp
-@@ -96 +96 @@
--        m_ext = m_conf->readEntry( "LastExtension", ".tar.gz" );
-+        m_ext = m_conf->readEntry( "LastExtension", ".tar.xz" );
-@@ -107 +107 @@
--                                    "LastMimeType", "application/x-tgz" ) )->comment(),
-+                                    "LastMimeType", "application/x-txz" ) )->comment(),
-@@ -323 +323 @@
--        if ( m_conf->readBoolEntry( "UseJar", false ) )
-+        if ( m_conf->readBoolEntry( "UseJar", true ) )
-@@ -346 +346 @@
+@@ -347 +347 @@
 -    if ( !TDEStandardDirs::findExe( "ar" ).isNull() && m_conf->readBoolEntry( "UseAr", false ) )
 +    if ( !TDEStandardDirs::findExe( "ar" ).isNull() && m_conf->readBoolEntry( "UseAr", true ) )
-@@ -411 +411 @@
--        m_extractMimeTypes << "application/x-rar" << "application/x-rar-compressed";
-+        m_extractMimeTypes << "application/x-rar";
 ' | while read line
 do
-patch -p0
-done
-}
+patch -N -p0
+done || true
 
 chown_fn
 
 # check for libatlantic [tdegames]
-[[ $(ls $INSTALL_TDE/lib/libatlantic.so.*) ]] && ATLANTIKDESIGNER="ON"
+[[ $(ls $INSTALL_TDE/lib$LIBDIRSUFFIX/libatlantic.so.*) ]] && ATLANTIKDESIGNER="ON"
 
-# check for kaddressbook in tdepim
-[[ $(ls $INSTALL_TDE/share/cmake/kaddressbook.cmake) ]] && KADDRESSBOOK_PLUGINS="ON"
+# check for libkaddressbook [tdepim]
+[[ $(ls $INSTALL_TDE/lib$LIBDIRSUFFIX/libkaddressbook.so*) ]] && KADDRESSBOOK_PLUGINS="ON"
 
-# check for tdemultimedia
-[[ $(ls $INSTALL_TDE/include/arts/artsmodules.h) ]] && NOATUN_PLUGINS="ON"
+# check for libnoatun [tdemultimedia]
+[[ $(ls $INSTALL_TDE/lib$LIBDIRSUFFIX/libnoatun.so*) ]] && NOATUN_PLUGINS="ON"
 
 cd_builddir_fn
   cmake \
@@ -125,13 +71,26 @@ cd_builddir_fn
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DWITH_ALL_OPTIONS="ON" \
-    -DBUILD_ALL="ON" \
+    -DWITH_ARTS="ON" \
+    -DWITH_SDL="ON" \
+    -DWITH_BERKELEY_DB="ON" \
+    -DWITH_XMMS="OFF" \
+    -DWITH_TEST="OFF" \
+    -DBUILD_DOC="ON" \
     -DBUILD_ATLANTIKDESIGNER=${ATLANTIKDESIGNER:-"OFF"} \
     -DBUILD_KADDRESSBOOK_PLUGINS=${KADDRESSBOOK_PLUGINS:-"OFF"} \
     -DBUILD_NOATUN_PLUGINS=${NOATUN_PLUGINS:-"OFF"} \
+    -DBUILD_KATE_PLUGINS="ON" \
+    -DBUILD_KICKER_APPLETS="ON" \
+    -DBUILD_KNEWSTICKER_SCRIPTS="ON" \
+    -DBUILD_KONQ_PLUGINS="ON" \
+    -DBUILD_KSIG="ON" \
+    -DBUILD_RENAMEDLG_PLUGINS="ON" \
+    -DBUILD_TDEFILE_PLUGINS="ON" \
+    -DBUILD_TUTORIALS="OFF" \
     -Wno-dev \
     ..
+
 make_fn
 
 installdocs_fn
@@ -140,6 +99,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -147,39 +108,18 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (additional plugins and scripts)
-$PRGNAM:
 $PRGNAM: tdeaddons contains additional plugins and scripts for some TDE
 $PRGNAM: applications.
 $PRGNAM:
+$PRGNAM: See $INSTALL_TDE/doc/tdeaddons-$TDEVERSION/README for details
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: http://www.trinitydesktop.org/ 
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database $INSTALL_TDE/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t $INSTALL_TDE/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-# Update the mime database:
-if [ -x usr/bin/update-mime-database ]; then
-  chroot . /usr/bin/update-mime-database $INSTALL_TDE/share/mime >/dev/null 2>&1
-fi
-
-EOINS
 
 makepkg_fn

@@ -85,20 +85,18 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
-     |-----handy-ruler------------------------------------------------------|
-knemo: knemo (The TDE Network Monitor) offers a network monitor similar to
-knemo: the one found in that other operating system.  Supports Ethernet
-knemo: (including wireless) and PPP connections, showing both incoming and
-knemo: outgoing traffic. For every network interface it displays an icon in
-knemo: the Panel.
-knemo:
-knemo: With language support for:
-knemo: en $langs
-knemo:
-knemo: IMPORTANT: KNemo has to be started using
-knemo: Trinity Control Center|Internet & Network|Network Monitor.
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: knemo (The TDE Network Monitor) offers a network monitor similar to
+$PRGNAM: the one found in that other operating system.  Supports Ethernet
+$PRGNAM: (including wireless) and PPP connections, showing both incoming and
+$PRGNAM: outgoing traffic. For every network interface it displays an icon in
+$PRGNAM: the Panel.
+$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: en $langs
+$PRGNAM:
+$PRGNAM: IMPORTANT: KNemo has to be started using
+$PRGNAM: Trinity Control Center|Internet & Network|Network Monitor.
 " > $PKG/install/slack-desc
-
 
 makepkg_fn

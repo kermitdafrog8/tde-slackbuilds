@@ -23,8 +23,8 @@
 #   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 #   SUCH DAMAGE.
 
-PKGNAM=tdek3b-i18n
 PRGNAM=k3b-i18n
+PKGNAM=tde$PRGNAM
 [[ $I18N == "" ]] && echo -e "\nYou have tried to build $PRGNAM without selecting any language(s)\n" && exit
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
@@ -35,24 +35,40 @@ getsource_fn
 
 untar_fn
 
+## remove help documentation build instruction from all locales ...
+sed -i '/BUILD_DOC/d' */CMakeLists.txt
+
 listdocs_fn
 
 chown_fn
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langs="";for Lang in $I18N;do [[ $(grep $Lang subdirs) ]] && langs="$langs $Lang";done
-## remove wanted locales from subdirs file ...
-for loca in $langs;do sed -i "/$loca/d" subdirs;done
-## ... and use modified subdirs to remove unwanted locale directories
-while read dir;do rm -rf $dir;done < subdirs
+langs="" # the *.po file list
+locas="" # the locale codes
+ldocs="" # the help docs
+for Lang in $I18N
+do
+[[ -d $Lang ]] && {
+langs="$langs $Lang/messages/k3b.po $Lang/messages/k3bsetup.po $Lang/messages/libk3b.po $Lang/messages/libk3bdevice.po"
+locas="$locas $Lang"
+## ... and restore help documentation for the selected and available locales
+[[ -e $Lang/CMakeLists.txt ]] && {
+echo 'tde_conditional_add_subdirectory( BUILD_DOC doc )' > $Lang/CMakeLists.txt
+ldocs="$ldocs $Lang"
+}
+}
+done
+sed -i "s|\${po_files}|$langs|" CMakeLists.txt
 
 cd_builddir_fn
 
-  cmake \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
+cmake \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DBUILD_DOC="ON" \
+    -DBUILD_MESSAGES="ON" \
     ..
 
 make_fn
@@ -71,17 +87,16 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (internationalization files for the CD Creator).
+$PRGNAM: tdek3b-i18n (internationalization files for the CD Creator).
 $PRGNAM:
 $PRGNAM: For languages:
+$PRGNAM: $locas
 $PRGNAM:
-$PRGNAM: $langs
-$PRGNAM: 
+$PRGNAM: With help documentation for:
+$PRGNAM: $ldocs
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: 
 $PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc

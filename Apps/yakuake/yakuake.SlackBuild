@@ -33,16 +33,16 @@ getsource_fn
 
 untar_fn
 
-listdocs_fn
-
-chown_fn
-
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang/$PRGNAM.po";done
-sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt && \
+sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
 langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
 [[ $langs != "" ]] && TRANS=ON
+
+listdocs_fn
+
+chown_fn
 
 cd_builddir_fn 
 
@@ -53,7 +53,10 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
     -DCMAKE_SKIP_RPATH=ON \
     ..
@@ -66,6 +69,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -74,32 +79,17 @@ echo "
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Quake-style terminal emulator)
+$PRGNAM: Yakuake is a Quake-style terminal emulator based on
+$PRGNAM: TDE Konsole technology.
 $PRGNAM:
-$PRGNAM: Yakuake is a Quake-style terminal emulator based on TDE 
-$PRGNAM: Konsole technology.
-$PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
 $PRGNAM: With language support for:
-$PRGNAM:
 $PRGNAM: en $langs
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-EOINS
 
 makepkg_fn

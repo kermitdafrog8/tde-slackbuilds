@@ -24,54 +24,41 @@
 #   SUCH DAMAGE.
 
 PRGNAM=GraphicsMagick
-VERSION=${VERSION:-1.3.28}
+VERSION=${VERSION:-1.3.34}
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-SRCURL="https://sourceforge.net/projects/graphicsmagick/files/graphicsmagick/$VERSION/GraphicsMagick-$VERSION.tar.xz"
+SRCURL="https://ftp.icm.edu.pl/pub/unix/graphics/$PRGNAM/1.3/$PRGNAM-$VERSION.tar.xz"
 ARCHIVE_TYPE="tar.xz"
+
 source ../../get-source.sh
 getsource_fn
 
 untar_fn
+
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="$SLKLDFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-CFLAGS="$SLKCFLAGS" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CXXFLAGS=$SLKCFLAGS \
+CFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
   --prefix=/usr \
-  --libdir=/usr/lib${LIBDIRSUFFIX} \
+  --libdir=/usr/lib$LIBDIRSUFFIX \
   --localstatedir=/var \
   --sysconfdir=/etc \
   --mandir=/usr/man \
   --enable-shared \
   --disable-static \
-  --disable-openmp \
-  --without-modules \
+  --with-modules \
   --with-x \
-  --with-frozenpaths \
-  --build=$ARCH-slackware-linux
+  --with-frozenpaths
   
-# By default, GraphicsMagick is compiled with support for OpenMP (http://www.openmp.org/) if the compilation 
-# environment supports it. OpenMP automatically parallizes loops across concurrent threads based on instructions 
-# in pragmas. OpenMP was introduced in GCC 4.2. OpenMP is a well-established standard and was implemented in
-# some other compilers in the late '90s, long before its appearance in GCC. OpenMP adds additional build and linkage 
-# requirements.
-# By default, GraphicsMagick enables as many threads as there are CPU cores (or CPU threads). According to the OpenMP
-# standard, the OMP_NUM_THREADS environment variable specifies how many threads should be used and GraphicsMagick 
-# also honors this request. In order to obtain the best single-user performance, set OMP_NUM_THREADS equal to the 
-# number of available CPU cores. On a server with many cores and many programs running at once, there may be benefit 
-# to setting OMP_NUM_THREADS to a much smaller value than the number of cores, and sometimes values as low as two 
-# (or even one, to disable threading) will offer the best overall system performance. Tuning a large system with OpenMP
-# programs running in parallel (competing for resources) is a complex topic and some research and experimentation may
-# be required in order to find the best parameters.
 
 make_fn
 
@@ -90,9 +77,8 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (The swiss army knife of image processing)
+$PRGNAM: GraphicsMagick (The swiss army knife of image processing)
 $PRGNAM:
 $PRGNAM: GraphicsMagick is the swiss army knife of image processing. Comprised
 $PRGNAM: of 265K physical lines (according to David A. Wheeler's
@@ -104,6 +90,5 @@ $PRGNAM: DPX, GIF, JPEG, JPEG-2000, PNG, PDF, PNM, and TIFF.
 $PRGNAM:
 $PRGNAM: Home: http://www.graphicsmagick.org/ 
 " > $PKG/install/slack-desc
-
 
 makepkg_fn

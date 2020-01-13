@@ -35,29 +35,12 @@ untar_fn
 
 listdocs_fn
 
-[[ $TDEVERSION == *14.0.6 ]] && ltoolupdate_fn
-
 chown_fn
 
 cd_builddir_fn 
 
-[[ $TDEVERSION == *14.0.6 ]] && {
-
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
-   --disable-rpath \
-   --enable-closure
-
-} || {
 ## all locales and html docs built by default
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_COMPILER=$COMPILER \
@@ -68,7 +51,6 @@ CXX=$COMPILER_CXX \
     -DCMAKE_SKIP_RPATH=ON \
     ..
 
-}
 
 make_fn
 
@@ -78,6 +60,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -86,25 +70,17 @@ echo "
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (TDM theme module)
+$PRGNAM: TDM theme module
 $PRGNAM:
-$PRGNAM: Currently this module is installed in TDE Components found in the 
-$PRGNAM: Trinity Control Center. Under System Administration.
-$PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM: Currently this module is installed in TDE Components found in the
+$PRGNAM: Trinity Control Center, under System Administration.
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-EOINS
 
 makepkg_fn

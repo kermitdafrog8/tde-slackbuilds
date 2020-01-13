@@ -33,31 +33,38 @@ getsource_fn
 
 untar_fn
 
+# set support for additional language(s) as per I18N variable
+# but only for languages available with this package
+langs="" # for additional locales
+langdoc="kipi-plugins" # for html docs
+ldocs="" # for slack-desc
+for Lang in $I18N
+do [[ -d po/$Lang ]] && langs="$langs $Lang" && \
+[[ -d doc/$Lang"_kipi-plugins" ]] && {
+langdoc=$(echo $Lang"_kipi-plugins" $langdoc)
+ldocs="$ldocs $Lang"
+}
+done
+sed -i "s|SUBDIRS =.*$|SUBDIRS =$langs|" po/Makefile.am
+sed -i "s|SUBDIRS =.*$|SUBDIRS =$langdoc|" doc/Makefile.am
+
 listdocs_fn
 
 ltoolupdate_fn
 
 chown_fn
 
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang";done
-sed -i "s|SUBDIRS =.*$|SUBDIRS =$langs|" po/Makefile.am
-#
-langdoc="kipi-plugins";for Lang in $I18N;do [[ -d doc/$Lang"_kipi-plugins" ]] && langdoc=$(echo $Lang"_kipi-plugins" $langdoc);done
-sed -i "s|SUBDIRS =.*$|SUBDIRS =$langdoc|" doc/Makefile.am
-
 cd_builddir_fn
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=${INSTALL_TDE} \
+   --prefix=$INSTALL_TDE \
    --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
+   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 
@@ -76,9 +83,8 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Functions for the TDE Images Management Host Programs)
+$PRGNAM: kipi-plugins (Functions for the TDE Images Management Host Programs)
 $PRGNAM:
 $PRGNAM: Kipi Plugins are additional functions for the TDE Images Management
 $PRGNAM: Host Programs (digiKam, ksquirrel and gwenview). They can add
@@ -87,10 +93,37 @@ $PRGNAM: You can install as many or as few as you like, from within the host
 $PRGNAM: programs.
 $PRGNAM:
 $PRGNAM: With language support for:
+$PRGNAM: en$langs
 $PRGNAM:
-$PRGNAM: en $(echo $langs)
+$PRGNAM: With help documentation for:
+$PRGNAM: en$ldocs
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php 
+$PRGNAM: -- Enabled kipi plugins:
+$PRGNAM: + Acquire Images (acquireimages)
+$PRGNAM: + Batch Process Images (batchprocessimages)
+$PRGNAM: + Calendar (calendar)
+$PRGNAM: + CD Archiving (cdarchiving)
+$PRGNAM: + Find Images (findimages)
+$PRGNAM: + Flickr Exporter (flickrexport)
+$PRGNAM: + Remote Gallery Export (galleryexport)
+$PRGNAM: + GPS Synchronization (gpssync)
+$PRGNAM: + HTML Gallery (htmlexport)
+$PRGNAM: + Viewer (imageviewer)
+$PRGNAM: + JPEG Lossless (jpeglossless)
+$PRGNAM: + Kamera Klient (kameraklient)
+$PRGNAM: + Metadata Editor (metadataedit)
+$PRGNAM: + MPEG Encoder (mpegencoder)
+$PRGNAM: + Picasaweb Exporter (picasawebexport)
+$PRGNAM: + Print Wizard (printwizard)
+$PRGNAM: + RAW converter (rawconverter)
+$PRGNAM: + Send Images (sendimages)
+$PRGNAM: + Simple Viewer (simpleviewerexport)
+$PRGNAM: + Slideshow (slideshow)
+$PRGNAM: + Date & Time Adjust (timeadjust)
+$PRGNAM: + Wallpaper (wallpaper)
+$PRGNAM:
+$PRGNAM: -- Disabled kipi plugins [untested - libgpod not installed]:
+$PRGNAM: - iPod Export (ipodexport)
 " > $PKG/install/slack-desc
 
 makepkg_fn

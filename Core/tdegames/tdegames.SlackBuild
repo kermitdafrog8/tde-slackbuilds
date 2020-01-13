@@ -38,15 +38,15 @@ chown_fn
 
 cd_builddir_fn
 
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=${INSTALL_TDE}/man \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_ARTS="ON" \
     -DBUILD_ATLANTIK="ON" \
     -DBUILD_DOC="ON" \
@@ -110,19 +110,42 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Games for the Trinity Desktop Environment)
+$PRGNAM: Games for TDE
 $PRGNAM:
-$PRGNAM: atlantik, kasteroids, katomic, kbackgammon, kbattleship, kblackbox,
-$PRGNAM: kbounce, keneloba, kfouleggs, kjumpingcube, klickety, klines,
-$PRGNAM: kmahjongg, kmines, kolf, konquest, kpat, kpoker, kreversi, ksame,
-$PRGNAM: kshisen, ksirtet, ksmiletris, ksnake, ksokoban, kspaceduel, ktron,
-$PRGNAM: ktuberling, twin4, lskat.
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: * atlantik: Monopoly-like board games
+$PRGNAM: * kasteroids: Shoot at those nasty asteroids.
+$PRGNAM: * katomic: Build complex atoms with a minimal amount of moves.
+$PRGNAM: * kbackgammon: Play backgammon against a local human player, via a
+$PRGNAM:                game server or against GNU Backgammon (not included)
+$PRGNAM: * kbattleship: Battleships, with built-in game server.
+$PRGNAM: * kblackbox: Find atoms in a grid by shooting electrons.
+$PRGNAM: * kbounce: Reduce the areas for the bouncing balls
+$PRGNAM: * keneloba: Push pieces of your opponent out of the board
+$PRGNAM: * kfouleggs: A famous japanese game known as puyo-puyo.
+$PRGNAM: * kgoldrunner: dodge your enemies, collect all the gold
+$PRGNAM: * kjumpingcube: A tactical game for number-crunchers.
+$PRGNAM: * klickety: A tetris like game.
+$PRGNAM: * klines: Build lines of 5 or more marbles
+$PRGNAM: * kmahjongg: A tile laying patience.
+$PRGNAM: * kmines: The classical mine sweeper.
+$PRGNAM: * knetwalk: connect all the LAN terminals to the server
+$PRGNAM: * kolf: A mini golf game.
+$PRGNAM: * konquest: Conquer the planets of your enemy.
+$PRGNAM: * kpat: Several patience card games.
+$PRGNAM: * kpoker: The game of poker.
+$PRGNAM: * kreversi: The old reversi board game, also known as Othello.
+$PRGNAM: * ksame: Collect pieces of the same color.
+$PRGNAM: * kshisen: Patience game where you take away all pieces.
+$PRGNAM: * ksirtet: Tetris clone
+$PRGNAM: * ksmiletris: Another Tetris-like game.
+$PRGNAM: * ksnake: Don't bite yourself, eat apples!
+$PRGNAM: * ksokoban: Move all storage boxes into the cabinet.
+$PRGNAM: * kspaceduel: Two player game - shoot spaceships flying around a sun.
+$PRGNAM: * ktron: Like ksnake, but without fruits.
+$PRGNAM: * ktuberling: Kids game: make your own potato
+$PRGNAM: * lskat: 2 player skat card game.
+$PRGNAM: * twin4: Place 4 pieces in a row.
 " > $PKG/install/slack-desc
 
 makepkg_fn

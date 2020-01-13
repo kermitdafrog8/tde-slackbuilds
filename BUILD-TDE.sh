@@ -216,8 +216,9 @@ rm -f $TMPVARS/NUMJOBS
 dialog --cr-wrap --nocancel --no-shadow --colors --title " Parallel Build " --inputbox \
 "
 Set the number of simultaneous jobs for make to whatever your system will support.
+ 
 " \
-11 75 ${NUMJOBS:-"-j6"} \
+12 75 ${NUMJOBS:-"-j6"} \
 2> $TMPVARS/NUMJOBS
 
 
@@ -235,14 +236,15 @@ dialog --cr-wrap --nocancel --no-shadow --colors --help-button --help-label "REA
 
  Build language packages/support for any of:
 \Zb\Z6af ar az be bg bn br bs ca cs csb cy da de el en_GB eo es et eu fa fi fr fy ga gl he hi hr hu is it ja kk km ko lt lv mk mn ms nb nds nl nn pa pl pt pt_BR ro ru rw se sk sl sr sr@Latn ss sv ta te tg th tr uk uz uz@cyrillic vi wa zh_CN zh_TW\Zn
+ 
 " \
-24 75 \
+25 75 \
 2> $TMPVARS/I18N && break
 [[ $EXITVAL == 2 ]] && dialog --cr-wrap --defaultno --yes-label "Ascii" --no-label "Utf-8" --no-shadow --colors --no-collapse --yesno \
 "
 The source unpacked is ~950MB, so to save on build space, the SlackBuild script extracts, builds, and removes source for each language package one at a time.
 
-If you can see the two 'y' like characters, then you've probably got a suitable terminal font installed and can choose \Zr\Z4\ZbUtf-8\Zb\Zn, otherwise choose \Z1A\Zb\Z0scii\Zn.
+If you can see the two 'y' like characters, then you've probably got a suitable terminal font installed and can choose \Zr\Z4\ZbUtf-8\Zb\Zn to display the language codes, otherwise choose \Z1A\Zb\Z0scii\Zn.
 
                             <<\Z3\Zb ҷ ɣ \Zn>>
 
@@ -363,7 +365,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Deps/avahi-tqt" "Avahi support" off "\Zb\Z6 Requires Avahi. Optional for tdelibs and used by default if installed. \Zn" \
 "Core/tdelibs" "\Zb\Zr\Z4R\Zn TDE libraries" ${SELECT:-off} "\Zb\Z6 Will build with Avahi support if avahi/avahi-tqt are installed. \Zn" \
 "Core/tdebase" "\Zb\Zr\Z4R\Zn TDE base" ${SELECT:-off} "\Zb\Z6   \Zn" \
-"Core/tde-i18n" "Additional language support for TDE" off "\Zb\Z6 Required when \Zb\Z3Additional language support\Zb\Z6 has been selected \Zn" \
+"Core/tde-i18n" "Additional language support for TDE" off "\Zb\Z6 Required when any \Zb\Z3Additional language support\Zb\Z6 has been selected \Zn" \
 "Core/tdeaccessibility" "Accessibility programs" off "\Zb\Z6  \Zn" \
 "Core/tdeadmin" "System admin packages" off "\Zb\Z6  \Zn" \
 "Core/tdeartwork" "Extra artwork/themes/wallpapers for TDE" off "\Zb\Z6   \Zn" \
@@ -378,7 +380,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Deps/libcaldav" "Calendaring Extensions to WebDAV" off "\Zb\Z6 Optional dependency for korganizer [tdepim] \Zn" \
 "Deps/libcarddav" "Online address support" off "\Zb\Z6 Optional dependency for korganizer [tdepim] \Zn" \
 "Core/tdepim" "Personal Information Management" off "\Zb\Z6   \Zn" \
-"Core/tdeaddons" "Additional plugins and scripts" off "\Zb\Z6 Optional plugins from tdegames, tdemultimedia, tdepim \Zn" \
+"Core/tdeaddons" "Additional plugins and scripts" off "\Zb\Z6 Plugins from tdegames, tdemultimedia, tdepim are build-time options \Zn" \
 "Core/tdesdk" "Tools used by TDE developers" off "\Zb\Z6 Requires tdepim \Zn" \
 "Core/tdetoys" "TDE Amusements" off "\Zb\Z6   \Zn" \
 "Core/tdeutils" "Collection of utilities including ark" off "\Zb\Z6   \Zn" \
@@ -402,9 +404,9 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/gtk-qt-engine" "A GTK+2 theme engine" off "\Zb\Z6   \Zn" \
 "Apps/gtk3-tqt-engine" "A GTK+3 theme engine" off "\Zb\Z6   \Zn" \
 "Apps/tdegwenview" "An image viewer" off "\Zb\Z6 Requires kipi-plugins tdelibkdcraw tdelibkexiv2 tdelibkipi.  \Zn" \
-"Apps/tdegwenview-i18n" "Internationalization files for gwenview." off "\Zb\Z6 Required for tdegwenview when \Zb\Z3Additional language support\Zb\Z6 has been selected  \Zn" \
+"Apps/tdegwenview-i18n" "Internationalization files for gwenview." off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for tdegwenview  \Zn" \
 "Apps/tdek3b" "The CD Creator" off "\Zb\Z6   \Zn" \
-"Apps/tdek3b-i18n" "Internationalization files for tdek3b." off "\Zb\Z6 Required for tdek3b when \Zb\Z3Additional language support\Zb\Z6 has been selected  \Zn" \
+"Apps/tdek3b-i18n" "Internationalization files for tdek3b." off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for tdek3b  \Zn" \
 "Apps/k9copy" "A DVD backup utility" off "\Zb\Z6 Requires [tde]k3b and ffmpeg \Zn" \
 "Apps/kaffeine" "Media player for TDE" off "\Zb\Z6   \Zn" \
 "Apps/kbfx" "Alternate menu for TDE" off "\Zb\Z6   \Zn" \
@@ -418,8 +420,8 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/knights" "A graphical chess interface" off "\Zb\Z6   \Zn" \
 "Apps/knmap" "A graphical nmap interface" off "\Zb\Z6 Might need tdesudo \Zn" \
 " Misc/GraphicsMagick" "Swiss army knife of image processing" off "\Zb\Z6 Buildtime option for chalk[krita] in koffice \Zn" \
-"Apps/koffice" "Office Suite" off "\Zb\Z6 Optional build-time dependencies - GraphicsMagick/libpng14 [for chalk/krita]  \Zn" \
-"Apps/koffice-i18n" "Internationalization files for koffice" off "\Zb\Z6 Required for koffice when \Zb\Z3Additional language support\Zb\Z6 has been selected  \Zn" \
+"Apps/koffice" "Office Suite" off "\Zb\Z6 Optional build-time dependencies - GraphicsMagick, libpng14  \Zn" \
+"Apps/koffice-i18n" "Internationalization files for koffice" off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for koffice \Zn" \
 "Apps/krusader" "File manager for TDE" off "\Zb\Z6   \Zn" \
 " Misc/graphviz" "Graph Visualization" off "\Zb\Z6 Runtime option for kscope. pdf/html docs not built by default  \Zn" \
 "Apps/kscope" "A source-editing environment for C and C-style languages." off "\Zb\Z6 Runtime options cscope [d/cscope], ctags [ap/vim], dot [graphviz] \Zn" \
@@ -432,7 +434,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/piklab" "IDE for PIC microcontrollers" off "\Zb\Z6   \Zn" \
 " Misc/potrace" "For tracing bitmaps to a vector graphics format" off "\Zb\Z6 Required for potracegui, optional for inkscape \Zn" \
 "Apps/potracegui" "A GUI for potrace" off "\Zb\Z6 Requires potrace \Zn" \
-"Apps/rosegarden" "Audio sequencer and musical notation editor" off "\Zb\Z6 Requires jack-audio-connection-kit liblo and dssi for proper funtionality \Zn" \
+"Apps/rosegarden" "Audio sequencer and musical notation editor" off "\Zb\Z6 Requires jack-audio-connection-kit liblo and dssi for proper functionality \Zn" \
 "Apps/soundkonverter" "frontend to various audio converters" off "\Zb\Z6   \Zn" \
 "Apps/tde-style-lipstik" "lipstik theme" off "\Zb\Z6   \Zn" \
 "Apps/tde-style-qtcurve" "QtCurve theme" off "\Zb\Z6   \Zn" \
@@ -751,11 +753,17 @@ do
   build=$(cat $package.SlackBuild | grep "BUILD:" | cut -d "-" -f2 | rev | cut -c 2- | rev)
 
   # The real build starts here
-  script -c "sh $package.SlackBuild" $TMP/$package-$TDEVERSION-$ARCH-$build-build-log || ${EXIT_FAIL:-"true"}
+  echo -e "\033[39;1m
+
+  Starting $package.SlackBuild ..
+  $(printf '%0.s\"' $(seq 1 $[${#package}+20]))
+  \033[0m"
+
+  script -c "sh $package.SlackBuild" $TMP/$package-$(eval echo $version)-$ARCH-$build-build-log || ${EXIT_FAIL:-"true"}
 
 # remove colorizing escape sequences from build-log
 # Re: http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
-  sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$package-$TDEVERSION-$ARCH-$build-build-log || ${EXIT_FAIL:-"true"}
+  sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$package-$(eval echo $version)-$ARCH-$build-build-log || ${EXIT_FAIL:-"true"}
 
 checkinstall ()
 {
@@ -775,7 +783,7 @@ sed -i "s|$dir ||" $TMPVARS/TDEbuilds || \
 {
 echo "
       Error:  $package package build failed
-      Check the build log $TMP/$package-$TDEVERSION-$ARCH-$build-build-log
+      Check the build log $TMP/$package-$(eval echo $version)-$ARCH-$build-build-log
       "
 ## if koffice was building with libpng14, restore the libpng16 headers for any following builds
 [[ ${USE_PNG14:-} == yes ]] && source $BUILD_TDE_ROOT/get-source.sh && libpng16_fn || true

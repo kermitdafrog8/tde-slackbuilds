@@ -24,25 +24,27 @@
 #   SUCH DAMAGE.
 
 PRGNAM=potrace
-VERSION=${VERSION:-1.15}
+VERSION=${VERSION:-1.16}
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-SRCURL="https://sourceforge.net/projects/potrace/files/$VERSION/potrace-$VERSION.tar.gz"
+SRCURL="https://sourceforge.net/projects/potrace/files/$VERSION/potrace-$VERSION.tar.gz/download"
 ARCHIVE_TYPE="tar.gz"
+
 source ../../get-source.sh
 getsource_fn
 
 untar_fn
+
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="$SLKLDFLAGS" \
-CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS=$SLKCFLAGS \
+CXXFLAGS=$SLKCFLAGS \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
@@ -80,7 +82,6 @@ $PRGNAM:
 $PRGNAM: A separate program, mkbitmap, can act as a pre-processor for Potrace,
 $PRGNAM: applying scaling and various filters to an image before converting it
 $PRGNAM: to a bitmap. This is useful for potracing greyscale and color images.
-$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

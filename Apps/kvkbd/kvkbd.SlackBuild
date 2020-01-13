@@ -55,6 +55,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -63,8 +65,6 @@ echo "
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (A virtual keyboard for TDE)
-$PRGNAM:
 $PRGNAM: A virtual keyboard for TDE
 $PRGNAM:
 $PRGNAM: Re: kvkbd --help
@@ -74,22 +74,8 @@ $PRGNAM:               to Xsetup to run in xdm/tdm
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-EOINS
-
 
 makepkg_fn

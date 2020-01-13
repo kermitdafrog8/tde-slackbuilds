@@ -37,17 +37,11 @@ listdocs_fn
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
-## output list of available locales ...
-(cd po
-ls -1 *.po | while read line
-do
-## ... and compare to selected locales & remove those not required
-[[ $langs != *$line* ]] && rm -rf $line
-:
-done)
-[[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs|sed "s|.po||g")
-
+langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
+## this GLOB overrides the one in po/CMakeLists.txt:
+sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
+langs=$(echo $langs | sed "s|.po||g")
+[[ $langs != "" ]] && TRANS=ON
 
 chown_fn
 
@@ -61,7 +55,9 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
+    -DWITH_GCC_VISIBILITY="OFF" \
     ..
 
 make_fn
@@ -72,6 +68,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -79,42 +77,18 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (book reader)
+$PRGNAM: KBookReader (book reader) is a TDE twin-panel text files viewer
+$PRGNAM: specialized in reading e-books.
 $PRGNAM:
-$PRGNAM: $PRGNAM
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: It supports multiple bookmarks, custom fonts, encoding selection.
 $PRGNAM:
 $PRGNAM: With language support for:
+$PRGNAM: en $langs
 $PRGNAM:
-$PRGNAM: en ${langs:-}
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/ 
-
+$PRGNAM:
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-# Update the mime database:
-if [ -x usr/bin/update-mime-database ]; then
-  chroot . /usr/bin/update-mime-database ${INSTALL_TDE}/share/mime >/dev/null 2>&1
-fi
-
-EOINS
-
 
 makepkg_fn

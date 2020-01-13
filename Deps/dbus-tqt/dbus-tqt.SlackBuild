@@ -38,15 +38,16 @@ listdocs_fn
 chown_fn
 
 cd_builddir_fn
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
+
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     ..
 
 make_fn
@@ -66,9 +67,8 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (simple IPC library)
+$PRGNAM: dbus-tqt (simple IPC library)
 $PRGNAM:
 $PRGNAM: A core concept of the D-BUS implementation is that
 $PRGNAM: 'libdbus' is intended to be a low-level API, similar to
@@ -78,7 +78,7 @@ $PRGNAM: levels of completeness.
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

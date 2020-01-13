@@ -33,83 +33,13 @@ getsource_fn
 
 untar_fn
 
-[[ $TDEVERSION == R14.0.4 ]] && {
-## remove redundant application/x-tbz2 references [line 55] to get rid of ark warning:
-## tdeio (KMimeType): WARNING: mimetype not valid '' (missing entry in the file ?)
-## the other removals are a general clear out of the mimetype before they cause problems
-## application/x-rar-compressed causes a double entry in the Compress As menu without adding any functionality
-## patch for ark/archiveformatinfo.cpp split to accommodate cgit build
-echo $'
---- ark/archiveformatinfo.cpp
-+++ ark/archiveformatinfo.cpp
-@@ -55 +54,0 @@
--  addFormatInfo( TAR_FORMAT, "application/x-tbz2", ".tar.bz2" );
---- ark/archiveformatinfo.cpp
-+++ ark/archiveformatinfo.cpp
-@@ -79 +78,0 @@
--  addFormatInfo( RAR_FORMAT, "application/x-rar-compressed", ".rar" );
---- ark/tar.cpp
-+++ ark/tar.cpp
-@@ -94,7 +93,0 @@
--    if ( m_fileMimeType == "application/x-tbz2" )
--    {
--        // ark treats .tar.bz2 as x-tbz, instead of duplicating the mimetype
--        // let\'s just alias it to the one we already handle.
--        m_fileMimeType = "application/x-tbz";
--    }
--
---- superkaramba/src/sknewstuff.cpp
-+++ superkaramba/src/sknewstuff.cpp
-@@ -67 +66,0 @@
--      result->name() == "application/x-tbz2" ||
---- ark/ark.desktop
-+++ ark/ark.desktop
-@@ -2 +2 @@
--MimeType=application/x-gzip;application/x-lha;application/x-tar;application/x-tgz;application/x-tbz;application/x-tbz2;application/x-zip;application/zip;application/x-bzip;application/x-tzo;application/x-lzop;application/x-rar;application/x-zoo;application/x-tarz;application/x-archive;application/x-bzip2;application/x-jar;application/x-deb;application/x-ace;application/x-7z;application/x-arc;application/x-arj;application/x-compress;application/x-cpio;application/x-pak;application/x-zip-compressed;application/x-lzma;application/x-xz;application/x-txz;application/x-tlz
-+MimeType=application/x-gzip;application/x-lha;application/x-tar;application/x-tgz;application/x-tbz;application/x-zip;application/zip;application/x-bzip;application/x-tzo;application/x-lzop;application/x-rar;application/x-zoo;application/x-tarz;application/x-archive;application/x-bzip2;application/x-jar;application/x-deb;application/x-ace;application/x-7z;application/x-arc;application/x-arj;application/x-compress;application/x-cpio;application/x-pak;application/x-zip-compressed;application/x-lzma;application/x-xz;application/x-txz;application/x-tlz
---- ark/ark_part.desktop
-+++ ark/ark_part.desktop
-@@ -2 +2 @@
--MimeType=application/x-gzip;application/x-lha;application/x-tar;application/x-tgz;application/x-tbz;application/x-tbz2;application/x-zip;application/x-bzip;application/x-tzo;application/x-lzop;application/x-rar;application/x-zoo;application/x-tarz;application/x-archive;application/x-bzip2;application/x-jar;application/x-deb;application/x-ace;application/x-7z;application/x-arc;application/x-arj;application/x-compress;application/x-cpio;application/x-pak;application/x-lzma;application/x-xz;application/x-tlz;application/x-txz
-+MimeType=application/x-gzip;application/x-lha;application/x-tar;application/x-tgz;application/x-tbz;application/x-zip;application/x-bzip;application/x-tzo;application/x-lzop;application/x-rar;application/x-zoo;application/x-tarz;application/x-archive;application/x-bzip2;application/x-jar;application/x-deb;application/x-ace;application/x-7z;application/x-arc;application/x-arj;application/x-compress;application/x-cpio;application/x-pak;application/x-lzma;application/x-xz;application/x-tlz;application/x-txz
-' | while read line
-do
-patch -p0
-done
-
-## fix bug 2794 - ark can't open rar files
-echo $'
---- ark/rar.cpp
-+++ ark/rar.cpp
-@@ -102 +102 @@
--    TQRegExp versionRegExp (TQString::fromLatin1 ("RAR\\\\s(\\\\d+)\\\\.(\\\\d+)\\\\s(beta (\\\\d+))?\\\\s+Copyright.*"));
-+    TQRegExp versionRegExp (TQString::fromLatin1 ("(UN)?RAR\\\\s(\\\\d+)\\\\.(\\\\d+)( beta (\\\\d+))?.*"));
-@@ -107,3 +107,3 @@
--      m_version  = versionRegExp.cap(1).toShort() * VERSION_MAJOR;
--      m_version += versionRegExp.cap(2).toShort()/10 * VERSION_MINOR;
--      m_version += versionRegExp.cap(2).toShort()%10 * VERSION_PATCH;
-+      m_version  = versionRegExp.cap(2).toShort() * VERSION_MAJOR;
-+      m_version += versionRegExp.cap(3).toShort()/10 * VERSION_MINOR;
-+      m_version += versionRegExp.cap(3).toShort()%10 * VERSION_PATCH;
-@@ -111 +111 @@
--      if (!versionRegExp.cap(4).isEmpty()) { // beta versions should go befor release ones
-+      if (!versionRegExp.cap(5).isEmpty()) { // beta versions should go before release ones
-@@ -113 +113 @@
--        m_version += versionRegExp.cap(4).toShort();
-+        m_version += versionRegExp.cap(5).toShort();
-' | while read line
-do
-patch -p0
-done
-}
-
 listdocs_fn
 
 chown_fn
 
-## See CMakeLists.txt for specific laptop support
 cd_builddir_fn
-  cmake \
+
+cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
@@ -125,9 +55,38 @@ cd_builddir_fn
     -DWITH_XSCREENSAVER="OFF" \
     -DWITH_SENSORS="ON" \
     -DWITH_SNMP="OFF" \
-    -DBUILD_ALL="ON" \
+    -DWITH_ASUS="OFF" \
+    -DWITH_POWERBOOK="OFF" \
+    -DWITH_POWERBOOK2="OFF" \
+    -DWITH_VAIO="OFF" \
+    -DWITH_THINKPAD="OFF" \
+    -DWITH_I8K="OFF" \
+    -DWITH_XMMS="OFF" \
+    -DWITH_TDENEWSTUFF="OFF" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_ARK="ON" \
+    -DBUILD_CHARSELECTAPPLET="ON" \
+    -DBUILD_KCALC="ON" \
+    -DBUILD_KCHARSELECT="ON" \
+    -DBUILD_TDELIRC="ON" \
+    -DBUILD_TDESSH="ON" \
+    -DBUILD_KDF="ON" \
+    -DBUILD_KEDIT="ON" \
+    -DBUILD_KFLOPPY="ON" \
+    -DBUILD_KGPG="ON" \
+    -DBUILD_KHEXEDIT="ON" \
+    -DBUILD_KJOTS="ON" \
+    -DBUILD_KLAPTOPDAEMON="ON" \
+    -DBUILD_KMILO="ON" \
+    -DBUILD_KREGEXPEDITOR="ON" \
+    -DBUILD_KSIM="ON" \
+    -DBUILD_KTIMER="ON" \
+    -DBUILD_TDEWALLET="ON" \
+    -DBUILD_SUPERKARAMBA="ON" \
+    -DBUILD_TDEFILEREPLACE="ON" \
     -Wno-dev \
     ..
+
 make_fn
 
 installdocs_fn
@@ -136,6 +95,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -143,38 +104,30 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Collection of utilities)
+$PRGNAM: tdeutils (Collection of utilities)
 $PRGNAM:
-$PRGNAM: Collection of utilities including ark
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM: * ark: manager for compressed files and archives
+$PRGNAM: * kcalc: scientific calculator
+$PRGNAM: * kcharselect: select characters from any font into the clipboard
+$PRGNAM: * charselectapplet: as kcharselect, but as a Kicker applet
+$PRGNAM: * tdessh: front end to ssh
+$PRGNAM: * kdf: like 'df', a graphical free disk space viewer
+$PRGNAM: * kedit: a simple text editor, without formatting like bold, etc
+$PRGNAM: * kfloppy: a floppy disks formatter
+$PRGNAM: * kgpg: Encryption Tool
+$PRGNAM: * khexedit: binary file editor
+$PRGNAM: * kjots: manages several 'books' with a subject and notes
+$PRGNAM: * klaptopdaemon: battery and power management
+$PRGNAM: * kmilo: hardware input devices support
+$PRGNAM: * kregexpeditor: graphical regular expression editor
+$PRGNAM: * ksim: a plugin based system monitor
+$PRGNAM: * ktimer: execute programs after some time
+$PRGNAM: * superkaramba: a version of Karamba with python scripting
+$PRGNAM: * tdelirc: a TDE frontend for the Linux Infrared Remote Control system
+$PRGNAM: * tdewallet: a convenient and secure way to manage all your passwords
+$PRGNAM: * TDEFileReplace: powerful search and replace in multiple files
+$PRGNAM:                   [Moved from tdewebdev for R14.1.0]
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database $INSTALL_TDE/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t $INSTALL_TDE/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-# Update the mime database:
-if [ -x usr/bin/update-mime-database ]; then
-  chroot . /usr/bin/update-mime-database $INSTALL_TDE/share/mime >/dev/null 2>&1
-fi
-EOINS
 
 makepkg_fn

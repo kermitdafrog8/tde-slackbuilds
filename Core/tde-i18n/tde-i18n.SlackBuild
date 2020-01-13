@@ -47,6 +47,7 @@ tar xf $SOURCE $PRGNAM${SNAPSHOT:-}/cmake
 tar xf $SRCDIR/../../src/cmake-$TDEVERSION.$ARCHIVE_TYPE --strip-components=1 -C $PRGNAM${SNAPSHOT:-}/cmake
 }
 }
+
 for lang in $I18N
 do
 [[ $TDEVERSION == *14.0.? ]] && {
@@ -56,6 +57,9 @@ echo "Extracting the $PRGNAM-$lang source from the $(basename $SOURCE) archive .
 echo -e "\033[0m"
 tar -xf $SOURCE $PRGNAM${SNAPSHOT:-}/$PRGNAM-$lang
 cd $PRGNAM*
+
+true # don't go to cgit if extracting fails
+
 } || {
 mkdir -p $PRGNAM # need -p for git builds if more than one lang
 cd $PRGNAM
@@ -72,9 +76,10 @@ chown_fn
 
 mkdir -p $PRGNAM-$lang/build
 cd $PRGNAM-$lang/build
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
+
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
@@ -82,7 +87,9 @@ cd $PRGNAM-$lang/build
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DBUILD_ALL="ON" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_DATA="ON" \
+    -DBUILD_MESSAGES="ON" \
     ..
 
 make_fn
@@ -93,13 +100,14 @@ cat $SRCDIR/$(basename $0) > $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION/$PRGNAM-$lang
 chown -R root:root $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
 find $PKG$INSTALL_TDE/doc -type f -exec chmod 644 {} \;
 
-
 mkdir_install_fn
 
 # extract the name of the language from the source text - a bit messy but there is no standard format
 Lang=$(grep Language-Team: $TMP_BUILD/tmp-$PRGNAM/$PRGNAM*/tde-i18n-$lang/messages/tdebase/*.po|sort -k2 | sed -e 's|Team: |\n|' -e 's| <|\n|' -e 's|akh\\n"|akh|' -e 's|an S|#|' | grep "[A-Z][a-z][a-z]*$"|head -n 1)
 [[ "$lang" == "pt" ]] && Lang="Portuguese"
 [[ "$lang" == "fy" ]] && Lang="Frisian"
+
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:
@@ -109,12 +117,12 @@ echo "
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
              |-----handy-ruler------------------------------------------------------|
+$PRGNAM-$lang: tde-i18n-$lang
 $PRGNAM-$lang:
-$PRGNAM-$lang: $PRGNAM-$lang
+$PRGNAM-$lang: Language support for TDE: $Lang
 $PRGNAM-$lang:
-$PRGNAM-$lang: Language support for TDE:
 $PRGNAM-$lang:
-$PRGNAM-$lang:              $(echo $Lang)
+$PRGNAM-$lang:
 $PRGNAM-$lang:
 $PRGNAM-$lang:
 $PRGNAM-$lang:
@@ -122,15 +130,6 @@ $PRGNAM-$lang:
 $PRGNAM-$lang:
 $PRGNAM-$lang:
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-\$(which update-desktop-database) $INSTALL_TDE/share/applications
-
-# Update hicolor theme cache:
-\$(which gtk-update-icon-cache) -f -t $INSTALL_TDE/share/icons/hicolor
-
-EOINS
 
 ARCH="noarch"
 cd $PKG

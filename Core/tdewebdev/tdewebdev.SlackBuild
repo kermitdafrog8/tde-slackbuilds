@@ -32,6 +32,7 @@ source ../../get-source.sh
 getsource_fn
 
 untar_fn
+
 listdocs_fn
 
 ltoolupdate_fn
@@ -40,15 +41,15 @@ chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=${INSTALL_TDE} \
+   --prefix=$INSTALL_TDE \
    --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
+   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 
@@ -60,6 +61,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -67,33 +70,18 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Quanta Plus and other applications)
+$PRGNAM: Quanta Plus and runtime dependencies
 $PRGNAM:
-$PRGNAM: The tdewebdev package contains Quanta Plus and other applications,
-$PRGNAM: which are useful for web development. They are runtime dependencies
-$PRGNAM: of Quanta Plus, and it is highly recommended that you install them.
+$PRGNAM: * Quanta Plus: a web IDE
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: Home: http://www.trinitydesktop.org/ 
+$PRGNAM: The runtime dependencies are:
+$PRGNAM: * Kommander: a GUI script builder and executor tool.
+$PRGNAM: * TDEFileReplace: powerful search and replace in multiple files
+$PRGNAM:                   [Moved to tdeutils for R14.1.0]
+$PRGNAM: * KXSLDbg: XSL debugger
+$PRGNAM: * KImageMapEditor: image map editor
+$PRGNAM: * KLinkStatus: link checker
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-EOINS
 
 makepkg_fn

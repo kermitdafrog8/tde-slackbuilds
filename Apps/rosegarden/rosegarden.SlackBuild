@@ -33,33 +33,64 @@ getsource_fn
 
 untar_fn
 
+listdocs_fn
+
 # Check for Jack Audio Connection Kit
 [[ $(ls /var/log/packages/jack-audio-connection-kit-*) ]] && JACK="ON"
 
 # Check for DSSI aka "Dizzy"
 [[ $(grep -E "dssi.h" /var/log/packages/*) ]] && DSSI="ON"
 
-listdocs_fn
+## remove help documentation build instruction from all locales ...
+sed -i '/tde_create_handbook/,+3d' doc/??{,_??}/CMakeLists.txt || true
+## ... and restore for 'en'
+echo "tde_create_handbook( LANG en DESTINATION $PRGNAM )" >> doc/en/CMakeLists.txt
+
+# set support for additional language(s) as per I18N variable
+# but only for languages available with this package
+langs="" # the *.po file list
+ldocs="" # the help docs
+for Lang in $I18N
+do
+[[ -d po/$Lang ]] && {
+langs="$langs $Lang/$PRGNAM.po"
+## ... and restore help documentation for the selected and available locales
+[[ -e doc/$Lang/CMakeLists.txt ]] && {
+echo "tde_create_handbook( LANG $Lang DESTINATION $PRGNAM )" >> doc/$Lang/CMakeLists.txt
+ldocs="$ldocs $Lang"
+}
+}
+done
+#
+sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
+langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
+[[ $langs != "" ]] && TRANS=ON
 
 chown_fn
 
 cd_builddir_fn
 
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=${INSTALL_TDE}/man \
-    -DBUILD_ALL="ON" \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
+    -DWANT_SOUND="ON" \
     -DWANT_DEBUG="OFF" \
     -DWANT_FULLDBG="OFF" \
     -DWANT_JACK=${JACK:-"OFF"} \
     -DWANT_DSSI=${DSSI:-"OFF"} \
+    -DWANT_LIRC="OFF" \
+    -DWANT_PCH="OFF" \
+    -DWANT_TEST="OFF" \
     ..
+
 make_fn
 
 installdocs_fn
@@ -67,6 +98,8 @@ installdocs_fn
 strip_fn
 
 mkdir_install_fn
+
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:
@@ -76,34 +109,17 @@ echo "
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM:
-$PRGNAM: $PRGNAM (Audio sequencer and musical notation editor)
-$PRGNAM:
 $PRGNAM: Rosegarden is a MIDI and audio sequencer and musical notation editor.
 $PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: en $langs
 $PRGNAM:
-$PRGNAM: 
+$PRGNAM: With help documentation for:
+$PRGNAM: en$ldocs
 $PRGNAM:
-$PRGNAM: 
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM:
 " > $PKG/install/slack-desc
 
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-EOINS
-
 makepkg_fn
-

@@ -38,7 +38,6 @@ untar_fn
 # but only for languages available with this package
 langdir="";for Lang in $I18N;do [[ -d koffice-i18n-$Lang ]] && langdir="${langdir}koffice-i18n-$Lang ";done
 
-
 # update admin for installed version of libtool
 cp /$(grep -h ltmain.sh /var/log/packages/libtool*) admin/
 cp /$(grep -h libtool.m4 /var/log/packages/libtool*) admin/libtool.m4.in
@@ -56,13 +55,13 @@ chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=${INSTALL_TDE}
+   --prefix=$INSTALL_TDE
 
 make_fn
 
@@ -81,12 +80,10 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
-$PRGNAM|-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (internationalization files for koffice).
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: koffice-i18n (internationalization files for koffice).
 $PRGNAM:
 $PRGNAM: For languages:
-$PRGNAM:
 $PRGNAM: $langs
 $PRGNAM:
 $PRGNAM:
@@ -94,8 +91,8 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
-
 
 ARCH="noarch"
 makepkg_fn

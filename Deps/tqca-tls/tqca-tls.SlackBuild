@@ -68,9 +68,8 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Plugin to provide SSL/TLS capability)
+$PRGNAM: tqca-tls (Plugin to provide SSL/TLS capability)
 $PRGNAM:
 $PRGNAM: This is a plugin to provide SSL/TLS capability to programs that
 $PRGNAM: utilize the TQt Cryptographic Architecture (TQCA).
@@ -80,7 +79,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

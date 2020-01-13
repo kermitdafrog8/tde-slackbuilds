@@ -32,28 +32,41 @@ source ../../get-source.sh
 getsource_fn
 
 untar_fn
+
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
+
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=${INSTALL_TDE}/man \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DWITH_ARTS="ON" \
     -DWITH_XSCREENSAVER="OFF" \
-    -DBUILD_ALL="ON" \
+    -DWITH_LIBART="ON" \
+    -DWITH_OPENGL="ON" \
+    -DBUILD_EMOTICONS="ON" \
+    -DBUILD_ICEWM_THEMES="ON" \
+    -DBUILD_ICON_THEMES="ON" \
+    -DBUILD_TDESCREENSAVER="ON" \
+    -DBUILD_TWIN_STYLES="ON" \
+    -DBUILD_KWORLDCLOCK="ON" \
+    -DBUILD_SOUNDS="ON" \
+    -DBUILD_STYLES="ON" \
+    -DBUILD_WALLPAPERS="ON" \
     -Wno-dev \
     ..
+
 make_fn
 
 installdocs_fn
@@ -62,6 +75,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -69,39 +84,18 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Extra artwork/themes/wallpapers for TDE)
+$PRGNAM: tdeartwork
 $PRGNAM:
 $PRGNAM: Extra artwork/themes/wallpapers for TDE
+$PRGNAM: * themes,
+$PRGNAM: * screensaver,
+$PRGNAM: * sounds,
+$PRGNAM: * wallpapers,
+$PRGNAM: * widget styles and
+$PRGNAM: * window styles
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php 
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-# Update the mime database:
-if [ -x usr/bin/update-mime-database ]; then
-  chroot . /usr/bin/update-mime-database ${INSTALL_TDE}/share/mime >/dev/null 2>&1
-fi
-
-EOINS
 
 makepkg_fn

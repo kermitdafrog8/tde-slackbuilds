@@ -31,9 +31,16 @@ BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
 # override download option in get-source.sh because there is no version # in the file name
-[[ ! -s ../../src/tidy-html5-master.zip ]] && wget -nv -T 20 -O ../../src/tidy-html5-master.zip https://github.com/htacg/tidy-html5/archive/master.zip || true
-
+[[ ! -s ../../src/$PRGNAM-$VERSION.zip ]] && {
+wget -nv -T 20 -O ../../src/$PRGNAM-$VERSION.zip https://github.com/htacg/$PRGNAM/archive/$VERSION.zip || {
+echo -e "\033[39;1m"
+echo " $PRGNAM-$VERSION.zip isn't in 'src' and hasn't been downloaded "
+echo -e "\033[0m"
+exit
+}
+}
 ARCHIVE_TYPE="zip"
+
 source ../../get-source.sh
 getsource_fn
 
@@ -95,12 +102,12 @@ $PRGNAM: Tidy corrects and cleans up HTML and XML documents by fixing markup
 $PRGNAM: errors and upgrading legacy code to modern standards.
 $PRGNAM: Optional with Quanta+
 $PRGNAM:
+$PRGNAM: For languages:
+$PRGNAM: en ${langs:-}
+$PRGNAM:
 $PRGNAM: http://www.html-tidy.org
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM: For languages:
-$PRGNAM: en ${langs:-}
 $PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc

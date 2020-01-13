@@ -32,26 +32,38 @@ source ../../get-source.sh
 getsource_fn
 
 untar_fn
+
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
+
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=${INSTALL_TDE}/man \
-    -DBUILD_ALL="ON" \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DBUILD_AMOR="ON" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_EYESAPPLET="ON" \
+    -DBUILD_FIFTEENAPPLET="ON" \
+    -DBUILD_KMOON="ON" \
+    -DBUILD_KODO="ON" \
+    -DBUILD_KTEATIME="ON" \
+    -DBUILD_KTUX="ON" \
+    -DBUILD_KWEATHER="ON" \
+    -DBUILD_KWORLDWATCH="ON" \
     -Wno-dev \
     ..
+
 make_fn
 
 installdocs_fn
@@ -60,6 +72,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -67,33 +81,19 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (TDE Amusements)
-$PRGNAM:
 $PRGNAM: TDE Amusements
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: Home: http://www.trinitydesktop.org/
+$PRGNAM: * amor: puts comic figures above your windows
+$PRGNAM: * eyesapplet: a kicker applet similar to XEyes
+$PRGNAM: * fifteenapplet: order 15 pieces in a 4x4 square by moving them
+$PRGNAM: * kmoon: system tray applet showing the moon phase
+$PRGNAM: * kodo: mouse movement meter
+$PRGNAM: * kteatime: applet to ensure your tea doesn't get too strong
+$PRGNAM: * ktux: Tux-in-a-Spaceship screen saver
+$PRGNAM: * kweather: applet that will display the current weather outside
+$PRGNAM: * kworldwatch: application and kicker applet showing daylight area
+$PRGNAM:                on the world globe
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-EOINS
 
 makepkg_fn

@@ -27,13 +27,13 @@ config .{SYS_CNF_DIR}/tdm/tdmrc.new
 config .{SYS_CNF_DIR}/tdm/backgroundrc.new
 
 # Update the desktop database:
-$(which update-desktop-database) {INSTALL_TDE}/share/applications
+/usr/bin/update-desktop-database .{INSTALL_TDE}/share/applications
 
 # Update the mime database:
-$(which update-mime-database) /usr/share/mime
+/usr/bin/update-mime-database usr/share/mime
 
 # Update hicolor theme cache:
-$(which gtk-update-icon-cache) -f -t {INSTALL_TDE}/share/icons/hicolor
+/usr/bin/gtk-update-icon-cache -f -t .{INSTALL_TDE}/share/icons/hicolor
 
 
 # update PATH

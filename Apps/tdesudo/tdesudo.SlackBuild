@@ -73,19 +73,17 @@ echo "
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Graphical front end for the sudo command)
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: Graphical front end for the sudo command
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: tdesudo (Graphical front end for the sudo command)
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM:
 $PRGNAM: en $langs
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
-
 
 makepkg_fn

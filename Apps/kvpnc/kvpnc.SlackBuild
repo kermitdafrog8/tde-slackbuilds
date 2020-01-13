@@ -82,17 +82,16 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
-$PRGNAM|-----handy-ruler------------------------------------------------------|
-$PRGNAM:
-$PRGNAM: $PRGNAM is a TDE frontend for various vpn clients.
-$PRGNAM:
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: kvpnc is a TDE frontend for various vpn clients.
 $PRGNAM:
 $PRGNAM: With language support for:
 $PRGNAM: en $langs
 $PRGNAM:
 $PRGNAM: and help documentation for:
 $PRGNAM: $(echo $langdoc | sed 's| man||')
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc

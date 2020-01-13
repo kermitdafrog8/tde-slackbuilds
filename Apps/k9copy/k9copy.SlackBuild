@@ -41,22 +41,6 @@ langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po
 sed -i "s|POFILES =.*$|POFILES =$langs|" po/Makefile.am
 langs=$(echo $langs | sed 's|.po||g')
 
-[[ $TDEVERSION == R14.0.4 ]] && {
-## patch for clang from commit 72845f6
-echo $'
---- libk9copy/k9config.cpp
-+++ libk9copy/k9config.cpp
-@@ -82,2 +82,2 @@
--  m_prefButtonHiliteColor=m_config->readColorEntry("buttonHiliteColor",&TQColor(TQt::yellow));
--  m_prefButtonTextColor=m_config->readColorEntry("buttonTextColor",&TQColor(TQt::yellow));
-+  m_prefButtonHiliteColor=m_config->readColorEntry("buttonHiliteColor", &TQt::yellow);
-+  m_prefButtonTextColor=m_config->readColorEntry("buttonTextColor", &TQt::yellow);
-' | while read line
-do
-patch -p0
-done
-}
-
 ltoolupdate_fn
 
 chown_fn
@@ -91,20 +75,18 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
-$PRGNAM|-----handy-ruler------------------------------------------------------|
-$PRGNAM:
+       |-----handy-ruler------------------------------------------------------|
 $PRGNAM: k9copy is an easy to use and powerful DVD backup utility.
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
 $PRGNAM: With language support for:
+$PRGNAM: en $langs
 $PRGNAM:
-$PRGNAM: en $(echo $langs)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc
-
 
 makepkg_fn

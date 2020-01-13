@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=inkscape
-VERSION=${VERSION:-0.92.3}
+VERSION=${VERSION:-0.92.4}
 BUILD=${BUILD:-1}
 
 SRCURL="https://media.inkscape.org/dl/resources/file/inkscape-$VERSION.tar.bz2"
@@ -36,15 +36,16 @@ getsource_fn
 untar_fn
 
 ## install to .../lib64 on 64-bit system
+## add -DLIB_SUFFIX=$LIBDIRSUFFIX to cmake
 [[ -d /lib64 ]] && \
 { ## set RPATH
-sed -i "s|ORIGIN/../lib/inkscape|ORIGIN/../lib$LIBDIRSUFFIX/inkscape|" CMakeLists.txt
+sed -i 's|ORIGIN/../lib/inkscape|ORIGIN/../lib${LIB_SUFFIX}/inkscape|' CMakeLists.txt
 ## set output directory
-sed -i "s|/lib |/lib$LIBDIRSUFFIX |" CMakeLists.txt
+sed -i 's|/lib |/lib${LIB_SUFFIX} |' CMakeLists.txt
 ## for dynamic lib
-sed -i "s|lib/inkscape|lib$LIBDIRSUFFIX/inkscape|" src/CMakeLists.txt
+sed -i 's|lib/inkscape|lib${LIB_SUFFIX}/inkscape|' src/CMakeLists.txt
 ## for static libs
-sed -i "s|lib/inkscape|lib$LIBDIRSUFFIX/inkscape|" CMakeScripts/HelperMacros.cmake
+sed -i 's|lib/inkscape|lib${LIB_SUFFIX}/inkscape|' CMakeScripts/HelperMacros.cmake
 }
 
 ## only build for required locales
@@ -105,63 +106,6 @@ rm share/templates/*.*.*
 mv $TEMP_DIR/* share/templates/
 } || true
 
-## https://gitlab.com/inkscape/inkscape/commit/a600c6438fef2f4c06f9a4a7d933d99fb054a973
-## Fix compilation with poppler 0.64
-echo $'--- src/extension/internal/pdfinput/pdf-parser.cpp
-+++ src/extension/internal/pdfinput/pdf-parser.cpp
-@@ -2585,1 +2585,1 @@
--void PdfParser::doShowText(GooString *s) {
-+void PdfParser::doShowText(const GooString *s) {
-@@ -2604,1 +2604,1 @@
--  builder->beginString(state, s);
-+  builder->beginString(state);
-@@ -2634,1 +2634,1 @@
--    p = s->getCString();
-+    p = g_strdup(s->getCString());
-@@ -2689,1 +2689,1 @@
--    p = s->getCString();
-+    p = g_strdup(s->getCString());
-@@ -2735,1 +2735,1 @@
--  char *name = args[0].getName();
-+  char *name = g_strdup(args[0].getName());
---- src/extension/internal/pdfinput/pdf-parser.h
-+++ src/extension/internal/pdfinput/pdf-parser.h
-@@ -290,1 +290,1 @@
--  void doShowText(GooString *s);
-+  void doShowText(const GooString *s);
---- src/extension/internal/pdfinput/svg-builder.cpp
-+++ src/extension/internal/pdfinput/svg-builder.cpp
-@@ -1023,1 +1023,1 @@
--        _font_specification = font->getName()->getCString();
-+        _font_specification = g_strdup(font->getName()->getCString());
-@@ -1364,1 +1364,1 @@
--void SvgBuilder::beginString(GfxState *state, GooString * /*s*/) {
-+void SvgBuilder::beginString(GfxState *state) {
---- src/extension/internal/pdfinput/svg-builder.h
-+++ src/extension/internal/pdfinput/svg-builder.h
-@@ -32,1 +32,0 @@
--class GooString;
-@@ -139,1 +138,1 @@
--    void beginString(GfxState *state, GooString *s);
-+    void beginString(GfxState *state);
-' | while read line
-do
-patch -p0
-done
-
-## https://gitlab.com/inkscape/inkscape/commit/10e8ae0ff522d3a9caeed9a7f137cdfd795ba0a3
-## Fix compilation with poppler 0.65.0
-## replace unused includes with one that is actually used
-echo $'--- src/extension/internal/pdfinput/pdf-parser.cpp
-+++ src/extension/internal/pdfinput/pdf-parser.cpp
-@@ -40,2 +40,1 @@
--#include "goo/GooTimer.h"
--#include "goo/GooHash.h"
-+#include "goo/GooString.h"
-' | while read line
-do
-patch -p0
-done
 
 chown_fn
 
@@ -170,31 +114,33 @@ listdocs_fn
 cd_builddir_fn
 
 ## default options have been pulled from CMakeLists.txt
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr/local \
-    -DWITH_NLS="ON" \
-    -DWITH_DBUS="OFF" \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DENABLE_LCMS="ON" \
+    -DENABLE_POPPLER="ON" \
+    -DENABLE_POPPLER_CAIRO="ON" \
+    -DWITH_DBUS="OFF" \
     -DWITH_GNOME_VFS="ON" \
     -DWITH_SVG2="ON" \
     -DWITH_LPETOOL="OFF" \
     -DWITH_INKJAR="ON" \
     -DWITH_OPENMP="ON" \
     -DWITH_PROFILING="OFF" \
-    -DENABLE_POPPLER="ON" \
-    -DENABLE_POPPLER_CAIRO="ON" \
     -DWITH_IMAGE_MAGICK="ON" \
     -DWITH_LIBCDR="ON" \
     -DWITH_LIBVISIO="ON" \
     -DWITH_LIBWPG="ON" \
+    -DWITH_NLS="ON" \
     -DWITH_GTK3_EXPERIMENTAL="OFF" \
+    -DWITH_GTKSPELL="OFF" \
     -DENABLE_BINRELOC="OFF" \
     ..
 
@@ -218,6 +164,14 @@ strip_fn
 mkdir_install_fn
 
 echo "
+# Update the desktop database:
+/usr/bin/update-desktop-database usr/local/share/applications
+
+# Update hicolor theme cache:
+/usr/bin/gtk-update-icon-cache -f -t usr/local/share/icons/hicolor
+" >> $PKG/install/doinst.sh
+
+echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|' on
@@ -231,26 +185,12 @@ $PRGNAM: Inkscape is an Open Source vector graphics editor, with capabilities
 $PRGNAM: similar to Illustrator, Freehand, CorelDraw, or Xara X using the W3C
 $PRGNAM: standard Scalable Vector Graphics (SVG) file format.
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
 $PRGNAM: With language support for:
 $PRGNAM: en $(echo $(cat ../po/LINGUAS))
 $PRGNAM:
 $PRGNAM: Homepage: http://www.inkscape.org/
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database /usr/local/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t /usr/local/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-EOINS
 
 makepkg_fn

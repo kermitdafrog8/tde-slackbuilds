@@ -47,13 +47,13 @@ chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=${INSTALL_TDE}
+   --prefix=$INSTALL_TDE
 
 make_fn
 
@@ -70,20 +70,18 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
-$PRGNAM|-----handy-ruler------------------------------------------------------|
-$PRGNAM:
-$PRGNAM: $PRGNAM is a TDE-based source-editing environment for C and C-style
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: kscope is a TDE-based source-editing environment for C and C-style
 $PRGNAM: languages. Primarily, it is a front-end to the veteran Cscope,
 $PRGNAM: a source-code browser originally developed at Bell Labs.
 $PRGNAM:
-$PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM:
 $PRGNAM: en $langs
 $PRGNAM:
 $PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
-
 
 makepkg_fn

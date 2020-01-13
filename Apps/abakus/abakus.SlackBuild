@@ -42,17 +42,25 @@ sed -i 's|mpfr gmp|mpfr -lgmp|' src/CMakeLists.txt
 
 listdocs_fn
 
+# set support for additional language(s) as per I18N variable
+# but only for languages available with this package
+langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang/$PRGNAM.po";done
+sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
+langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
+[[ $langs != "" ]] && TRANS=ON
+
 chown_fn
 
 cd_builddir_fn
 
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \ \
     ..
 
 make_fn
@@ -70,21 +78,18 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
-$PRGNAM|-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM is a calculator designed with computer usability in mind.
-$PRGNAM: Instead of using your powerful computer to put a limited simulation
-$PRGNAM: of a calculator on-screen, $PRGNAM instead allows you to use your
-$PRGNAM: computer to its greater potential.
-$PRGNAM:
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: abakus is an improvement in the limited simulation of a calculator.
 $PRGNAM: Can be built and used with mpfr.
 $PRGNAM: Customizable precision up to 75 digits.
 $PRGNAM:
 $PRGNAM: Copy/paste or type in and evaluate complex expressions. Exponentiation
 $PRGNAM: is right-associative, for example:  (2^3)^2*e^4/pi  2^3^2*e^4/pi
-$PRGNAM:      [The answers given by $PRGNAM:  1112.26437907   8898.11503252]
-
+$PRGNAM:      [The answers given by abakus:  1112.26437907   8898.11503252]
+$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: en $langs
+$PRGNAM:
 " > $PKG/install/slack-desc
-
 
 makepkg_fn

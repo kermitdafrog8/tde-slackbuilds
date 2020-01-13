@@ -37,10 +37,9 @@ untar_fn
 
 listdocs_fn
 
-## patch for gcc7 twin/client.cpp:2978:38: error: ISO C++ forbids comparison between pointer and integer [-fpermissive]
-sed -i 's|data != None|data != 0|' twin/client.cpp
 ## allow for configuration files directory != /etc/trinity
 sed -i "s|/etc/trinity/|$SYS_CNF_DIR/|" tdm/kfrontend/gentdmconf.c || true
+
 ## make default tdm screen text clearer against dark background and align login button with clickable area
 ## edit color="#ffff74" and/or color="#ff0000" for your own choice
 echo $'
@@ -111,7 +110,7 @@ chown_fn
 
 cd_builddir_fn
 
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
@@ -123,30 +122,91 @@ cd_builddir_fn
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DWITH_OPENEXR="ON" \
-    -DWITH_XCOMPOSITE="ON" \
-    -DWITH_XCURSOR="ON" \
-    -DWITH_SUDO_TDESU_BACKEND="ON" \
-    -DWITH_SUDO_KONSOLE_SUPER_USER_COMMAND="ON" \
-    -DWITH_PAM="OFF" \
-    -DWITH_SHADOW="ON" \
-    -DWITH_XFIXES="ON" \
-    -DWITH_XRANDR="ON" \
-    -DWITH_XRENDER="ON" \
-    -DWITH_OPENGL="ON" \
-    -DWITH_XSCREENSAVER="OFF" \
-    -DWITH_XTEST="ON" \
-    -DWITH_LIBART="ON" \
-    -DWITH_LIBUSB="OFF" \
-    -DWITH_XDMCP="ON" \
-    -DWITH_XINERAMA="ON" \
     -DWITH_ARTS="ON" \
+    -DWITH_ELFICON="OFF" \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_HAL="OFF" \
+    -DWITH_I8K="OFF" \
+    -DWITH_LDAP="OFF" \
+    -DWITH_LIBART="ON" \
+    -DWITH_LIBCONFIG="OFF" \
+    -DWITH_LIBRAW1394="OFF" \
+    -DWITH_LIBUSB="OFF" \
+    -DWITH_OPENEXR="ON" \
+    -DWITH_OPENGL="ON" \
+    -DWITH_PAM="OFF" \
+    -DWITH_PCRE="ON" \
+    -DWITH_SAMBA="OFF" \
+    -DWITH_SASL="OFF" \
+    -DWITH_SENSORS="OFF" \
+    -DWITH_SHADOW="ON" \
+    -DWITH_SUDO_KONSOLE_SUPER_USER_COMMAND="ON" \
+    -DWITH_SUDO_TDESU_BACKEND="ON" \
     -DWITH_TDEHWLIB="ON" \
     -DWITH_UPOWER="ON" \
-    -DWITH_PCRE="ON" \
-    -DBUILD_ALL="ON" \
+    -DWITH_XCOMPOSITE="ON" \
+    -DWITH_XCURSOR="ON" \
+    -DWITH_XDMCP="ON" \
+    -DWITH_XFIXES="ON" \
+    -DWITH_XINERAMA="ON" \
+    -DWITH_XRANDR="ON" \
+    -DWITH_XRENDER="ON" \
+    -DWITH_XSCREENSAVER="OFF" \
+    -DWITH_XTEST="ON" \
+    -DBUILD_APPLNK="ON" \
+    -DBUILD_CRASHTEST="ON" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_DRKONQI="ON" \
+    -DBUILD_KAPPFINDER="ON" \
+    -DBUILD_KATE="ON" \
+    -DBUILD_KCHECKPASS="ON" \
+    -DBUILD_KCMINIT="ON" \
+    -DBUILD_KCONTROL="ON" \
+    -DBUILD_KDCOP="ON" \
+    -DBUILD_KDESKTOP="ON" \
+    -DBUILD_KDIALOG="ON" \
+    -DBUILD_KFIND="ON" \
+    -DBUILD_KHELPCENTER="ON" \
+    -DBUILD_KHOTKEYS="ON" \
+    -DBUILD_KICKER="ON" \
+    -DBUILD_KLIPPER="ON" \
+    -DBUILD_KMENUEDIT="ON" \
+    -DBUILD_KNETATTACH="ON" \
+    -DBUILD_KONQUEROR="ON" \
+    -DBUILD_KONSOLE="ON" \
+    -DBUILD_KPAGER="ON" \
+    -DBUILD_KPERSONALIZER="ON" \
+    -DBUILD_KREADCONFIG="ON" \
+    -DBUILD_KROOTBACKING="ON" \
+    -DBUILD_KSMSERVER="ON" \
+    -DBUILD_KSPLASHML="ON" \
+    -DBUILD_KSTART="ON" \
+    -DBUILD_KSYSGUARD="ON" \
+    -DBUILD_KSYSTRAYCMD="ON" \
+    -DBUILD_KTIP="ON" \
+    -DBUILD_KXKB="ON" \
+    -DBUILD_L10N="ON" \
+    -DBUILD_LIBKONQ="ON" \
+    -DBUILD_NSPLUGINS="ON" \
+    -DBUILD_PICS="ON" \
+    -DBUILD_PROFILE_SHUTDOWN="OFF" \
+    -DBUILD_STARTTDE="ON" \
+    -DBUILD_TDEDEBUGDIALOG="ON" \
+    -DBUILD_TDEEJECT="ON" \
+    -DBUILD_TDEINIT="ON" \
+    -DBUILD_TDEIOSLAVES="ON" \
+    -DBUILD_TDEKBDLEDSYNC="ON" \
+    -DBUILD_TDEPASSWD="ON" \
+    -DBUILD_TDEPRINT="ON" \
+    -DBUILD_TDESCREENSAVER="ON" \
+    -DBUILD_TDESU="ON" \
+    -DBUILD_TDM="ON" \
+    -DBUILD_TQT3INTEGRATION="ON" \
+    -DBUILD_TSAK="ON" \
+    -DBUILD_TWIN="ON" \
     -Wno-dev \
     ..
+
 make_fn
 
 installdocs_fn
@@ -199,28 +259,6 @@ fi
 
 mkdir_install_fn
 
-echo "
-# HOW TO EDIT THIS FILE:
-# The 'handy ruler' below makes it easier to edit a package description.  Line
-# up the first '|' above the ':' following the base package name, and the '|'
-# on the right side marks the last column you can put a character in.  You must
-# make exactly 11 lines for the formatting to be correct.  It's also
-# customary to leave one space after the ':'.
-
-       |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (The Trinity Desktop base)
-$PRGNAM:
-$PRGNAM: tdebase is the second mandatory package (besides tdelibs) for the
-$PRGNAM: Trinity Desktop Environment. Here we have various applications and
-$PRGNAM: infrastructure files and libraries.
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
-" > $PKG/install/slack-desc
-
 sed "s|{SYS_CNF_DIR}|$SYS_CNF_DIR|;s|{INSTALL_TDE}|$INSTALL_TDE|;s|{TQTDIR}|$TQTDIR|" < $SRCDIR/doinst.sh > $PKG/install/doinst.sh
 [[ $RUNLEVEL == 4 ]] && {
 echo "
@@ -236,5 +274,26 @@ echo 'export TDEHOME=~/.tde' >> /etc/profile
 echo 'export TDEROOTHOME=/root/.tde' >> /etc/profile
 " >> $PKG/install/doinst.sh
 }
+
+echo "
+# HOW TO EDIT THIS FILE:
+# The 'handy ruler' below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: tdebase (The Trinity Desktop base)
+$PRGNAM:
+$PRGNAM: tdebase is the second mandatory package (besides tdelibs) for the
+$PRGNAM: Trinity Desktop Environment. Here we have various applications and
+$PRGNAM: infrastructure files and libraries.
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+" > $PKG/install/slack-desc
 
 makepkg_fn

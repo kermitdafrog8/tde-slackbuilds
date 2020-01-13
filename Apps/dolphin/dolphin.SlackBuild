@@ -35,72 +35,30 @@ untar_fn
 
 listdocs_fn
 
-[[ $TDEVERSION == R14.0.[45] ]] && {
-## Patches to edit/create CMakeLists.txt for documentation and locales support
-sed -i 's|src )|src )\nadd_subdirectory( po )\nadd_subdirectory( doc )|' CMakeLists.txt
-
-## for doc - based on amarok CMakeLists.txt:
-echo "tde_auto_add_subdirectories()
-" > doc/CMakeLists.txt
-echo "tde_create_handbook( LANG en DESTINATION d3lphin )
-" > doc/en/CMakeLists.txt
-## for po - based on tde-style-qtcurve CMakeLists.txt:
-echo 'exec_program(tde-config
-             ARGS --install locale --expandvars
-             OUTPUT_VARIABLE TDE_LOCALE_PREFIX)
-
-find_program(GETTEXT_MSGFMT_EXECUTABLE msgfmt)
- 
-if(NOT GETTEXT_MSGFMT_EXECUTABLE)
-    message("------\n"
-            "NOTE: msgfmt not found. Translations will *not* be installed\n"
-            "------\n")
-else(NOT GETTEXT_MSGFMT_EXECUTABLE)
-    set(catalogname d3lphin)
-    add_custom_target(translations ALL)
-    file(GLOB PO_FILES *.po)
-    foreach(_poFile ${PO_FILES})
-        get_filename_component(_poFileName ${_poFile} NAME)
-        string(REGEX REPLACE "^${catalogname}_?" "" _langCode ${_poFileName} )
-        string(REGEX REPLACE "\\.po$" "" _langCode ${_langCode} )
-        if(_langCode)
-            get_filename_component(_lang ${_poFile} NAME_WE)
-            set(_gmoFile ${CMAKE_CURRENT_BINARY_DIR}/${_lang}.gmo)
-            add_custom_command(TARGET translations
-                    COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --check -o ${_gmoFile} ${_poFile}
-                    DEPENDS ${_poFile})
-            install(FILES ${_gmoFile} DESTINATION  ${TDE_LOCALE_PREFIX}/${_langCode}/LC_MESSAGES/ RENAME ${catalogname}.mo)
-        endif( _langCode )
-    endforeach(_poFile ${PO_FILES})
-endif(NOT GETTEXT_MSGFMT_EXECUTABLE)
-' > po/CMakeLists.txt
-}
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-cd po
-langs="";for Lang in $I18N;do [[ -e $Lang".po" ]] && langs="$langs $Lang"".po";done
-## output list of available locales ...
-for line in $(ls -1 *.po)
-do
-## ... and compare to selected locales & remove those not required
-[[ $langs != *$line* ]] && rm -rf $line
-done
-langs=$(echo $langs | sed 's|.po||g')
-cd ..
+langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
+## this GLOB overrides the one in po/CMakeLists.txt:
+sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
+langs=$(echo $langs | sed "s|.po||g")
+[[ $langs != "" ]] && TRANS=ON
 
 chown_fn
 
 cd_builddir_fn
 
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=${INSTALL_TDE}/man \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
     ..
 
 make_fn
@@ -111,6 +69,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -119,43 +79,24 @@ echo "
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Dolphin file manager for TDE)
-$PRGNAM:
-$PRGNAM: Dolphin file manager for TDE
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: Dolphin (a file manager for TDE)
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM:
 $PRGNAM: en $langs
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php 
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
 
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-EOINS
-
-
-# Replace the desktop file, with an alternate one. This one changes the 
-# icon name from d3lphin to dolphin. To allow easy system-wide icon 
-# themeing changes. No other alterations made. I've decided this shouldn't
-# be default. I will uncomment this when I build, and others can do the 
-# the same if they wish =]
-#mv -v $PKG/${INSTALL_TDE}/share/applications/tde/d3lphin.desktop \
-#$PKG/${INSTALL_TDE}/share/applications/tde/d3lphine.desktop.orig
-#cp -v $SRCDIR/d3lphin.desktop $PKG/${INSTALL_TDE}/share/applications/tde/d3lphin.desktop
+## Legacy note:
+# Change the icon name from d3lphin to dolphin in the desktop file to
+# allow easy system-wide icon theme changes.
+# Uncomment if required ..
+#
+#sed -i 's|Icon=d3lphin|Icon=dolphin|' $PKG/$INSTALL_TDE/share/applications/tde/d3lphin.desktop
 
 makepkg_fn

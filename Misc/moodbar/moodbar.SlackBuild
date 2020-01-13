@@ -30,27 +30,28 @@ TAG=${TAG:-}
 
 SRCURL="http://pkgs.fedoraproject.org/repo/pkgs/${PRGNAM}/${PRGNAM}-${VERSION}.tar.gz/28c8eb65e83b30f71b84be4fab949360/${PRGNAM}-${VERSION}.tar.gz"
 ARCHIVE_TYPE="tar.gz"
+
 source ../../get-source.sh
 getsource_fn
 
 untar_fn
+
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="$SLKLDFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-CFLAGS="$SLKCFLAGS" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CXXFLAGS=$SLKCFLAGS \
+CFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
   --prefix=/usr \
-  --libdir=/usr/lib${LIBDIRSUFFIX} \
+  --libdir=/usr/lib$LIBDIRSUFFIX \
   --mandir=/usr/man \
-  --disable-static \
-  --build=$ARCH-slackware-linux \
+  --disable-static
 
 make_fn
 
@@ -69,20 +70,19 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (For inclusion in the Amarok music player)
-$PRGNAM: 
+$PRGNAM: moodbar (For inclusion in the Amarok music player)
+$PRGNAM:
 $PRGNAM: The Moodbar is an algorithm for creating a colorful visual
 $PRGNAM: representation of the contents of an audio file, giving an idea of its
 $PRGNAM: mood (this is a rather fanciful term for the simple analysis it
 $PRGNAM: actually does).
-$PRGNAM: 
+$PRGNAM:
 $PRGNAM: This package contains a GStreamer plugin with elements that are used
 $PRGNAM: in the moodbar analysis, and an application that actually does the analysis.
-$PRGNAM: 
 $PRGNAM:
-$PRGNAM:      
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

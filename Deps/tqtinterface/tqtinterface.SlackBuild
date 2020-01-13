@@ -38,25 +38,28 @@ listdocs_fn
 chown_fn
 
 # Until the cmake migration is fully completed, tqtinterface should be 
-# built to install with a $PREFIX of /usr rather than ${INSTALL_TDE}, 
-# even if you are installing everything else to ${INSTALL_TDE}.
+# built to install with a $PREFIX of /usr rather than $INSTALL_TDE, 
+# even if everything else is being installed to $INSTALL_TDE.
 cd_builddir_fn
 
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
-    -DQT_PREFIX_DIR=${INSTALL_TDE} \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DQT_PREFIX_DIR=$INSTALL_TDE \
     -DQT_INCLUDE_DIR=$TQTDIR/include \
     -DQT_LIBRARY_DIR=$TQTDIR/lib \
     -DQT_BINARY_DIR=$TQTDIR/bin \
     -DQT_VERSION=3 \
+    -DWITH_QT3="ON" \
+    -DWITH_QT4="OFF" \
     ..
+
 make_fn
 
 installdocs_fn
@@ -72,9 +75,8 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (libraries that abstract the underlying Qt system)
+$PRGNAM: tqtinterface (libraries that abstract the underlying Qt system)
 $PRGNAM:
 $PRGNAM: This package includes libraries that abstract the underlying
 $PRGNAM: Qt system from the actual Trinity code, allowing easy, complete
@@ -84,7 +86,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

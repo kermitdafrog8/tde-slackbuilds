@@ -33,34 +33,6 @@ getsource_fn
 
 untar_fn
 
-[[ $TDEVERSION == R14.0.4 ]] && {
-## fix for gcc7:
-##In file included from ../../../../../digikam/imageplugins/coreplugin/sharpnesseditor/matrix.cpp:35:0:
-##/usr/include/stdlib.h:751:12: error: expected unqualified-id before ‘int’
-## extern int abs (int __x) __THROW __attribute__ ((__const__)) __wur;
-##            ^
-echo '--- digikam/imageplugins/coreplugin/sharpnesseditor/clapack/f2c.h
-+++ digikam/imageplugins/coreplugin/sharpnesseditor/clapack/f2c.h
-@@ -157 +156,0 @@
--#define abs(x) ((x) >= 0 ? (x) : -(x))
---- digikam/imageplugins/coreplugin/sharpnesseditor/matrix.cpp
-+++ digikam/imageplugins/coreplugin/sharpnesseditor/matrix.cpp
-@@ -32,0 +33,5 @@
-+// C++ includes.
-+#include <stdlib.h>
-+#include <cmath>
-+using ::abs;
-+
-@@ -38,4 +42,0 @@
--
--// C++ includes.
--
--#include <cmath>' | while read line
-do
-patch -p0
-done
-}
-
 listdocs_fn
 
 # set support for additional language(s) as per I18N variable
@@ -68,7 +40,8 @@ listdocs_fn
 langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang";done
 sed -i "s|SUBDIRS =.*$|SUBDIRS =.$langs|" po/Makefile.am
 # only package help documents where they exist for the languages being included
-langdocdk="digikam";for Lang in $langs;do [[ -d doc/$Lang"_digikam" ]] && langdocdk=$(echo $Lang"_digikam" $langdocdk);done
+ldocs="" # for slack-desc
+langdocdk="digikam";for Lang in $langs;do [[ -d doc/$Lang"_digikam" ]] && langdocdk=$(echo $Lang"_digikam" $langdocdk) && ldocs="$ldocs $Lang";done
 langdocsf="showfoto";for Lang in $langs;do [[ -d doc/$Lang"_showfoto" ]] && langdocsf=$(echo $Lang"_showfoto" $langdocsf);done
 sed -i "s|SUBDIRS =.*$|SUBDIRS =. $langdocdk $langdocsf|" doc/Makefile.am
 
@@ -78,15 +51,15 @@ chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=${INSTALL_TDE} \
+   --prefix=$INSTALL_TDE \
    --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
+   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 
@@ -98,6 +71,18 @@ strip_fn
 
 mkdir_install_fn
 
+# If building with additional language support, showfoto doesn't run using the language selected
+# because showfoto.mo files are not being built. This is added into the build at this packaging
+# stage as a work-around to provide the translations for showfoto ..
+if [ -d $PKG$INSTALL_TDE/share/locale ]
+then
+for DIR in $PKG$INSTALL_TDE/share/locale/*/LC_MESSAGES/
+do
+(cd $DIR
+ln -s digikam.mo showfoto.mo)
+done
+fi
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -105,32 +90,18 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-digikam: Digikam is a digital photo management application for the TDE desktop.
-digikam:
-digikam: Showfoto is a photo viewer and editor.
-digikam:
-digikam: With language support for:
-digikam:
-digikam: en $(echo $langs)
-digikam:
-digikam:
-digikam:
-digikam:
+$PRGNAM: Digikam is a digital photo management application for the TDE desktop.
+$PRGNAM:
+$PRGNAM: Showfoto is a photo viewer and editor.
+$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: en$langs
+$PRGNAM:
+$PRGNAM: With help documentation for:
+$PRGNAM: en$ldocs
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
 
-
-# If building with additional language support, showfoto doesn't run using the language selected
-# because showfoto.mo files are not being built. This is added into the build at this packaging
-# stage as a work-around to provide the translations for showfoto ..
-if [ -d $PKG${INSTALL_TDE}/share/locale ]
-then
-for DIR in $PKG${INSTALL_TDE}/share/locale/*/LC_MESSAGES/
-do
-(cd $DIR
-ln -s digikam.mo showfoto.mo)
-done
-fi
 makepkg_fn
-

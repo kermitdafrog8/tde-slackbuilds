@@ -36,15 +36,10 @@ untar_fn
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
-## output list of available locales ...
-(cd po
-ls -1 *.po | while read line
-do
-## ... and compare to selected locales & remove those not required
-[[ $langs != *$line* ]] && rm -rf $line
-:
-done)
-[[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs|sed "s|.po||g")
+## this GLOB overrides the one in po/CMakeLists.txt:
+sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
+#langs=$(echo $langs | sed "s|.po||g")
+[[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs | sed "s|.po||g")
 [[ $langs == *ru* || $langs == *uk* ]] && RU_UA=ON
 
 listdocs_fn
@@ -61,9 +56,11 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
     -DWITH_RU_UA_LAYOUT=${RU_UA:-OFF} \
-    -DCMAKE_SKIP_RPATH=ON \
+    -DCMAKE_SKIP_RPATH="ON" \
     ..
 
 make_fn
@@ -81,7 +78,6 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
 $PRGNAM: KKBSwitch is a keyboard layout indicator which displays an icon in
 $PRGNAM: the system tray that indicates which layout is currently active.
@@ -90,9 +86,9 @@ $PRGNAM: Switch keyboard groups by clicking the icon or selecting the desired
 $PRGNAM: group from the icon's menu
 $PRGNAM: Toggle between the two most recently used groups.
 $PRGNAM:
-$PRGNAM:
 $PRGNAM: With language support for:
 $PRGNAM: en $langs
+$PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc
 

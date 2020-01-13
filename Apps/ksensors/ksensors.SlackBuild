@@ -73,20 +73,18 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
-$PRGNAM|-----handy-ruler------------------------------------------------------|
-$PRGNAM:
-$PRGNAM: $PRGNAM is a sensors frontend for TDE.
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: ksensors is a sensors frontend for TDE.
 $PRGNAM:
 $PRGNAM: lm_sensors:
 $PRGNAM: Read the 'sensors-detect' man page for warnings on usage, then
 $PRGNAM: run 'sensors-detect' to scan for hardware monitoring chips.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM:
 $PRGNAM: en $langs
 $PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
-
 
 makepkg_fn

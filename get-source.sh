@@ -356,6 +356,22 @@ cat $PKG/install/slack-desc | grep "^$PRGNAM" | grep -v handy > $OUTPUT/$PRGNAM-
 umask ${_UMASK_}
 }
 
+
+## paths in doinst.sh should be relative to allow for installation to ROOT != "/"
+doinst_sh_fn ()
+{
+echo "
+# Update the desktop database:
+/usr/bin/update-desktop-database .$INSTALL_TDE/share/applications
+
+# Update hicolor theme cache:
+/usr/bin/gtk-update-icon-cache -f -t .$INSTALL_TDE/share/icons/hicolor
+
+# Update the mime database:
+/usr/bin/update-mime-database -Vn usr/share/mime
+" >> $PKG/install/doinst.sh
+}
+
 libpng16_fn ()
 {
 (cd /usr/bin

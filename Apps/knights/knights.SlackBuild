@@ -78,20 +78,18 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-knights: A graphical chess interface for the Trinity Desktop Environment
-knights:
-knights: Download themepack [additional boards and chessman themes] from:
-knights:            http://sourceforge.net/project/showfiles.php?group_id=31461
-knights:
-knights: Needs separate chess engines, for example gnuchess, stockfish, komodo.
-knights:
-knights: With language support for:
-knights:
-knights: en $langs
-knights:
+$PRGNAM: A graphical chess interface for the Trinity Desktop Environment
+$PRGNAM:
+$PRGNAM: Download themepack [additional boards and chessman themes] from:
+$PRGNAM:         http://sourceforge.net/project/showfiles.php?group_id=31461
+$PRGNAM:
+$PRGNAM: Needs separate chess engines, for example gnuchess, stockfish, komodo.
+$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: en $langs
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
-
 
 makepkg_fn

@@ -23,8 +23,8 @@
 #   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 #   SUCH DAMAGE.
 
-PKGNAM=tdeamarok
 PRGNAM=amarok
+PKGNAM=tde$PRGNAM
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -45,7 +45,7 @@ sed -i -e 's|wav )|wav )\nadd_subdirectory( speex )|' \
 -e 's|tagaac-static|tagaac-static tagspeex-static|' amarok/src/metadata/CMakeLists.txt
 
 # If libmp4v2 is installed, use mp4 metadata sources in build, otherwise use m4a ..
-[[ $(grep -E "mp4.h|mp4v2.h" /var/log/packages/*) ]] && LMP4V2="ON" || sed -i 's|tagmp4|tagm4a|' amarok/src/metadata/CMakeLists.txt
+[[ $(grep -E "mp4.h|mp4v2.h" /var/log/packages/*) ]] && LMP4V2="ON" || sed -i 's|tagmp4-static|tagm4a-static|' amarok/src/metadata/CMakeLists.txt
 
 # See if xine-lib package from Slackware is installed. (Need this to play music so hopefully it is.)
 [[ $(grep -E "xine.h" /var/log/packages/*) ]] && XINE="ON"
@@ -188,43 +188,48 @@ find . -name \*.ui -exec sed -i -e 's|includehint|include|g' '{}' +
 
 listdocs_fn
 
+## remove help documentation build instruction from all [non-en] locales ...
+sed -i '/tde_create_handbook/,+3d' doc/??{,_??}/CMakeLists.txt || true
+
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang";done
-#
-## output list of available locales ...
-ls -1 po | while read line
+langs="" # the *.po file list
+ldocs="" # the help docs
+for Lang in $I18N
 do
-## ... and compare to selected locales & remove those not required
-[[ -d po/$line ]] && [[ $langs != *$line* ]] && rm -rf po/$line
-done 
-#
-## output list of available locale documentation ...
-ldocs="amarok $langs"
-ls -1 doc | while read line
-do
-## ... and compare to docs for selected locales & remove those not required
-[[ -d doc/$line ]] && [[ $ldocs != *$line* ]] && rm -rf doc/$line
+[[ -d po/$Lang ]] && {
+langs="$langs $Lang/$PRGNAM.po"
+## ... and restore help documentation for the selected and available locales
+[[ -e doc/$Lang/CMakeLists.txt ]] && {
+[[ $Lang == ru ]] && NOINDEX=NOINDEX
+echo "tde_create_handbook( ${NOINDEX:-} LANG $Lang DESTINATION $PRGNAM )" >> doc/$Lang/CMakeLists.txt
+ldocs="$ldocs $Lang"
+}
+}
 done
+#
+sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
+langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
+[[ $langs != "" ]] && TRANS=ON
 
 chown_fn
 
 cd_builddir_fn
 
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=${INSTALL_TDE}/man \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_MP4V2=${LMP4V2:-"OFF"} \
-    -DWITH_LIBVISUAL="ON" \
-    -DWITH_KONQSIDEBAR="ON" \
     -DWITH_XINE=${XINE:-"OFF"} \
     -DWITH_YAUAP=${YAUAP:-"OFF"} \
+    -DWITH_LIBVISUAL="ON" \
+    -DWITH_KONQSIDEBAR="ON" \
     -DWITH_AKODE="OFF" \
     -DWITH_IPOD="OFF" \
     -DWITH_IFP="OFF" \
@@ -234,7 +239,7 @@ cd_builddir_fn
     -DWITH_DAAP="OFF" \
     -DWITH_INOTIFY="OFF" \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS="ON" \
+    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     ..
 
 <<'Comment'
@@ -254,6 +259,9 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
+PRGNAM=$PKGNAM
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -261,36 +269,18 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
-$PKGNAM|-----handy-ruler------------------------------------------------------|
-$PKGNAM: $PKGNAM (Amarok Music Player)
-$PKGNAM:
-$PKGNAM: Amarok music player for TDE
-$PKGNAM:
-$PKGNAM:
-$PKGNAM: With language support for:
-$PKGNAM:
-$PKGNAM: en$langs
-$PKGNAM:
-$PKGNAM:
-$PKGNAM: Home: https://www.trinitydesktop.org/index.php
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: Amarok music player for TDE
+$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: en $langs
+$PRGNAM:
+$PRGNAM: With help documentation for:
+$PRGNAM: en$ldocs
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
 
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-EOINS
-
-
-PRGNAM=$PKGNAM
 makepkg_fn

@@ -82,7 +82,7 @@ chown_fn
 
 #cd_builddir_fn
 
-echo "yes" | CFLAGS="$SLKCFLAGS" CXXFLAGS="$SLKCFLAGS" \
+echo "yes" | CFLAGS=$SLKCFLAGS CXXFLAGS=$SLKCFLAGS \
  ./configure \
  -no-exceptions \
  -prefix $TQTDIR-$VERSION \
@@ -181,28 +181,6 @@ mkdir -p $PKG$INSTALL_TDE/include
 
 mkdir_install_fn
 
-echo "
-# HOW TO EDIT THIS FILE:
-# The 'handy ruler' below makes it easier to edit a package description.  Line
-# up the first '|' above the ':' following the base package name, and the '|'
-# on the right side marks the last column you can put a character in.  You must
-# make exactly 11 lines for the formatting to be correct.  It's also
-# customary to leave one space after the ':'.
-
-$PRGNAM|-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (C++ GUI application framework)
-$PRGNAM:
-$PRGNAM: Qt is a multiplatform C++ GUI application framework
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-" > $PKG/install/slack-desc
-
 # Add this to the doinst.sh:
 [[ $PREPEND != yes ]] && \
 cat <<EOINS >> $PKG/install/doinst.sh
@@ -245,19 +223,27 @@ sed -i "s|PKG_CONFIG_PATH |PKG_CONFIG_PATH $INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconf
 
 EOINS
 
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database $INSTALL_TDE/share/applications > /dev/null 2>&1
-fi
+doinst_sh_fn
 
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t $INSTALL_TDE/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-EOINS
+echo "
+# HOW TO EDIT THIS FILE:
+# The 'handy ruler' below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: tqt3 (C++ GUI application framework)
+$PRGNAM:
+$PRGNAM: Qt is a multiplatform C++ GUI application framework
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+" > $PKG/install/slack-desc
 
 makepkg_fn

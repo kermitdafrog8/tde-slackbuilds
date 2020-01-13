@@ -51,16 +51,17 @@ cmake \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DBUILD_DOC=ON \
-    -DBUILD_KCRON=ON \
-    -DBUILD_KDAT=ON \
-    -DBUILD_KNETWORKCONF=ON \
-    -DBUILD_KSYSV=ON \
-    -DBUILD_KUSER=ON \
-    -DBUILD_LILO_CONFIG=ON \
-    -DBUILD_KPACKAGE=ON \
-    -DBUILD_TDEFILE_PLUGINS=ON \
-    -DBUILD_SECPOLICY=OFF \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_KCRON="ON" \
+    -DBUILD_KDAT="ON" \
+    -DBUILD_KNETWORKCONF="ON" \
+    -DBUILD_KSYSV="ON" \
+    -DBUILD_KUSER="ON" \
+    -DBUILD_LILO_CONFIG="ON" \
+    -DBUILD_KPACKAGE="ON" \
+    -DBUILD_TDEFILE_PLUGINS="ON" \
+    -DBUILD_SECPOLICY="OFF" \
     -Wno-dev \
     ..
 
@@ -72,6 +73,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -80,32 +83,17 @@ echo "
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (System admin packages)
+$PRGNAM: System admin packages
 $PRGNAM:
-$PRGNAM: The tdeadmin package contains packages that usually only a system
-$PRGNAM: administrator might need
-$PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM: * kcron: Editor for the cron command scheduler.
+$PRGNAM: * kdat: Tape backup tool.
+$PRGNAM: * tdefile-plugins: Make Konquerer display info about *.dep/rpm files.
+$PRGNAM: * kpackage: Manager for DEB, RPM and similar software packages.
+$PRGNAM: * ksysv: An editor for System V startup schemes.
+$PRGNAM: * kuser: An user manager.
+$PRGNAM: * lilo-config: A KControl plugin to manage the Linux boot loader LILO
+$PRGNAM: * knetworkconf: management of Network Interfaces, Routing
+$PRGNAM:                 and DNS properties
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-EOINS
 
 makepkg_fn

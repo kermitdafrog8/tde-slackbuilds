@@ -41,18 +41,17 @@ chown_fn
 
 cd_builddir_fn 
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=${INSTALL_TDE} \
+   --prefix=$INSTALL_TDE \
    --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
+   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
-   --enable-closure \
-   --build=$ARCH-slackware-linux
+   --enable-closure
 
 make_fn
 
@@ -62,6 +61,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -70,32 +71,17 @@ echo "
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (accessibility programs)
+$PRGNAM: Accessibility programs
 $PRGNAM:
-$PRGNAM: accessibility programs
-$PRGNAM: 
+$PRGNAM: * kmag: a screen magnifier.
+$PRGNAM: * kmousetool: clicks the mouse whenever the mouse cursor
+$PRGNAM:               pauses briefly
+$PRGNAM: * kmouth: lets the computer speak.
+$PRGNAM:           Requires a speech synthesizer installed.
+$PRGNAM: * ksayit: a text to speech frontend
+$PRGNAM: * kttsd: Text-to-Speech system. A plugin based service to allow any
+$PRGNAM:          application to speak using the dcop interface
 $PRGNAM:
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-EOINS
 
 makepkg_fn

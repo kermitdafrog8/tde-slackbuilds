@@ -23,8 +23,8 @@
 #   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 #   SUCH DAMAGE.
 
-PKGNAM=tdegwenview
 PRGNAM=gwenview
+PKGNAM=tde$PRGNAM
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -42,15 +42,15 @@ chown_fn
 
 cd_builddir_fn
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=${INSTALL_TDE} \
+   --prefix=$INSTALL_TDE \
    --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
+   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 
@@ -62,6 +62,7 @@ strip_fn
 
 mkdir_install_fn
 
+PRGNAM=$PKGNAM
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -69,21 +70,18 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
-        |-----handy-ruler------------------------------------------------------|
-tdegwenview: tdegwenview (gwenview is an image viewer for TDE.)
-tdegwenview:
-tdegwenview: gwenview is an image viewer for TDE
-tdegwenview:
-tdegwenview:
-tdegwenview:
-tdegwenview:
-tdegwenview:
-tdegwenview:
-tdegwenview:
-tdegwenview:
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: tdegwenview (gwenview is an image viewer for TDE)
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
 
-
-PRGNAM=$PKGNAM
 makepkg_fn

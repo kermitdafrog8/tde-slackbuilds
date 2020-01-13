@@ -39,7 +39,7 @@ chown_fn
 
 cd_builddir_fn
 
-CFLAGS="$SLKCFLAGS" \
+CFLAGS=$SLKCFLAGS \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
@@ -68,7 +68,7 @@ echo "
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Portable Network Graphics library)
+$PRGNAM: libpng (Portable Network Graphics library)
 $PRGNAM:
 $PRGNAM: PNG (Portable Network Graphics) is an extensible file format for the
 $PRGNAM: lossless, portable, well-compressed storage of raster images.  PNG
@@ -76,7 +76,6 @@ $PRGNAM: provides a patent-free replacement for GIF and can also replace many
 $PRGNAM: common uses of TIFF.  Indexed-color, grayscale, and truecolor images
 $PRGNAM: are supported, plus an optional alpha channel.  Sample depths range
 $PRGNAM: from 1 to 16 bits.
-$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

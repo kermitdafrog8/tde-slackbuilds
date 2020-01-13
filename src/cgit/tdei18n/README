@@ -1,2 +1,2 @@
 This directory is used for downloads of tde-i18n-ab_CD packs as they are not git repositories and therefore can't be cloned individually.
-They are copied to the build area in place of the extracted R14.0.4 archives.
+They are copied to the build area in place of the extracted R14.0.x archives.

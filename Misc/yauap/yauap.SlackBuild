@@ -28,8 +28,9 @@ VERSION=${VERSION:-0.2.4}
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-SRCURL="http://download.savannah.nongnu.org/releases/yauap/yauap-0.2.4.tar.gz"
+SRCURL="https://download.savannah.nongnu.org/releases/yauap/yauap-$VERSION.tar.gz"
 ARCHIVE_TYPE="tar.gz"
+
 source ../../get-source.sh
 getsource_fn
 
@@ -70,18 +71,18 @@ echo "
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (simple commandline audio player)
-$PRGNAM: 
-$PRGNAM: Yauap is a simple commandline audio player based on the GStreamer 
-$PRGNAM: multimedia framework. There is also a DBus interface that allows yauap 
-$PRGNAM: to act as a backend for the Amarok audio player.
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
+$PRGNAM: yauap (a simple commandline audio player)
+$PRGNAM:
+$PRGNAM: Yauap is a simple commandline audio player based on the GStreamer
+$PRGNAM: multimedia framework.
+$PRGNAM:
+$PRGNAM: There is also a DBus interface that allows yauap to act as a backend
+$PRGNAM: for the Amarok audio player.
+$PRGNAM:
 $PRGNAM: http://www.nongnu.org/yauap/
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

@@ -33,9 +33,6 @@ getsource_fn
 
 untar_fn
 
-## remove x-rar-compressed.desktop
-sed -i '/x-rar-compressed.desktop/d' mimetypes/application/{CMakeLists.txt,Makefile.am}
-
 ## TDE bug 2821
 ## patch to enable tdecmshell to find TDE .desktop file in the event of a duplication in file names
 echo $'--- tdecmshell/main.cpp
@@ -49,6 +46,7 @@ echo $'--- tdecmshell/main.cpp
 do
 patch -N -p0
 done || true
+#
 ## further patch to make error message more user friendly
 echo $'--- tdecmshell/main.cpp
 +++ tdecmshell/main.cpp
@@ -71,11 +69,12 @@ listdocs_fn
 
 chown_fn
 
+cd_builddir_fn
+
 # Check for avahi-tqt
 [[ -s $INSTALL_TDE/include/avahi-tqt/qt-watch.h ]] && AVAHI="ON"
 
-cd_builddir_fn
-  cmake \
+cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
@@ -88,21 +87,47 @@ cd_builddir_fn
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DCMAKE_SKIP_RPATH="OFF" \
-    -DWITH_CUPS="ON" \
-    -DWITH_SUDO_TDESU_BACKEND="ON" \
-    -DWITH_NETWORK_MANAGER_BACKEND="ON" \
+    -DTDE_MALLOC="OFF" \
+    -DTDE_MALLOC_DEBUG="OFF" \
+    -DTDE_MALLOC_FULL="OFF" \
+    -DWITH_ALSA="ON" \
+    -DWITH_ARTS="ON" \
     -DWITH_ASPELL="OFF" \
     -DWITH_AVAHI=${AVAHI:-"OFF"} \
+    -DWITH_CONSOLEKIT="OFF" \
+    -DWITH_CUPS="ON" \
+    -DWITH_DEVKITPOWER="ON" \
+    -DWITH_ELFICON="OFF" \
+    -DWITH_GAMIN="OFF" \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_HAL="OFF" \
+    -DWITH_HSPELL="OFF" \
+    -DWITH_INOTIFY="ON" \
+    -DWITH_JASPER="OFF" \
+    -DWITH_KDE4_MENU_SUFFIX="ON" \
     -DWITH_LIBART="ON" \
-    -DWITH_OPENEXR="ON" \
+    -DWITH_LIBBFD="OFF" \
+    -DWITH_LIBIDN="OFF" \
+    -DWITH_LOGINDPOWER="ON" \
+    -DWITH_LUA="OFF" \
     -DWITH_LZMA="ON" \
-    -DWITH_XRANDR="ON" \
-    -DWITH_XCOMPOSITE="ON" \
+    -DWITH_MITSHM="OFF" \
+    -DWITH_NETWORK_MANAGER_BACKEND="ON" \
+    -DWITH_OLD_XDG_STD="OFF" \
+    -DWITH_OPENEXR="ON" \
+    -DWITH_PCRE="ON" \
+    -DWITH_SSL="ON" \
+    -DWITH_SUDO_TDESU_BACKEND="ON" \
+    -DWITH_TDEHWLIB="ON" \
+    -DWITH_TDEHWLIB_DAEMONS="ON" \
+    -DWITH_TDEICONLOADER_DEBUG="OFF" \
+    -DWITH_TIFF="OFF" \
     -DWITH_UDISKS2="ON" \
     -DWITH_UDISKS="ON" \
-    -DWITH_DEVKITPOWER="ON" \
-    -DWITH_LOGINDPOWER="ON" \
-    -DWITH_KDE4_MENU_SUFFIX="ON" \
+    -DWITH_UPOWER="OFF" \
+    -DWITH_UTEMPTER="OFF" \
+    -DWITH_XCOMPOSITE="ON" \
+    -DWITH_XRANDR="ON" \
     -Wno-dev \
     ..
 
@@ -114,6 +139,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -121,38 +148,18 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (TDE libraries)
+$PRGNAM: tdelibs (TDE libraries)
 $PRGNAM:
-$PRGNAM: These are the Trinity Desktop Environment [TDE]
-$PRGNAM: libraries. This package includes libraries that are central
+$PRGNAM: These are the Trinity Desktop Environment [TDE] libraries.
+$PRGNAM:
+$PRGNAM: This package includes libraries that are central
 $PRGNAM: to the development and execution of a TDE program, as well
 $PRGNAM: as internationalization files for these libraries, misc HTML
 $PRGNAM: documentation, theme modules, and regression tests.
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database $INSTALL_TDE/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t $INSTALL_TDE/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-# Update the mime database:
-if [ -x usr/bin/update-mime-database ]; then
-  chroot . /usr/bin/update-mime-database $INSTALL_TDE/share/mime >/dev/null 2>&1
-fi
-EOINS
 
 makepkg_fn

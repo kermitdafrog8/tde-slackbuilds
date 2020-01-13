@@ -38,7 +38,8 @@ listdocs_fn
 chown_fn
 
 cd_builddir_fn
-  cmake \
+
+cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
@@ -49,7 +50,16 @@ cd_builddir_fn
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DCMAKE_SKIP_RPATH="OFF" \
+    -DWITH_ALSA="ON" \
+    -DWITH_AUDIOFILE="ON" \
+    -DWITH_ESOUND="OFF" \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_JACK="OFF" \
+    -DWITH_MAD="ON" \
+    -DWITH_SNDIO="OFF" \
+    -DWITH_VORBIS="ON" \
     ..
+
 make_fn
 
 installdocs_fn
@@ -65,19 +75,18 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (arts)
+$PRGNAM: aRts
 $PRGNAM:
-$PRGNAM: arts
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: All of the aRts documentation is in 'The aRts Handbook',
+$PRGNAM: installed with tdemultimedia.
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

@@ -34,38 +34,87 @@ getsource_fn
 untar_fn
 
 # If libcaldav is installed, include it in the build for korganizer
-[[ $(ls /var/log/packages/libcaldav*) ]] 2>/dev/null && LCALDAV="ON"
+[[ -s $INSTALL_TDE/include/libcaldav/caldav.h ]] 2>/dev/null && LCALDAV="ON"
 
 # If libcarddav is installed, include it in the build for korganizer
-[[ $(ls /var/log/packages/libcarddav*) ]] 2>/dev/null && LCARDDAV="ON"
-
-## add patch for gcc7
-sed -i "s|Attachment( '\\\0' )|Attachment( TQChar('\\\0') )|" korganizer/koeditorattachments.cpp
+[[ -s $INSTALL_TDE/include/libcarddav/carddav.h ]] 2>/dev/null && LCARDDAV="ON"
 
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
+
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=${INSTALL_TDE}/man \
-    -DWITH_ALL_OPTIONS="ON" \
-    -DWITH_GNOKII="OFF" \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DWITH_ARTS="ON" \
+    -DWITH_BIRTHDAYS="ON" \
     -DWITH_CALDAV=${LCALDAV:-"OFF"} \
     -DWITH_CARDDAV=${LCARDDAV:-"OFF"} \
-    -DBUILD_ALL="ON" \
+    -DWITH_EGROUPWARE="ON" \
+    -DWITH_EXCHANGE="ON" \
+    -DWITH_FEATUREPLAN="ON" \
+    -DWITH_GNOKII="OFF" \
+    -DWITH_GROUPDAV="ON" \
+    -DWITH_GROUPWISE="ON" \
+    -DWITH_INDEXLIB="ON" \
+    -DWITH_KOLAB="ON" \
+    -DWITH_NEWDISTRLISTS="ON" \
+    -DWITH_NEWEXCHANGE="ON" \
+    -DWITH_SASL="ON" \
+    -DWITH_SCALIX="ON" \
+    -DWITH_SLOX="ON" \
+    -DWITH_XSCREENSAVER="ON" \
+    -DBUILD_AKREGATOR="ON" \
+    -DBUILD_CERTMANAGER="ON" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_INDEXLIB="ON" \
+    -DBUILD_KADDRESSBOOK="ON" \
+    -DBUILD_KALARM="ON" \
+    -DBUILD_KANDY="ON" \
+    -DBUILD_KARM="ON" \
+    -DBUILD_KGANTT="ON" \
+    -DBUILD_KITCHENSYNC="OFF" \
+    -DBUILD_KMAIL="ON" \
+    -DBUILD_KMAILCVT="ON" \
+    -DBUILD_KMOBILE="ON" \
+    -DBUILD_KNODE="ON" \
+    -DBUILD_KNOTES="ON" \
+    -DBUILD_KODE="ON" \
+    -DBUILD_KONSOLEKALENDAR="ON" \
+    -DBUILD_KONTACT="ON" \
+    -DBUILD_KORGANIZER="ON" \
+    -DBUILD_KORN="ON" \
+    -DBUILD_KTNEF="ON" \
+    -DBUILD_LIBKCAL="ON" \
+    -DBUILD_LIBKHOLIDAYS="ON" \
+    -DBUILD_LIBKMIME="ON" \
+    -DBUILD_LIBKPGP="ON" \
+    -DBUILD_LIBKPIMEXCHANGE="ON" \
+    -DBUILD_LIBKPIMIDENTITIES="ON" \
+    -DBUILD_LIBKSIEVE="ON" \
+    -DBUILD_LIBTDENETWORK="ON" \
+    -DBUILD_LIBTDEPIM="ON" \
+    -DBUILD_MIMELIB="ON" \
+    -DBUILD_PLUGINS="ON" \
+    -DBUILD_TDEABC="ON" \
+    -DBUILD_TDEFILE_PLUGINS="ON" \
+    -DBUILD_TDEIOSLAVE="ON" \
+    -DBUILD_TDERESOURCES="ON" \
+    -DBUILD_WIZARDS="ON" \
     -Wno-dev \
     ..
+
 make_fn
 
 installdocs_fn
@@ -74,6 +123,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -81,38 +132,27 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (personal information management)
+$PRGNAM: tdepim (personal information management)
 $PRGNAM:
-$PRGNAM: The TDE-PIM project aims to bring together those who wish to help
-$PRGNAM: design, implement, test, etc. anything that's to do with
-$PRGNAM: personal information management.
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM: Home: http://www.trinitydesktop.org/ 
+$PRGNAM: * akregator: Feed reader
+$PRGNAM: * kaddressbook: The KDE addressbook application.
+$PRGNAM: * kalarm: for setting up personal alarm messages, emails and commands
+$PRGNAM: * kalarmd: alarm monitoring daemon, shared by korganizer and kalarm.
+$PRGNAM: * kandy: sync phone book entries between cell phone and computer
+$PRGNAM: * karm: Time tracker.
+$PRGNAM: * kleopatra: a tool for managing X.509 certificates
+$PRGNAM: * kmail: the KDE mail client
+$PRGNAM: * kmailcvt: tool for importing mail related data from other programs
+$PRGNAM: * kmobile: a mobile device manager for TDE
+$PRGNAM: * knode: news client
+$PRGNAM: * knotes: yellow notes application
+$PRGNAM: * konsolecalendar: Command line tool for accessing calendar files.
+$PRGNAM: * kontact: Integrated PIM application
+$PRGNAM: * korganizer: a calendar-of-events and todo-list manager
+$PRGNAM: * korn: mail checker
+$PRGNAM: * ktnef: a viewer for mail attachments using the TNEF format
+$PRGNAM: * tdefile-plugins: vCard KFIleItem plugin.
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-
-# Update the mime database:
-if [ -x usr/bin/update-mime-database ]; then
-  chroot . /usr/bin/update-mime-database ${INSTALL_TDE}/share/mime >/dev/null 2>&1
-fi
-EOINS
 
 makepkg_fn

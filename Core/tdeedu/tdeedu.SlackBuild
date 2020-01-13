@@ -33,6 +33,22 @@ getsource_fn
 
 untar_fn
 
+## patch for kig python scripting error:
+## kig: /usr/include/boost/python/object_core.hpp:422: boost::python::api::object_base::~object_base(): Assertion `Py_REFCNT(m_ptr) > 0' failed.
+## Re: https://bugs.kde.org/show_bug.cgi?id=401512#c5
+echo $'
+--- kig/scripting/python_scripter.cc
++++ kig/scripting/python_scripter.cc
+@@ -493,0 +494 @@
++      Py_XINCREF((objectvect.begin() +i)->ptr());
+' | while read line
+do
+patch -N -p0
+done || true
+
+## for 14.0.7, already done in cgit
+sed -i 's|Nome del file di input|Input filename|' kig/pykig/pykig.py
+
 listdocs_fn
 
 ## There are issues building with cmake - see README
@@ -40,10 +56,19 @@ USE_CMAKE_EDU=${USE_CMAKE_EDU:-no}
 
 [[ $USE_CMAKE_EDU == no ]] && {
 
+## patch for the libboost_python soname as used in Slackware
+sed -i 's|for bplib in|& "-lboost_python${PYVERSHORT%.*}${PYVERSHORT#*.}"|' kig/configure.in.in
+
 ## include all keyboards for ktouch
 (cd ktouch/keyboards/
 sed -i '/keyboard_DATA/q' Makefile.am
 echo $(ls *keyboard) >> Makefile.am)
+
+## add sk data to klatin
+cat klatin/klatin/data/vocab/pl/Makefile.am | sed 's|pl|sk|g' > klatin/klatin/data/vocab/sk/Makefile.am
+
+## install kig examples
+sed -i 's|noinst_DATA|examplesdir = $(kde_datadir)/kig/examples\nexamples_DATA|' kig/examples/Makefile.am
 
 ltoolupdate_fn
 
@@ -59,19 +84,21 @@ CXX=$COMPILER_CXX \
    --disable-rpath \
    --enable-closure
 
+true # don't go to cmake if ./configure fails
+
 } || {
 
 chown_fn
 
 cd_builddir_fn
 
-## KALZIUM won't build without ocamlc
-KALZIUM=OFF
+## The Kalzium Chemical Equation Solver needs OCaml
+OCAML=OFF
 
 cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
@@ -79,15 +106,13 @@ cmake \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DWITH_ALL_OPTIONS="OFF" \
     -DWITH_GCC_VISIBILITY="OFF" \
     -DWITH_ARTS="ON" \
-    -DWITH_OCAML_SOLVER="ON" \
+    -DWITH_OCAML_SOLVER=$OCAML \
     -DWITH_LIBUSB="ON" \
     -DWITH_V4L="ON" \
-    -DBUILD_ALL="OFF" \
     -DBUILD_BLINKEN="ON" \
-    -DBUILD_KALZIUM="$KALZIUM" \
+    -DBUILD_KALZIUM="ON" \
     -DBUILD_KANAGRAM="ON" \
     -DBUILD_KBRUCH="ON" \
     -DBUILD_KEDUCA="ON" \
@@ -110,6 +135,9 @@ cmake \
 
 }
 
+## remove obsolete tags
+doxygen -u doc/kig/scripting-api/Doxyfile.scripting-api
+
 make_fn
 
 installdocs_fn
@@ -117,6 +145,8 @@ installdocs_fn
 strip_fn
 
 mkdir_install_fn
+
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:
@@ -126,32 +156,27 @@ echo "
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (TDE educational software)
+$PRGNAM: tdeedu (TDE educational software)
 $PRGNAM:
-$PRGNAM: Many pieces of software for education.
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: * blinken: the KDE version of the well-known game Simon Says
+$PRGNAM: * kalzium: periodic table of elements
+$PRGNAM: * kanagram: an anagram game
+$PRGNAM: * kbruch: fraction excercise trainer
+$PRGNAM: * keduca: creation and revision of form-based tests and exams.
+$PRGNAM: * kgeography: geography learning program
+$PRGNAM: * khangman: hangman game.
+$PRGNAM: * kig: interactive geometry
+$PRGNAM: * kiten: japanese reference tool
+$PRGNAM: * klatin: aims to help revise or learn Latin
+$PRGNAM: * klettres: helps to learn the alphabet and to read some syllables
+$PRGNAM: * kmplot: mathematical function plotter
+$PRGNAM: * kpercentage: improve skills in calculating percentages
+$PRGNAM: * kstars: desktop planetarium
+$PRGNAM: * ktouch: program for learning touch typing
+$PRGNAM: * kturtle: programming environment using the Logo programming language
+$PRGNAM: * kverbos: study Spanish verb forms
+$PRGNAM: * kvoctrain: vocabulary trainer
+$PRGNAM: * kwordquiz: a powerful way to master new vocabularies
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-EOINS
 
 makepkg_fn

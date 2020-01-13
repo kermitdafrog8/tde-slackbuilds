@@ -39,16 +39,16 @@ chown_fn
 
 #cd_builddir_fn - don't use
 
-LDFLAGS="${SLKLDFLAGS}" \
-CFLAGS="${SLKCFLAGS} $TQT_INCLUDE_PATH" \
-CXXFLAGS="${SLKCFLAGS}" \
-CC=${COMPILER} \
-CXX=${COMPILER_CXX} \
+LDFLAGS=$SLKLDFLAGS \
+CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+CXXFLAGS=$SLKCFLAGS \
+CC=$COMPILER \
+CXX=$COMPILER_CXX \
 ./autogen.sh \
-   --prefix=${INSTALL_TDE} \
-   --libdir=${INSTALL_TDE}/lib${LIBDIRSUFFIX} \
+   --prefix=$INSTALL_TDE \
+   --libdir=$INSTALL_TDE/lib$LIBDIRSUFFIX \
    --sysconfdir=$SYS_CNF_DIR \
-   --mandir=${INSTALL_TDE}/man \
+   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 
@@ -67,19 +67,18 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Calendaring Extensions to WebDAV)
+$PRGNAM: libcaldav (Calendaring Extensions to WebDAV)
 $PRGNAM:
 $PRGNAM: Calendaring Extensions to WebDAV
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: 
-$PRGNAM: With language support for:
 $PRGNAM:
-$PRGNAM: en $(echo $langs)
 $PRGNAM:
-$PRGNAM: Home: https://www.trinitydesktop.org/index.php
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

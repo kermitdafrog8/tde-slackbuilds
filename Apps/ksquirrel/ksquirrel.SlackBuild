@@ -47,7 +47,8 @@ langs=$(echo $langs | sed 's|.po||g')
 
 # Only Russian and English help documents are in the source,
 # if Russian is not required, only package English docs
-[[ $I18N != *ru* ]] && sed -i "s| ru||" doc/Makefile.am
+ldocs="ru"
+[[ $I18N != *ru* ]] && sed -i "s| ru||" doc/Makefile.am && ldocs=""
 
 ltoolupdate_fn
 
@@ -67,7 +68,6 @@ CXX=$COMPILER_CXX \
    --disable-rpath \
    --enable-closure
 
-
 make_fn
 
 installdocs_fn
@@ -83,20 +83,18 @@ echo "
 # the right side marks the last column you can put a character in.  You must make
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
-
-         |-----handy-ruler------------------------------------------------------|
-ksquirrel: KSquirrel is an image viewer for TDE.
-ksquirrel:
-ksquirrel: Image decoding is based on its own decoders (ksquirrel-libs)
-ksquirrel:
-ksquirrel: With OpenGL and KIPI support.
-ksquirrel:
-ksquirrel: With language support for:
-ksquirrel:
-ksquirrel: en $(echo $langs)
-ksquirrel:
-ksquirrel:
+       |-----handy-ruler------------------------------------------------------|
+$PRGNAM: KSquirrel is an image viewer for TDE.
+$PRGNAM:
+$PRGNAM: Image decoding is based on its own decoders (ksquirrel-libs)
+$PRGNAM: With OpenGL and KIPI support.
+$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: en $langs
+$PRGNAM:
+$PRGNAM: With help documentation for:
+$PRGNAM: en $ldocs
+$PRGNAM:
 " > $PKG/install/slack-desc
-
 
 makepkg_fn

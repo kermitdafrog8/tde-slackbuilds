@@ -33,187 +33,48 @@ getsource_fn
 
 untar_fn
 
-## for R14* - bug 2957
-[[ $TDEVERSION == R14.0.? ]] && {
-echo $'--- tdefile-plugins/dependencies/poppler-tqt/ConfigureChecks.cmake
-+++ tdefile-plugins/dependencies/poppler-tqt/ConfigureChecks.cmake
-@@ -27,5 +27,5 @@
--if( NOT DEFINED HAVE_POPPLER_060 )
--  message( STATUS "Performing Test HAVE_POPPLER_060" )
--  if( NOT POPPLER_VERSION VERSION_LESS "0.60" )
--    set( HAVE_POPPLER_060 1 CACHE INTERNAL "" FORCE )
--    message( STATUS "Performing Test HAVE_POPPLER_060 - Success" )
-+if( NOT DEFINED HAVE_POPPLER_058 )
-+  message( STATUS "Performing Test HAVE_POPPLER_058" )
-+  if( NOT POPPLER_VERSION VERSION_LESS "0.58" )
-+    set( HAVE_POPPLER_058 1 CACHE INTERNAL "" FORCE )
-+    message( STATUS "Performing Test HAVE_POPPLER_058 - Success" )
-@@ -33,2 +33,13 @@
--    set( HAVE_POPPLER_060 "" CACHE INTERNAL "" FORCE )
--    message( STATUS "Performing Test HAVE_POPPLER_060 - Failed" )
-+    set( HAVE_POPPLER_058 "" CACHE INTERNAL "" FORCE )
-+    message( STATUS "Performing Test HAVE_POPPLER_058 - Failed" )
-+  endif( )
-+endif( )
-+
-+if( NOT DEFINED HAVE_POPPLER_064 )
-+  message( STATUS "Performing Test HAVE_POPPLER_064" )
-+  if( NOT POPPLER_VERSION VERSION_LESS "0.64" )
-+    set( HAVE_POPPLER_064 1 CACHE INTERNAL "" FORCE )
-+    message( STATUS "Performing Test HAVE_POPPLER_064 - Success" )
-+  else( )
-+    set( HAVE_POPPLER_064 "" CACHE INTERNAL "" FORCE )
-+    message( STATUS "Performing Test HAVE_POPPLER_064 - Failed" )
---- config.h.cmake
-+++ config.h.cmake
-@@ -4 +4,2 @@
--#cmakedefine HAVE_POPPLER_060
-+#cmakedefine HAVE_POPPLER_064
-+#cmakedefine HAVE_POPPLER_058
---- tdefile-plugins/dependencies/poppler-tqt/poppler-document.cc
-+++ tdefile-plugins/dependencies/poppler-tqt/poppler-document.cc
-@@ -156 +156 @@
--# if defined(HAVE_POPPLER_060)
-+# if defined(HAVE_POPPLER_058)
-@@ -166 +166 @@
--  GooString *s1;
-+  CONST_064 GooString *s1;
-@@ -173 +173 @@
--#   if defined(HAVE_POPPLER_060)
-+#   if defined(HAVE_POPPLER_058)
-@@ -205 +205 @@
--#   if !defined(HAVE_POPPLER_060)
-+#   if !defined(HAVE_POPPLER_058)
-@@ -211 +211 @@
--# if !defined(HAVE_POPPLER_060)
-+# if !defined(HAVE_POPPLER_058)
-@@ -226 +226 @@
--# if defined(HAVE_POPPLER_060)
-+# if defined(HAVE_POPPLER_058)
-@@ -232 +232 @@
--#   if !defined(HAVE_POPPLER_060)
-+#   if !defined(HAVE_POPPLER_058)
-@@ -245 +245 @@
--#   if defined(HAVE_POPPLER_060)
-+#   if defined(HAVE_POPPLER_058)
-@@ -259 +259 @@
--#	if !defined(HAVE_POPPLER_060)
-+#	if !defined(HAVE_POPPLER_058)
-@@ -267 +267 @@
--# if !defined(HAVE_POPPLER_060)
-+# if !defined(HAVE_POPPLER_058)
-@@ -323 +323 @@
--  GooList * items = outline->getItems();
-+  CONST_064 GooList * items = outline->getItems();
-@@ -350 +350 @@
--#if defined(HAVE_POPPLER_060) || defined(HAVE_POPPLER_030)
-+#if defined(HAVE_POPPLER_058) || defined(HAVE_POPPLER_030)
---- tdefile-plugins/dependencies/poppler-tqt/poppler-link.cc
-+++ tdefile-plugins/dependencies/poppler-tqt/poppler-link.cc
-@@ -33,2 +33,2 @@
--		LinkDest *ld = data.ld;
--		
-+		CONST_064 LinkDest *ld = data.ld;
-+
---- tdefile-plugins/dependencies/poppler-tqt/poppler-page.cc
-+++ tdefile-plugins/dependencies/poppler-tqt/poppler-page.cc
-@@ -132 +132 @@
--#if defined(HAVE_POPPLER_060) || defined(HAVE_POPPLER_030) || defined(HAVE_POPPLER_020)
-+#if defined(HAVE_POPPLER_058) || defined(HAVE_POPPLER_030) || defined(HAVE_POPPLER_020)
-@@ -167 +167 @@
--#if defined(HAVE_POPPLER_060) || defined(HAVE_POPPLER_030) || defined(HAVE_POPPLER_020)
-+#if defined(HAVE_POPPLER_058) || defined(HAVE_POPPLER_030) || defined(HAVE_POPPLER_020)
-@@ -208 +208 @@
--#   if defined(HAVE_POPPLER_060)
-+#   if defined(HAVE_POPPLER_058)
-@@ -215 +215 @@
--#   if !defined(HAVE_POPPLER_060)
-+#   if !defined(HAVE_POPPLER_058)
---- tdefile-plugins/dependencies/poppler-tqt/poppler-private.cc
-+++ tdefile-plugins/dependencies/poppler-tqt/poppler-private.cc
-@@ -34 +34 @@
--TQString unicodeToTQString(Unicode* u, int len)
-+TQString unicodeToTQString(CONST_064 Unicode* u, int len)
-@@ -44 +44 @@
--TQString UnicodeParsedString(GooString *s1)
-+TQString UnicodeParsedString(CONST_064 GooString *s1)
-@@ -89 +89 @@
--void DocumentData::addTocChildren( TQDomDocument * docSyn, TQDomNode * parent, GooList * items )
-+void DocumentData::addTocChildren( TQDomDocument * docSyn, TQDomNode * parent, CONST_064 GooList * items )
-@@ -99 +99 @@
--        Unicode * uniChar = outlineItem->getTitle();
-+        CONST_064 Unicode * uniChar = outlineItem->getTitle();
-@@ -109 +109 @@
--        ::LinkAction * a = outlineItem->getAction();
-+        CONST_064 ::LinkAction * a = outlineItem->getAction();
-@@ -113,2 +113,2 @@
--            LinkGoTo * g = static_cast< LinkGoTo * >( a );
--            LinkDest * destination = g->getDest();
-+            CONST_064 LinkGoTo * g = static_cast< CONST_064 LinkGoTo * >( a );
-+            CONST_064 LinkDest * destination = g->getDest();
-@@ -120 +120 @@
--                GooString *s = g->getNamedDest();
-+                CONST_064 GooString *s = g->getNamedDest();
-@@ -134 +134 @@
--                    LinkGoToR * g2 = static_cast< LinkGoToR * >( a );
-+                    CONST_064 LinkGoToR * g2 = static_cast< CONST_064 LinkGoToR * >( a );
-@@ -141 +141 @@
--        GooList * children = outlineItem->getKids();
-+        CONST_064 GooList * children = outlineItem->getKids();
---- tdefile-plugins/dependencies/poppler-tqt/poppler-private.h
-+++ tdefile-plugins/dependencies/poppler-tqt/poppler-private.h
-@@ -36,0 +37,5 @@
-+#if defined(HAVE_POPPLER_064)
-+#define CONST_064 const
-+#else
-+#define CONST_064
-+#endif
-@@ -42 +47 @@
--TQString unicodeToTQString(Unicode* u, int len);
-+TQString unicodeToTQString(CONST_064 Unicode* u, int len);
-@@ -44 +49 @@
--TQString UnicodeParsedString(GooString *s1);
-+TQString UnicodeParsedString(CONST_064 GooString *s1);
-@@ -50 +55 @@
--     LinkDestinationData( LinkDest *l, GooString *nd, Poppler::DocumentData *pdfdoc ) : ld(l), namedDest(nd), doc(pdfdoc)
-+     LinkDestinationData( CONST_064 LinkDest *l, GooString *nd, Poppler::DocumentData *pdfdoc ) : ld(l), namedDest(nd), doc(pdfdoc)
-@@ -53,2 +58,2 @@
--	
--     LinkDest *ld;
-+
-+     CONST_064 LinkDest *ld;
-@@ -87 +92 @@
--    void addTocChildren( TQDomDocument * docSyn, TQDomNode * parent, GooList * items );
-+    void addTocChildren( TQDomDocument * docSyn, TQDomNode * parent, CONST_064 GooList * items );
-' | while read line
-do
-patch -p0
-done
+## build error with cgit:
+##/tmp/build/tmp-tdegraphics/tdegraphics/build-tdegraphics/kmrml/kmrml/kcontrol/serverconfigwidget.cpp:37:61: error: invalid use of incomplete type ‘class KComboBox’
+## .. and more ..
+## patch based on solution for similar amarok errors, issue #16
+[[ $TDEVERSION == cgit ]] && {
+echo $'
+--- kmrml/kmrml/kcontrol/serverconfigwidget.ui
++++ kmrml/kmrml/kcontrol/serverconfigwidget.ui
+@@ -271,0 +272,5 @@
++<includes>
++    <include location="global" impldecl="in implementation">kcombobox.h</include>
++    <include location="global" impldecl="in implementation">knuminput.h</include>
++    <include location="global" impldecl="in implementation">klineedit.h</include>
++</includes>
+' | patch -N -p0 || true
 }
 
 listdocs_fn
 
 chown_fn
 
-# If imlib is installed, include Kuickshow:
-[[ $(ls /var/log/packages/imlib-*) ]] && KUICKSHOW=ON
 cd_builddir_fn
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
-    -DCMAKE_C_COMPILER=${COMPILER} \
-    -DCMAKE_CXX_COMPILER=${COMPILER_CXX} \
+
+# If imlib is installed, include Kuickshow:
+[[ -s /usr/include/Imlib.h ]] && KUICKSHOW=ON
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_TDE} \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=${INSTALL_TDE}/man \
-    -DLIB_SUFFIX=${LIBDIRSUFFIX} \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DWITH_T1LIB="OFF" \
+    -DWITH_PAPER="OFF" \
     -DWITH_TIFF="OFF" \
     -DWITH_OPENEXR="OFF" \
     -DWITH_PDF="ON" \
-    -DBUILD_ALL="ON" \
+    -DBUILD_DOC="ON" \
     -DBUILD_TDEFILE_PLUGINS="ON" \
     -DBUILD_KUICKSHOW=${KUICKSHOW:-OFF} \
     -DBUILD_KPDF="ON" \
@@ -221,8 +82,23 @@ cd_builddir_fn
     -DBUILD_KSVG="OFF" \
     -DBUILD_LIBKSCAN="OFF" \
     -DBUILD_KOOKA="OFF" \
+    -DBUILD_KCOLOREDIT="ON" \
+    -DBUILD_KDVI="ON" \
+    -DBUILD_KFAX="ON" \
+    -DBUILD_KFAXVIEW="ON" \
+    -DBUILD_KGAMMA="ON" \
+    -DBUILD_KGHOSTVIEW="ON" \
+    -DBUILD_TDEICONEDIT="ON" \
+    -DBUILD_KMRML="ON" \
+    -DBUILD_KOLOURPAINT="ON" \
+    -DBUILD_KPOVMODELER="ON" \
+    -DBUILD_KRULER="ON" \
+    -DBUILD_KSNAPSHOT="ON" \
+    -DBUILD_KVIEW="ON" \
+    -DBUILD_KVIEWSHELL="ON" \
     -Wno-dev \
     ..
+
 make_fn
 
 installdocs_fn
@@ -231,6 +107,8 @@ strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -238,33 +116,33 @@ echo "
 # on the right side marks the last column you can put a character in.  You must
 # make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':'.
-
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: $PRGNAM (Misc graphics apps)
+$PRGNAM: tdegraphics is a collection of graphic oriented applications:
 $PRGNAM:
-$PRGNAM: Misc graphics apps and related
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: * kamera: Digital camera io_slave for Konqueror. With gPhoto this
+$PRGNAM:           allows camera image access with the URL kamera:/
+$PRGNAM: * kcoloredit: A color value editor and color picker.
+$PRGNAM: * kdvi: Program (and embeddable KPart) to display *.DVI files from TeX
+$PRGNAM: * kfax: Display raw and tiffed fax images (g3, g3-2d, g4).
+$PRGNAM: * kfaxview: An embeddable KPart to display tiffed fax images.
+$PRGNAM: * kgamma: set monitor gamma
+$PRGNAM: * kghostview: Program (and embeddable KPart) to display *.pdf and *.ps
+$PRGNAM: * kmrml: Connects to a MRML server and find similar images
+$PRGNAM: * kolourpaint: An easy-to-use paint program designed for drawing
+$PRGNAM:                simple diagrams/logos/icons and editing screenshots.
+$PRGNAM: * kooka: A raster image scan program, based on SANE and libkscan.
+$PRGNAM: * kpdf: a TDE pdf viewer
+$PRGNAM: * kpovmodeler: Enter scenes for the 3D rendering engine PovRay.
+$PRGNAM: * kruler: An on-screen ruler in inch, centimeter and pixel
+$PRGNAM: * ksnapshot: Capture image of screen
+$PRGNAM: * ksvg: a TDE implementation of Scalable Vector Graphics
+$PRGNAM: * kuickshow: Imageviewer.
+$PRGNAM: * kview: Picture viewer - standalone program and embeddable KPart.
+$PRGNAM: * kviewshell: Generic framework for viewer applications.
+$PRGNAM: * libkscan: Library to access scanners used by kooka (and koffice)
+$PRGNAM:             needs SANE
+$PRGNAM: * tdefile-plugins: Provide meta information for graphic files.
+$PRGNAM: * tdeiconedit: An icon editor.
 " > $PKG/install/slack-desc
-
-cat <<EOINS >> $PKG/install/doinst.sh
-# Update the desktop database:
-if [ -x usr/bin/update-desktop-database ]; then
-  chroot . /usr/bin/update-desktop-database ${INSTALL_TDE}/share/applications > /dev/null 2>&1
-fi
-
-# Update hicolor theme cache:
-if [ -d usr/share/icons/hicolor ]; then
-  if [ -x /usr/bin/gtk-update-icon-cache ]; then
-    chroot . /usr/bin/gtk-update-icon-cache -f -t ${INSTALL_TDE}/share/icons/hicolor 1> /dev/null 2> /dev/null
-  fi
-fi
-EOINS
 
 makepkg_fn
