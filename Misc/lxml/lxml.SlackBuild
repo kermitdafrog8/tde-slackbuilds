@@ -44,7 +44,8 @@ listdocs_fn
 
 chown_fn
 
-#cd_builddir_fn
+#cd_builddir_fn - don't use
+
 CC=$COMPILER \
 python setup.py install --with-unicode-strings --root=$PKG || exit 1
 
@@ -55,8 +56,6 @@ if $(python3 -c 'import os' 2>/dev/null); then
 fi
 
 installdocs_fn
-
-mangzip_fn
 
 strip_fn
 

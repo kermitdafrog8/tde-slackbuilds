@@ -55,8 +55,6 @@ CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --disable-debug \
    --enable-closure
@@ -83,8 +81,6 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_ALSA="ON" \
     -DWITH_ARTS_AKODE="$AKODE" \
     -DWITH_ARTS_AUDIOFILE="ON" \

@@ -33,8 +33,6 @@ getsource_fn
 
 untar_fn
 
-listdocs_fn
-
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang";done
@@ -44,6 +42,8 @@ ldocs="" # for slack-desc
 langdocdk="digikam";for Lang in $langs;do [[ -d doc/$Lang"_digikam" ]] && langdocdk=$(echo $Lang"_digikam" $langdocdk) && ldocs="$ldocs $Lang";done
 langdocsf="showfoto";for Lang in $langs;do [[ -d doc/$Lang"_showfoto" ]] && langdocsf=$(echo $Lang"_showfoto" $langdocsf);done
 sed -i "s|SUBDIRS =.*$|SUBDIRS =. $langdocdk $langdocsf|" doc/Makefile.am
+
+listdocs_fn
 
 ltoolupdate_fn
 
@@ -58,7 +58,6 @@ CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
    --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
@@ -66,6 +65,8 @@ CXX=$COMPILER_CXX \
 make_fn
 
 installdocs_fn
+
+mangzip_fn
 
 strip_fn
 
@@ -82,6 +83,8 @@ do
 ln -s digikam.mo showfoto.mo)
 done
 fi
+
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:

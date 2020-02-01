@@ -489,13 +489,11 @@ do
 patch -p0
 done
 
-
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
-
 
 CFLAGS=$SLKCFLAGS \
 CC=$COMPILER \
@@ -509,6 +507,7 @@ make_fn
 
 installdocs_fn
 
+INSTALL_TDE=/usr
 mangzip_fn
 
 strip_fn

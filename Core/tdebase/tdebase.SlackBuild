@@ -35,8 +35,6 @@ getsource_fn
 
 untar_fn
 
-listdocs_fn
-
 ## allow for configuration files directory != /etc/trinity
 sed -i "s|/etc/trinity/|$SYS_CNF_DIR/|" tdm/kfrontend/gentdmconf.c || true
 
@@ -106,6 +104,8 @@ do
 patch -N -p0
 done || true
 
+listdocs_fn
+
 chown_fn
 
 cd_builddir_fn
@@ -120,7 +120,6 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DWITH_ARTS="ON" \
     -DWITH_ELFICON="OFF" \
@@ -213,59 +212,297 @@ installdocs_fn
 
 strip_fn
 
+##############################################################################
+
 # Add xinitrc:
+
 mkdir -p $PKG/etc/X11/xinit
-sed "s|{INSTALL_TDE}|$INSTALL_TDE|g" < $SRCDIR/xinitrc.tde > $PKG/etc/X11/xinit/xinitrc.tde
+echo '#!''/bin/sh
+
+userresources=$HOME/.Xresources
+usermodmap=$HOME/.Xmodmap
+sysresources=/etc/X11/xinit/.Xresources
+sysmodmap=/etc/X11/xinit/.Xmodmap
+
+if [ -f $sysresources ]; then
+    /usr/bin/xrdb -merge $sysresources
+fi
+
+if [ -f $sysmodmap ]; then
+    /usr/bin/xmodmap $sysmodmap
+fi
+
+if [ -f $userresources ]; then
+    /usr/bin/xrdb -merge $userresources
+fi
+
+if [ -f $usermodmap ]; then
+    /usr/bin/xmodmap $usermodmap
+fi
+
+if [ -z "$DESKTOP_SESSION" -a -x /usr/bin/ck-launch-session ]; then
+  exec ck-launch-session dbus-launch --exit-with-session '"$INSTALL_TDE"'/bin/starttde
+else
+  exec dbus-launch --exit-with-session '"$INSTALL_TDE"'/bin/starttde
+fi
+' > $PKG/etc/X11/xinit/xinitrc.tde
 chmod 755 $PKG/etc/X11/xinit/xinitrc.tde
 (cd $PKG/etc/X11/xinit/
 ln -sf xinitrc.tde xinitrc)
 
+##############################################################################
+
+## create tde.{,c}sh:
+
 mkdir -p $PKG/etc/profile.d
-sed "s|{SYS_CNF_DIR}|$SYS_CNF_DIR|;s|{INSTALL_TDE}|$INSTALL_TDE|" < $SRCDIR/profile.d/tde.sh > $PKG/etc/profile.d/tde.sh
-sed "s|{SYS_CNF_DIR}|$SYS_CNF_DIR|;s|{INSTALL_TDE}|$INSTALL_TDE|" < $SRCDIR/profile.d/tde.csh > $PKG/etc/profile.d/tde.csh
+echo '#!'"/bin/sh
+# TDE additions:
+export TDEDIR=$INSTALL_TDE
+
+# upgradepkg runs installpkg twice, so test for the second run:
+[[ \"\$XDG_CONFIG_DIRS\" != *$SYS_CNF_DIR/xdg* ]] && {
+if [ ! \"\$XDG_CONFIG_DIRS\" = \"\" ]; then
+  export XDG_CONFIG_DIRS=\$XDG_CONFIG_DIRS:$SYS_CNF_DIR/xdg
+else
+  export XDG_CONFIG_DIRS=/etc/xdg:$SYS_CNF_DIR/xdg
+fi
+}
+
+## Re: https://specifications.freedesktop.org/basedir-spec/basedir-spec-0.6.html
+## If XDG_DATA_DIRS is null or unset, the default is /usr/local/share:/usr/share
+[[ \$XDG_DATA_DIRS == \"\" ]] && \\
+export XDG_DATA_DIRS=/usr/local/share:/usr/share:$INSTALL_TDE/share || {
+[[ \$XDG_DATA_DIRS != *$INSTALL_TDE/share* ]] && \\
+export XDG_DATA_DIRS=\$XDG_DATA_DIRS:$INSTALL_TDE/share
+}
+" > $PKG/etc/profile.d/tde.sh
+
+echo '#!'"/bin/csh
+# TDE additions:
+if ( ! \$?TDEDIR ) then
+    setenv TDEDIR $INSTALL_TDE
+endif
+
+if ( \$?XDG_CONFIG_DIRS ) then
+    setenv XDG_CONFIG_DIRS \$XDG_CONFIG_DIRS:$SYS_CNF_DIR/xdg
+else
+    setenv XDG_CONFIG_DIRS /etc/xdg:$SYS_CNF_DIR/xdg
+endif
+
+setenv XDG_DATA_DIRS /usr/local/share:/usr/share:$INSTALL_TDE/share
+" > $PKG/etc/profile.d/tde.csh
+
 chmod 755 $PKG/etc/profile.d/tde.{,c}sh
+
+##############################################################################
 
 # Add some configuration files / scripts needed by TDE.
 mkdir -p $PKG$SYS_CNF_DIR
 mv $PKG$INSTALL_TDE/share/config/tdm $PKG$SYS_CNF_DIR/tdm
 ( cd $PKG$INSTALL_TDE/share/config ; ln -sf $SYS_CNF_DIR/tdm tdm )
 
+##############################################################################
+
 # Add rc.4.local to give TDM priority over rc.4 X11 session manager options
 # Assumes that rc.4.new from sysvinit-scripts still has the rc.4.local option
+
 mkdir $PKG/etc/rc.d
-sed "s|{INSTALL_TDE}|$INSTALL_TDE|" < $SRCDIR/rc.4.local > $PKG/etc/rc.d/rc.4.local
+echo '#!'" /bin/sh
+
+# Start TDM:
+if [ -x $INSTALL_TDE/bin/tdm ]; then
+ echo 'Using TDM (Trinity Login Manager).'
+ echo
+# log_cleanup '/var/log/tdm.log'
+ exec $INSTALL_TDE/bin/tdm -nodaemon -error /var/log/tdm.log
+fi
+" > $PKG/etc/rc.d/rc.4.local
 chmod 755 $PKG/etc/rc.d/rc.4.local
+
+##############################################################################
 
 # Set sane permissions for the include files.
 if [ -d $PKG$INSTALL_TDE/include ]; then
    find $PKG$INSTALL_TDE/include -type f -exec chmod 0644 {} \;
 fi
 
+##############################################################################
+
 # Setup config files for TDM:
 $PKG$INSTALL_TDE/bin/gentdmconf --no-old --no-old-scripts --no-backup --in $PKG$SYS_CNF_DIR/tdm
+
 ## set correct paths for config files
 sed -i "s|$INSTALL_TDE/share/config/tdm/|$SYS_CNF_DIR/tdm/|" $PKG$SYS_CNF_DIR/tdm/tdmrc
+
 # Allow root to login
 sed 's|AllowRootLogin=false|AllowRootLogin=true|' $PKG$SYS_CNF_DIR/tdm/tdmrc > $PKG$SYS_CNF_DIR/tdm/tdmrc.new
+
 ## Remove tdmrc which has AllowRootLogin=false set and would be used for a new installation
 ## The installed tdmrc will be created by doinst.sh from tdmrc.new if it doesn't exist
 rm $PKG$SYS_CNF_DIR/tdm/tdmrc
 mv $PKG$SYS_CNF_DIR/tdm/Xsession $PKG$SYS_CNF_DIR/tdm/Xsession.orig
-cat $SRCDIR/config/Xsession | sed "s|{INSTALL_TDE}|$INSTALL_TDE|" > $PKG$SYS_CNF_DIR/tdm/Xsession
-mv $PKG$SYS_CNF_DIR/tdm/backgroundrc $PKG$SYS_CNF_DIR/tdm/backgroundrc.new
-if [[ -r $PKG$SYS_CNF_DIR/tdm/README ]]; then
- sed -i "s|$TMP_BUILD/package-tdebase$SYS_CNF_DIR/tdm|$SYS_CNF_DIR/tdm|" $PKG$SYS_CNF_DIR/tdm/README
+#
+## new Xsession:
+echo '#!'' /bin/sh
+# Xsession - run as user
+
+# Merged in parts of the old Xsession to load defaults from
+# Xresources and Xmodmap files, 2006-02-09 volkerdi
+
+session=$1
+
+# This section is borrowed from the old X11 Xsession file:
+userresources=$HOME/.Xresources
+usermodmap=$HOME/.Xmodmap
+sysresources=/usr/lib/X11/xinit/.Xresources
+sysmodmap=/usr/lib/X11/xinit/.Xmodmap
+# merge in defaults and keymaps
+if [ -r $sysresources ]; then
+        /usr/bin/xrdb -merge $sysresources
 fi
+if [ -r $sysmodmap ]; then
+        /usr/bin/xmodmap $sysmodmap
+fi
+if [ -r $userresources ]; then
+        /usr/bin/xrdb -merge $userresources
+fi
+if [ -r $usermodmap ]; then
+        /usr/bin/xmodmap $usermodmap
+fi
+
+# Note that the respective logout scripts are not sourced.
+case $SHELL in
+  */bash)
+    [ -z "$BASH" ] && exec $SHELL $0 "$@"
+    set +o posix
+    [ -f /etc/profile ] && . /etc/profile
+    if [ -f $HOME/.bash_profile ]; then
+      . $HOME/.bash_profile
+    elif [ -f $HOME/.bash_login ]; then
+      . $HOME/.bash_login
+    elif [ -f $HOME/.profile ]; then
+      . $HOME/.profile
+    fi
+    ;;
+  */zsh)
+    [ -z "$ZSH_NAME" ] && exec $SHELL $0 "$@"
+    emulate -R zsh
+    [ -d /etc/zsh ] && zdir=/etc/zsh || zdir=/etc
+    zhome=${ZDOTDIR:-$HOME}
+    # zshenv is always sourced automatically.
+    [ -f $zdir/zprofile ] && . $zdir/zprofile
+    [ -f $zhome/.zprofile ] && . $zhome/.zprofile
+    [ -f $zdir/zlogin ] && . $zdir/zlogin
+    [ -f $zhome/.zlogin ] && . $zhome/.zlogin
+    ;;
+  */csh|*/tcsh)
+    # [t]cshrc is always sourced automatically.
+    # Note that sourcing csh.login after .cshrc is non-standard.
+    xsess_tmp=`mktemp`
+    $SHELL -c "if (-f /etc/csh.login) source /etc/csh.login; if (-f ~/.login) source ~/.login; /bin/sh -c export >! $xsess_tmp"
+    . $xsess_tmp
+    rm -f $xsess_tmp
+    ;;
+  *) # Plain sh, ksh, and anything we don'\''t know.
+    [ -f /etc/profile ] && . /etc/profile
+    [ -f $HOME/.profile ] && . $HOME/.profile
+    ;;
+esac
+
+[ -f /etc/xprofile ] && . /etc/xprofile
+[ -f $HOME/.xprofile ] && . $HOME/.xprofile
+
+case $session in
+  "")
+    exec xmessage -center -buttons OK:0 -default OK "Sorry, $DESKTOP_SESSION is no valid session."
+    ;;
+  failsafe)
+    exec xterm -geometry 80x24-0-0
+    ;;
+  custom)
+    exec $HOME/.xsession
+    ;;
+  default)
+    exec '"$INSTALL_TDE"'/bin/starttde
+    ;;
+  *)
+    eval exec "$session"
+    ;;
+esac
+exec xmessage -center -buttons OK:0 -default OK "Sorry, cannot execute $session. Check $DESKTOP_SESSION.desktop."
+' > $PKG$SYS_CNF_DIR/tdm/Xsession
+
+##############################################################################
+
+mv $PKG$SYS_CNF_DIR/tdm/backgroundrc $PKG$SYS_CNF_DIR/tdm/backgroundrc.new
+[[ -r $PKG$SYS_CNF_DIR/tdm/README ]] && \
+sed -i "s|$TMP_BUILD/package-tdebase$SYS_CNF_DIR/tdm|$SYS_CNF_DIR/tdm|" $PKG$SYS_CNF_DIR/tdm/README
+
 
 mkdir_install_fn
 
-sed "s|{SYS_CNF_DIR}|$SYS_CNF_DIR|;s|{INSTALL_TDE}|$INSTALL_TDE|;s|{TQTDIR}|$TQTDIR|" < $SRCDIR/doinst.sh > $PKG/install/doinst.sh
+##############################################################################
+## create doinst.sh:
+
+echo '# Save old config files:
+if [ ! -L etc/X11/tdm ]; then
+  if [ -d etc/X11/tdm ]; then
+  mkdir -p .'"$SYS_CNF_DIR"'/tdm
+  cp -a etc/X11/tdm/* .'"$SYS_CNF_DIR"'/tdm
+  rm -rf etc/X11/tdm
+  ( cd etc/X11 ; ln -sf ../..'"$SYS_CNF_DIR"'/tdm tdm )
+    elif [ ! -e etc/X11/tdm ]; then
+    mkdir -p etc/X11
+    ( cd etc/X11 ; ln -sf ../..'"$SYS_CNF_DIR"'/tdm tdm )
+  fi
+fi
+
+config() {
+  NEW="$1"
+  OLD="$(dirname $NEW)/$(basename $NEW .new)"
+  # If there'\''s no config file by that name, mv it over:
+  if [ ! -r $OLD ]; then
+    mv $NEW $OLD
+  elif [ "$(cat $OLD | md5sum)" = "$(cat $NEW | md5sum)" ]; then # toss the redundant copy
+    rm $NEW
+  fi
+  # Otherwise, we leave the .new copy for the admin to consider...
+}
+config .'"$SYS_CNF_DIR"'/tdm/tdmrc.new
+config .'"$SYS_CNF_DIR"'/tdm/backgroundrc.new
+
+# update PATH
+# upgradepkg runs installpkg twice, so even though '"$TQTDIR"'/bin will be
+# a new PATH, it needs to be tested for the second run
+if ! grep '"$INSTALL_TDE"'/bin /etc/profile
+then
+echo "PATH=\$PATH:'"$INSTALL_TDE"'/bin:'"$TQTDIR"'/bin" >> /etc/profile
+else
+if ! grep '"$TQTDIR"'/bin /etc/profile
+then
+echo "PATH=\$PATH:'"$TQTDIR"'/bin" >> /etc/profile
+fi
+fi
+
+# update MANPATH
+if ! grep '"$INSTALL_TDE"'/man /etc/profile
+then
+echo "export MANPATH=\$MANPATH:'"$INSTALL_TDE"'/man" >> /etc/profile
+fi
+
+## you may not want to do this ##
+# start a '\''konsole'\'' with system-wide profile
+[[ ! $(grep -x "source /etc/profile" $HOME/.bashrc ) ]] && echo "source /etc/profile" >> $HOME/.bashrc || true
+# don'\''t want this
+sed -i '\''s|source /etc/profile.d/mc.sh|#source /etc/profile.d/mc.sh|'\'' $HOME/.bashrc || true
+' > $PKG/install/doinst.sh
+
 [[ $RUNLEVEL == 4 ]] && {
-echo "
-## set default runlevel to 4 for tdm
+echo "## set default runlevel to 4 for tdm
 sed -i 's|id:[1-5]|id:4|' etc/inittab
 " >> $PKG/install/doinst.sh
 }
+
 ## set TDEHOME and TDEROOTHOME variables - defaults ~/.trinity and /root/.trinity
 [[ $SYS_CNF_DIR == /etc/tde ]] && {
 echo "# upgradepkg runs installpkg twice, so firstly remove any previous TDE*HOME entries
@@ -274,6 +511,10 @@ echo 'export TDEHOME=~/.tde' >> /etc/profile
 echo 'export TDEROOTHOME=/root/.tde' >> /etc/profile
 " >> $PKG/install/doinst.sh
 }
+
+doinst_sh_fn
+
+##############################################################################
 
 echo "
 # HOW TO EDIT THIS FILE:

@@ -54,8 +54,6 @@ make_fn
 
 installdocs_fn
 
-mangzip_fn
-
 strip_fn
 
 mkdir_install_fn

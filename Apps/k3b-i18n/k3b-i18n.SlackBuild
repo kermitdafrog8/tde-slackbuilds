@@ -23,9 +23,9 @@
 #   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 #   SUCH DAMAGE.
 
-PRGNAM=gwenview-i18n
-PKGNAM=tde$PRGNAM
-[[ $I18N == "" ]] && echo -e "\033[39;1m\nYou have tried to build $PRGNAM without selecting any language(s)\n\033[0m" && exit
+PRGNAM=k3b-i18n
+PKGNAM=$TDEPFX$PRGNAM
+[[ $PRE_DOWNLOAD != yes ]] && [[ $I18N == "" ]] && echo -e "\033[39;1m\nYou have tried to build $PRGNAM without selecting any language(s)\n\033[0m" && exit
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -35,32 +35,19 @@ getsource_fn
 
 untar_fn
 
-# Add missing files for Spanish TDE handbook docs
-if [[ $I18N == *es* ]]
-then
-## restore es/doc/CMakeLists.txt as the following creates a handbook index
-sed -i 's|# ||' es/doc/CMakeLists.txt
-# use the German index.docbook as a template
-cp de/doc/index.docbook es/doc/
-# these index.docbook 'translations' have been made from the gwenview [US] English original,
-# the other 'es' *.docbook files are the original translations in the source code
-# any corrections from a Spanish speaker will be welcome
-sed -i -e 's|German|Spanish|' -e 's|Das Handbuch zu Gwenview|Manual del usuario Gwenview|' -e 's|Deutsche Übersetzung|Traducción Española|' -e 's|ist ein Bildbetrachter für &kde;|es un visor de imágenes para TDE|' -e '85s|Bild|imagen|' -e '87s|Betrachter|visionador|' -e 's|Künstler|artista|' -e 's|Photo|foto|' -e '93s|Bild|dibujo|' -e 's|Tipps|Consejos|' -e 's|Thomas||' -e 's|Reitelbach||' -e 's|tr@erdfunkstelle.de||' es/doc/index.docbook
-fi
-
 ## remove help documentation build instruction from all locales ...
 sed -i '/BUILD_DOC/d' */CMakeLists.txt
-
-listdocs_fn
-
+#
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="" # the *.po file list
+locas="" # the locale codes
 ldocs="" # the help docs
 for Lang in $I18N
 do
 [[ -d $Lang ]] && {
-langs="$langs $Lang/messages/gwenview.po"
+langs="$langs $Lang/messages/k3b.po $Lang/messages/k3bsetup.po $Lang/messages/libk3b.po $Lang/messages/libk3bdevice.po"
+locas="$locas $Lang"
 ## ... and restore help documentation for the selected and available locales
 [[ -e $Lang/CMakeLists.txt ]] && {
 echo 'tde_conditional_add_subdirectory( BUILD_DOC doc )' > $Lang/CMakeLists.txt
@@ -69,20 +56,19 @@ ldocs="$ldocs $Lang"
 }
 done
 sed -i "s|\${po_files}|$langs|" CMakeLists.txt
-langs=$(echo $langs|sed "s|/messages/gwenview.po||g") # the locale codes
+
+listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
 
 cmake \
-    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS="ON" \
+    -DBUILD_MESSAGES="ON" \
     ..
 
 make_fn
@@ -102,10 +88,10 @@ echo "
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: gwenview-i18n (Internationalization files for gwenview.)
+$PRGNAM: tdek3b-i18n (internationalization files for the CD Creator).
 $PRGNAM:
 $PRGNAM: For languages:
-$PRGNAM: $langs
+$PRGNAM: $locas
 $PRGNAM:
 $PRGNAM: With help documentation for:
 $PRGNAM: $ldocs

@@ -47,8 +47,6 @@ CXX=$COMPILER_CXX \
 ./autogen.sh \
    --prefix=$INSTALL_TDE \
    --libdir=$INSTALL_TDE/lib$LIBDIRSUFFIX \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 

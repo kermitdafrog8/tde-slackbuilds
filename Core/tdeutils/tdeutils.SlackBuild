@@ -39,6 +39,8 @@ chown_fn
 
 cd_builddir_fn
 
+## TDEFileReplace has been moved from tdewebdev for R14.1.0
+[[ $TDEVERSION == cgit ]] && TDEFileReplace="-DBUILD_TDEFILEREPLACE=ON"
 cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
@@ -48,8 +50,6 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DWITH_DPMS="ON" \
     -DWITH_XSCREENSAVER="OFF" \
@@ -83,7 +83,7 @@ cmake \
     -DBUILD_KTIMER="ON" \
     -DBUILD_TDEWALLET="ON" \
     -DBUILD_SUPERKARAMBA="ON" \
-    -DBUILD_TDEFILEREPLACE="ON" \
+    ${TDEFileReplace:-} \
     -Wno-dev \
     ..
 
@@ -97,6 +97,7 @@ mkdir_install_fn
 
 doinst_sh_fn
 
+[[ $TDEVERSION == cgit ]] && TDEFileReplace="* TDEFileReplace: powerful search and replace in multiple files"
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -126,8 +127,7 @@ $PRGNAM: * ktimer: execute programs after some time
 $PRGNAM: * superkaramba: a version of Karamba with python scripting
 $PRGNAM: * tdelirc: a TDE frontend for the Linux Infrared Remote Control system
 $PRGNAM: * tdewallet: a convenient and secure way to manage all your passwords
-$PRGNAM: * TDEFileReplace: powerful search and replace in multiple files
-$PRGNAM:                   [Moved from tdewebdev for R14.1.0]
+$PRGNAM: ${TDEFileReplace:-}
 " > $PKG/install/slack-desc
 
 makepkg_fn

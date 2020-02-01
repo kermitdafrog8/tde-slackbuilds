@@ -51,19 +51,18 @@ CXX=$COMPILER_CXX \
   --prefix=/usr \
   --libdir=/usr/lib$LIBDIRSUFFIX \
   --localstatedir=/var \
-  --sysconfdir=/etc \
   --mandir=/usr/man \
   --enable-shared \
   --disable-static \
   --with-modules \
   --with-x \
   --with-frozenpaths
-  
 
 make_fn
 
 installdocs_fn
 
+INSTALL_TDE=/usr
 mangzip_fn
 
 strip_fn

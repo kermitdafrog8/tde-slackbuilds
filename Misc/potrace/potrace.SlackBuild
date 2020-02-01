@@ -28,7 +28,7 @@ VERSION=${VERSION:-1.16}
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-SRCURL="https://sourceforge.net/projects/potrace/files/$VERSION/potrace-$VERSION.tar.gz/download"
+SRCURL="https://downloads.sourceforge.net/project/potrace/$VERSION/potrace-$VERSION.tar.gz"
 ARCHIVE_TYPE="tar.gz"
 
 source ../../get-source.sh
@@ -51,12 +51,13 @@ CXX=$COMPILER_CXX \
   --prefix=/usr/local \
   --libdir=/usr/lib$LIBDIRSUFFIX \
   --with-libpotrace \
-  --mandir=/usr/man \
-  
+  --mandir=/usr/man
+
 make_fn
 
 installdocs_fn
 
+INSTALL_TDE=/usr
 mangzip_fn
 
 strip_fn

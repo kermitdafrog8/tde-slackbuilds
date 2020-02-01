@@ -59,8 +59,8 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DBUILD_DOC=ON \
-    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
+    -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     ..
 
 make_fn
@@ -71,9 +71,13 @@ do
 cp ../doc/$file $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION/  2>/dev/null || true
 done
 
+mangzip_fn
+
 strip_fn
 
 mkdir_install_fn
+
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:

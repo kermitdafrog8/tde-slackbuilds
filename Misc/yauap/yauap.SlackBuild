@@ -57,8 +57,6 @@ make DESTDIR=$PKG install || exit 1
 
 installdocs_fn
 
-mangzip_fn
-
 strip_fn
 
 mkdir_install_fn

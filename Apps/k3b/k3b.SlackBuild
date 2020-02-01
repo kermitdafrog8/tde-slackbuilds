@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=k3b
-PKGNAM=tde$PRGNAM
+PKGNAM=$TDEPFX$PRGNAM
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -38,6 +38,8 @@ listdocs_fn
 
 chown_fn
 
+cd_builddir_fn
+
 # Check for ffmpeg:
 [[ -s /usr/include/libavcodec/avcodec.h ]] && FFMPEG="ON"
 # Check for lame:
@@ -47,8 +49,6 @@ chown_fn
 # Check for musicbrainz:
 [[ -s /usr/include/musicbrainz/mb_c.h ]] && MUSICBRAINZ="ON"
 
-cd_builddir_fn
-
 cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
@@ -56,8 +56,6 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_LIBDVDREAD="ON" \
     -DWITH_MUSICBRAINZ=${MUSICBRAINZ:-"OFF"} \
     -DWITH_SYSTEM_LIBSAMPLERATE="ON" \
@@ -85,6 +83,8 @@ installdocs_fn
 strip_fn
 
 mkdir_install_fn
+
+doinst_sh_fn
 
 PRGNAM=$PKGNAM
 echo "

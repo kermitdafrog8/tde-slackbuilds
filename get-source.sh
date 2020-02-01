@@ -53,7 +53,7 @@ PKG=$TMP_BUILD/package-$PRGNAM
 OUTPUT=/tmp
 
 # remove any previous builds if option chosen
-[[ $KEEP_BUILD != "yes" ]] && echo -e "\n removing previous build data ..\n" && rm -rf $TMP_BUILD/{tmp,package}*
+[[ $KEEP_BUILD != "yes" ]] && [[ $PRE_DOWNLOAD != yes ]] && echo -e "\n removing previous build data ..\n" && rm -rf $TMP_BUILD/{tmp,package}*
 # Create working directories:
 mkdir -p $OUTPUT
 mkdir -p $TMP_BUILD/tmp-$PRGNAM
@@ -85,8 +85,7 @@ done
 )
 
 ## if [r]14.0.? or misc, download archive:
-[[ $TDEVERSION == *14.0.? || $TDEMIR_SUBDIR == misc ]] && \
-{
+[[ $TDEVERSION == *14.0.? || $TDEMIR_SUBDIR == misc ]] && {
 ## check for and remove any zero byte archive files
 [[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} ]] && \
 rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} 2>/dev/null || true
@@ -102,13 +101,14 @@ SOURCE=$SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"}
 # SRCURL for non-TDE archives, set in the SB, will override the Trinity default *tar.xz URL
 SRCURL=${SRCURL:-"https://$TDE_MIRROR/releases/R$VERSION/main$TDEMIR_SUBDIR/$PRGNAM-trinity-$VERSION.tar.xz"}
 # Source file availability:
+[[ -f $SOURCE ]] && [[ $PRE_DOWNLOAD == yes ]] && echo "  $(basename $SOURCE) already downloaded ..."
+
 if ! [ -f $SOURCE ]; then
   echo "Source '$(basename $SOURCE)' not available yet..."
   # Check if the $SRCDIR is writable at all - if not, download to $OUTPUT
   [ -w "$SRCDIR" ] || SOURCE="$OUTPUT/$(basename $SOURCE)"
-  if [ -f $SOURCE ]; then echo "Ah, found it!"; continue; fi
   if ! [ "x$SRCURL" == "x" ]; then
-    echo "Will download file to $(dirname $SOURCE)"
+    echo -e "\nDownloading to $(dirname $SOURCE)"
     wget -T 20 -O "$SOURCE" "$SRCURL" 
     if [ $? -ne 0 -o ! -s "$SOURCE" ]; then
       echo "Downloading '$(basename $SOURCE)' failed... aborting the build."
@@ -122,6 +122,7 @@ if ! [ -f $SOURCE ]; then
     ${EXIT_FAIL:-":"}
   fi
 fi
+
 if [ "$P1" == "--download" ]; then
   echo "Download complete."
   exit 0
@@ -129,7 +130,8 @@ fi
 } || \
 {
 ## if not creating/updating git, nothing to do in this function for git builds
-## otherwise, now not R14.0.? or misc, and we are creating/updating git, so [1] start with admin/cmake:
+## otherwise, now not R14.0.? or misc, and we are creating/updating git,
+## so [1] start with admin/cmake:
 [[ $(cat $TMPVARS/CGIT) == yes ]] && {
 cd $BUILD_TDE_ROOT/src/cgit
 
@@ -154,9 +156,10 @@ git pull)
 touch $TMPVARS/admin-cmake-done
 }
 
-## if not tde-i18n, [2] update or clone PRGNAM
-[[ $PRGNAM != tde-i18n ]] && {
+## if not tde-i18n
+## [2] update or clone PRGNAM
 
+[[ $PRGNAM != tde-i18n ]] && {
 ## get latest commits if the local repository for PRGNAM exists
 [[ -d $PRGNAM ]] && \
 (echo "Updating $PRGNAM ..."
@@ -194,7 +197,8 @@ git clone https://mirror.git.trinitydesktop.org/cgit/libtdevnc
 true # stop the following i18n download (attempts) if this routine fails and i18n not required
 } || \
 {
-## still creating/updating git, so [3] for tde-i18n-$lang:
+## still creating/updating git
+## so [3] for tde-i18n-$lang:
 
 ## Use wget to download the required i18n repos to avoid the ~1x10^6 byte download for the full tde-i18n
 ## - same for both creating and updating
@@ -227,6 +231,8 @@ P1=${1:-1}
 # Save old umask and set to 0022:
 _UMASK_=$(umask)
 umask 0022
+
+[[ $PRE_DOWNLOAD == yes ]] && exit || true # need true to override exit 1 if 'PRE_DOWNLOAD != yes'
 }
 
 untar_fn ()
@@ -279,7 +285,6 @@ cd $PRGNAM*
 }
 }
 
-
 listdocs_fn ()
 {
 DOCDIR=$PWD # this is set for installdocs_fn
@@ -318,17 +323,18 @@ installdocs_fn ()
 [[ $TDEMIR_SUBDIR == misc || $PRGNAM == libart-lgpl ]] && INSTALL_TDE=/usr
 mkdir -p $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
 (cd ${DOCDIR:-};cp -a --parents ${DOCS:-} $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION) || true # DOCDIR might not exist
-cat $SRCDIR/$(basename $0) > $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+## leave this commented out in case anybody wants to reinstate it
+#cat $SRCDIR/$(basename $0) > $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 chown -R root:root $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
 find $PKG$INSTALL_TDE/doc -type f -exec chmod 644 {} \;
 }
 
 mangzip_fn ()
 {
-if [ -d $PKG/usr/man ]; then
-  find $PKG/usr/man -type f -name "*.?" -exec gzip -9f {} \;
-  for i in $(find $PKG/usr/man -type l -name "*.?") ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
-fi
+[[ -d $PKG$INSTALL_TDE/man ]] && {
+  find $PKG$INSTALL_TDE/man -type f -name "*.?" -exec gzip -9f {} \;
+  for i in $(find $PKG$INSTALL_TDE/man -type l -name "*.?") ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
+}
 }
 
 strip_fn ()

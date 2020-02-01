@@ -1,9 +1,0 @@
-#! /bin/sh
-
-# Start TDM:
-if [ -x {INSTALL_TDE}/bin/tdm ]; then
- echo "Using TDM (Trinity Login Manager)."
- echo
-# log_cleanup "/var/log/tdm.log"
- exec {INSTALL_TDE}/bin/tdm -nodaemon -error /var/log/tdm.log
-fi

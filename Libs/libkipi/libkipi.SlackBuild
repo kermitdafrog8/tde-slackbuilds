@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=libkipi
-PKGNAM=tde$PRGNAM
+PKGNAM=$TDEPFX$PRGNAM
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -34,16 +34,16 @@ getsource_fn
 
 untar_fn
 
-listdocs_fn
-
-chown_fn
-
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang/$PRGNAM.po";done
 sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
 langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
 [[ $langs != "" ]] && TRANS=ON
+
+listdocs_fn
+
+chown_fn
 
 cd_builddir_fn
 
@@ -56,8 +56,8 @@ cmake \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DWITH_GCC_VISIBILITY="OFF" \
-    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
-    -DCMAKE_SKIP_RPATH=ON \
+    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DCMAKE_SKIP_RPATH="ON" \
     ..
 
 make_fn
@@ -67,6 +67,8 @@ installdocs_fn
 strip_fn
 
 mkdir_install_fn
+
+doinst_sh_fn
 
 PRGNAM=$PKGNAM
 echo "

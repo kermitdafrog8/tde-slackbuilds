@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=TQt Linguist
-Icon=qtlinguist
-Comment=Translation tool for TQT3
-Exec=tqlinguist
-Terminal=false
-Categories=Development;Programming;

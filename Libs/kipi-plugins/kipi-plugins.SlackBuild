@@ -63,7 +63,6 @@ CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
    --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
@@ -71,6 +70,8 @@ CXX=$COMPILER_CXX \
 make_fn
 
 installdocs_fn
+
+mangzip_fn
 
 strip_fn
 

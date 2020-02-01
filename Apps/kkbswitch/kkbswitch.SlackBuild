@@ -58,8 +58,8 @@ cmake \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
-    -DWITH_RU_UA_LAYOUT=${RU_UA:-OFF} \
+    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DWITH_RU_UA_LAYOUT=${RU_UA:-"OFF"} \
     -DCMAKE_SKIP_RPATH="ON" \
     ..
 
@@ -67,9 +67,13 @@ make_fn
 
 installdocs_fn
 
+mangzip_fn
+
 strip_fn
 
 mkdir_install_fn
+
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:

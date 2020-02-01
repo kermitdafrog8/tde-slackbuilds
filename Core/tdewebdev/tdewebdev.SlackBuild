@@ -48,8 +48,6 @@ CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 
@@ -63,6 +61,8 @@ mkdir_install_fn
 
 doinst_sh_fn
 
+## TDEFileReplace has been moved to tdeutils for R14.1.0
+[[ $TDEVERSION == 14.0.7 ]] && TDEFileReplace="* TDEFileReplace: powerful search and replace in multiple files"
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -77,11 +77,11 @@ $PRGNAM: * Quanta Plus: a web IDE
 $PRGNAM:
 $PRGNAM: The runtime dependencies are:
 $PRGNAM: * Kommander: a GUI script builder and executor tool.
-$PRGNAM: * TDEFileReplace: powerful search and replace in multiple files
-$PRGNAM:                   [Moved to tdeutils for R14.1.0]
 $PRGNAM: * KXSLDbg: XSL debugger
 $PRGNAM: * KImageMapEditor: image map editor
 $PRGNAM: * KLinkStatus: link checker
+$PRGNAM: ${TDEFileReplace:-}
+$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

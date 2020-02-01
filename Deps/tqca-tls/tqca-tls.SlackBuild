@@ -37,7 +37,7 @@ listdocs_fn
 
 chown_fn
 
-#cd_builddir_fn
+#cd_builddir_fn - don't use
 
 [[ ! -d /usr/include/tqt ]] && sed -i "s|/usr/include/tqt|$INSTALL_TDE/include/tqt|g" configure || true
 LDFLAGS=$SLKLDFLAGS \

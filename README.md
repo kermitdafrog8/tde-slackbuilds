@@ -16,9 +16,10 @@ Run **INST=0 ./BUILD-TDE.sh** to build only.
 
 Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.  
 The TDE mandatory packages can be pre-selected.  
-Notes at the bottom of the dialog screen have been added for information about dependencies for some packages.
+Information about dependencies for some packages has been added at the bottom of the dialog screen.
 
-Source archives can be stored locally pre-build, or will be downloaded during the build from a geoIP located mirror site. Development [cgit] sources are downloaded, with the option to update, during the build.
+R14.0.7 source archives will be downloaded from a geoIP located mirror site, or the development sources [R14.1.0] cloned or updated from cgit.  
+Downloading can be done pre-build [useful for an off-line build], or during the build.
 
 The directory structure for the SlackBuild scripts is in line with the Trinity release source repositories:  
 ```

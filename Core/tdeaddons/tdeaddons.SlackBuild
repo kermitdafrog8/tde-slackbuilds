@@ -33,8 +33,6 @@ getsource_fn
 
 untar_fn
 
-listdocs_fn
-
 ## enable 'ar' compression in Compress As menu
 echo $'
 --- konq-plugins/arkplugin/arkplugin.cpp
@@ -46,6 +44,8 @@ echo $'
 do
 patch -N -p0
 done || true
+
+listdocs_fn
 
 chown_fn
 
@@ -59,7 +59,8 @@ chown_fn
 [[ $(ls $INSTALL_TDE/lib$LIBDIRSUFFIX/libnoatun.so*) ]] && NOATUN_PLUGINS="ON"
 
 cd_builddir_fn
-  cmake \
+
+cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
@@ -69,7 +70,6 @@ cd_builddir_fn
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DWITH_ARTS="ON" \
     -DWITH_SDL="ON" \

@@ -28,7 +28,7 @@
 PRGNAM=graphviz
 VERSION=${VERSION:-2.42.3}
 BUILD=${BUILD:-1}
-TAG=${TAG:-_tde}
+TAG=${TAG:-}
 
 SRCURL="https://ftp.osuosl.org/pub/blfs/conglomeration/graphviz/graphviz-$VERSION.tar.gz"
 ARCHIVE_TYPE="tar.gz"
@@ -38,26 +38,13 @@ getsource_fn
 
 untar_fn
 
-listdocs_fn
-
-chown_fn
-
-#cd_builddir_fn
-
-# set file permissions
-find -L . \
- \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 -o -perm 511 \) \
- -exec chmod 755 {} \; -o \
- \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
- -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
-
 # Install PHP bindings to proper location.
 sed -i 's|/php/modules|/php/extensions|' configure
 
 # Fix for php-5.4 and patches from Arch (thanks!)
 echo $'--- plugin/gs/gvloadimage_gs.c
 +++ plugin/gs/gvloadimage_gs.c
-@@ -72,11 +72,11 @@
+@@ -83,11 +83,11 @@
  
      assert (err < 0);
  
@@ -83,12 +70,18 @@ do
 patch -p0
 done
 
+listdocs_fn
+
+chown_fn
+
+cd_builddir_fn
+
 CFLAGS=$SLKCFLAGS \
 CXXFLAGS=$SLKCFLAGS \
 LDFLAGS=$SLKLDFLAGS \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
-./configure \
+../configure \
   --prefix=/usr \
   --libdir=/usr/lib$LIBDIRSUFFIX \
   --mandir=/usr/man \
@@ -118,9 +111,6 @@ cat << EOF > $PKG/etc/php.d/graphviz.ini.new
 ; ?>
 EOF
 
-# gzip man pages
-find $PKG/usr/man -type f -exec gzip -9 {} \;
-for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 # Remove empty directories of language bindings that are absent.
 find $PKG/usr/lib$LIBDIRSUFFIX/graphviz -depth -type d -empty -exec rmdir {} \;
 
@@ -136,9 +126,33 @@ echo '# Dummy content.' > $PKG/usr/lib$LIBDIRSUFFIX/graphviz/config6
 
 installdocs_fn
 
+INSTALL_TDE=/usr
+mangzip_fn
+
 strip_fn
 
 mkdir_install_fn
+
+cat << EOF > $PKG/install/doinst.sh
+config() {
+  NEW="\$1"
+  OLD="\$(dirname \$NEW)/\$(basename \$NEW .new)"
+  # If there's no config file by that name, mv it over:
+  if [ ! -r \$OLD ]; then
+    mv \$NEW \$OLD
+  elif [ "\$(cat \$OLD|md5sum)" = "\$(cat \$NEW|md5sum)" ]; then
+    # toss the redundant copy
+    rm \$NEW
+  fi
+  # Otherwise, we leave the .new copy for the admin to consider...
+}
+
+config etc/php.d/graphviz.ini.new
+
+# Configure plugins
+# (writes /usr/lib*/graphviz/config6 with available plugin information)
+chroot . /usr/bin/dot -c
+EOF
 
 echo "
 # HOW TO EDIT THIS FILE:
@@ -161,26 +175,5 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc
-
-cat << EOF > $PKG/install/doinst.sh
-config() {
-  NEW="\$1"
-  OLD="\$(dirname \$NEW)/\$(basename \$NEW .new)"
-  # If there's no config file by that name, mv it over:
-  if [ ! -r \$OLD ]; then
-    mv \$NEW \$OLD
-  elif [ "\$(cat \$OLD|md5sum)" = "\$(cat \$NEW|md5sum)" ]; then
-    # toss the redundant copy
-    rm \$NEW
-  fi
-  # Otherwise, we leave the .new copy for the admin to consider...
-}
-
-config etc/php.d/graphviz.ini.new
-
-# Configure plugins
-# (writes /usr/lib*/graphviz/config6 with available plugin information)
-chroot . /usr/bin/dot -c
-EOF
 
 makepkg_fn

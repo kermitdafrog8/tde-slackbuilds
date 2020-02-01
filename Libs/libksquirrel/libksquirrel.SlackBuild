@@ -33,6 +33,9 @@ getsource_fn
 
 untar_fn
 
+## don't install 'sources' docs
+sed -i 's|sources ||' doc/Makefile.am
+
 listdocs_fn
 
 ltoolupdate_fn
@@ -48,8 +51,6 @@ CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ./configure \
    --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 

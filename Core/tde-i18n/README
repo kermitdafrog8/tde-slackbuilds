@@ -1,6 +1,6 @@
 There is an option in tde-i18n.SlackBuild to include a language specific patch file in the build.
 
-It needs to be named tde-i18n-{lang}-patch and will then automatically be included for the build for that language. 
+It needs to be named tde-i18n-{lang}-patch and will then automatically be included for the build for that language.
 
 Because of its position in the Slackbuild and the patch -p0 option, the path to the patched file must start with 'tde-i18n-{lang}' - see tde-i18n-en_GB-patch for an example.
  

@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=TQt3 Config
-Icon=qtlogo
-Comment=Configure TQt3
-Exec=tqtconfig
-Terminal=false
-Categories=Settings

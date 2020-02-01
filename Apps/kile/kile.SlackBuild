@@ -56,8 +56,6 @@ CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 
@@ -68,6 +66,8 @@ installdocs_fn
 strip_fn
 
 mkdir_install_fn
+
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:

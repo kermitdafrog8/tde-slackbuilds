@@ -33,19 +33,11 @@ getsource_fn
 
 untar_fn
 
-listdocs_fn
-
-# Check for Jack Audio Connection Kit
-[[ $(ls /var/log/packages/jack-audio-connection-kit-*) ]] && JACK="ON"
-
-# Check for DSSI aka "Dizzy"
-[[ $(grep -E "dssi.h" /var/log/packages/*) ]] && DSSI="ON"
-
 ## remove help documentation build instruction from all locales ...
 sed -i '/tde_create_handbook/,+3d' doc/??{,_??}/CMakeLists.txt || true
 ## ... and restore for 'en'
 echo "tde_create_handbook( LANG en DESTINATION $PRGNAM )" >> doc/en/CMakeLists.txt
-
+#
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="" # the *.po file list
@@ -66,9 +58,17 @@ sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
 langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
 [[ $langs != "" ]] && TRANS=ON
 
+listdocs_fn
+
 chown_fn
 
 cd_builddir_fn
+
+# Check for Jack Audio Connection Kit
+[[ $(ls /var/log/packages/jack-audio-connection-kit-*) ]] && JACK="ON"
+
+# Check for DSSI aka "Dizzy"
+[[ $(grep -E "dssi.h" /var/log/packages/*) ]] && DSSI="ON"
 
 cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
@@ -77,10 +77,8 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
+    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     -DWANT_SOUND="ON" \
     -DWANT_DEBUG="OFF" \
     -DWANT_FULLDBG="OFF" \

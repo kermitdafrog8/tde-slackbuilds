@@ -35,8 +35,6 @@ untar_fn
 
 patch -p0 < $SRCDIR/reformat-message.patch
 
-listdocs_fn
-
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
@@ -52,6 +50,8 @@ for Lang in $I18N;do [[ -d doc/$Lang ]] && langdoc="$langdoc $Lang";done
 ## ... and edit tde_auto_add_subdirectories GLOB:
 sed -i "s|} \* )|} $langdoc )|" cmake/modules/TDEMacros.cmake
 
+listdocs_fn
+
 chown_fn
 
 cd_builddir_fn
@@ -63,17 +63,21 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DBUILD_DOC=ON \
-    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
+    -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     ..
 
 make_fn
 
 installdocs_fn
 
+mangzip_fn
+
 strip_fn
 
 mkdir_install_fn
+
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:

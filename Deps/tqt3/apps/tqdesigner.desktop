@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=TQt Designer
-Icon=qtdesigner
-Comment=Design TQt3 GUI
-Exec=tqdesigner
-Terminal=false
-Categories=Development;Programming; 

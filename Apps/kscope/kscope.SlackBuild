@@ -33,13 +33,13 @@ getsource_fn
 
 untar_fn
 
-listdocs_fn
-
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
 sed -i "s|POFILES =.*$|POFILES =$langs|" po/Makefile.am
 langs=$(echo $langs | sed 's|.po||g')
+
+listdocs_fn
 
 ltoolupdate_fn
 
@@ -62,6 +62,8 @@ installdocs_fn
 strip_fn
 
 mkdir_install_fn
+
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:

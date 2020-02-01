@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=amarok
-PKGNAM=tde$PRGNAM
+PKGNAM=$TDEPFX$PRGNAM
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -43,16 +43,6 @@ sed 's|tagaac|tagspeex|g;s|aacfile.*$|taglib_speexfiletyperesolver.cpp speexfile
 ## [2] patch metadata/CMakeLists.txt
 sed -i -e 's|wav )|wav )\nadd_subdirectory( speex )|' \
 -e 's|tagaac-static|tagaac-static tagspeex-static|' amarok/src/metadata/CMakeLists.txt
-
-# If libmp4v2 is installed, use mp4 metadata sources in build, otherwise use m4a ..
-[[ $(grep -E "mp4.h|mp4v2.h" /var/log/packages/*) ]] && LMP4V2="ON" || sed -i 's|tagmp4-static|tagm4a-static|' amarok/src/metadata/CMakeLists.txt
-
-# See if xine-lib package from Slackware is installed. (Need this to play music so hopefully it is.)
-[[ $(grep -E "xine.h" /var/log/packages/*) ]] && XINE="ON"
-
-# If yauap is installed this can be used as an engine for music playback as well.
-# Yauap does NOT handle the mp3 format.
-[[ $(ls /var/log/packages/yauap-*) ]] && YAUAP="ON"
 
 # fix includehints - see issue #16
 echo $'
@@ -186,11 +176,9 @@ done || true
 ## and then do the rest ...
 find . -name \*.ui -exec sed -i -e 's|includehint|include|g' '{}' +
 
-listdocs_fn
-
 ## remove help documentation build instruction from all [non-en] locales ...
 sed -i '/tde_create_handbook/,+3d' doc/??{,_??}/CMakeLists.txt || true
-
+#
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="" # the *.po file list
@@ -212,9 +200,21 @@ sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
 langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
 [[ $langs != "" ]] && TRANS=ON
 
+listdocs_fn
+
 chown_fn
 
 cd_builddir_fn
+
+# If libmp4v2 is installed, use mp4 metadata sources in build, otherwise use m4a ..
+[[ $(grep -E "mp4\.h|mp4v2\.h" /var/log/packages/*) ]] && LMP4V2="ON" || sed -i 's|tagmp4-static|tagm4a-static|' ../amarok/src/metadata/CMakeLists.txt
+
+# See if xine-lib package from Slackware is installed. (Need this to play music so hopefully it is.)
+[[ -s /usr/include/xine.h ]] && XINE="ON"
+
+# If yauap is installed this can be used as an engine for music playback as well.
+# Yauap does NOT handle the mp3 format.
+[[ -s $(which yauap) ]] && YAUAP="ON"
 
 cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
@@ -223,8 +223,6 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_MP4V2=${LMP4V2:-"OFF"} \
     -DWITH_XINE=${XINE:-"OFF"} \
     -DWITH_YAUAP=${YAUAP:-"OFF"} \

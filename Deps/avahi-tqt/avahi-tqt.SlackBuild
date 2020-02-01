@@ -49,7 +49,7 @@ cmake \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DWITH_GCC_VISIBILITY="OFF" \
-..
+    ..
 
 make_fn
 

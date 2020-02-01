@@ -50,14 +50,14 @@ cmake \
 
 make_fn
 
-installdocs_fn
-
-strip_fn
-
 # Add desktop file
 mkdir -p $PKG/$INSTALL_TDE/share/applications
 (cd $PKG/$INSTALL_TDE/share/applications
 ln -s ../autostart/kdbusnotification-autostart.desktop .)
+
+installdocs_fn
+
+strip_fn
 
 mkdir_install_fn
 

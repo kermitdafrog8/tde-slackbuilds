@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tde-i18n
-[[ $I18N == "" ]] && echo -e "\nYou have tried to build $PRGNAM without selecting any language(s)\n" && exit
+[[ $PRE_DOWNLOAD != yes ]] && [[ $I18N == "" ]] && echo -e "\033[39;1m\nYou have tried to build $PRGNAM without selecting any language(s)\n\033[0m" && exit
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 
@@ -84,8 +84,6 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DBUILD_DOC="ON" \
     -DBUILD_DATA="ON" \
@@ -94,11 +92,11 @@ cmake \
 
 make_fn
 
-mkdir -p $PKG/$INSTALL_TDE/doc/$PRGNAM-$VERSION
+#mkdir -p $PKG/$INSTALL_TDE/doc/$PRGNAM-$VERSION
 #cp -a $DOCS $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION || true
-cat $SRCDIR/$(basename $0) > $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION/$PRGNAM-$lang.SlackBuild
-chown -R root:root $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
-find $PKG$INSTALL_TDE/doc -type f -exec chmod 644 {} \;
+#cat $SRCDIR/$(basename $0) > $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION/$PRGNAM-$lang.SlackBuild
+#chown -R root:root $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
+#find $PKG$INSTALL_TDE/doc -type f -exec chmod 644 {} \;
 
 mkdir_install_fn
 
@@ -133,9 +131,9 @@ $PRGNAM-$lang:
 
 ARCH="noarch"
 cd $PKG
-makepkg --linkadd y --chown n $OUTPUT/$PRGNAM-$lang-$VERSION-$ARCH-$BUILD.${PKGTYPE:-txz} 
+makepkg --linkadd y --chown n $OUTPUT/$PRGNAM-$lang-$VERSION-$ARCH-$BUILD.txz
 cd $OUTPUT
-md5sum $PRGNAM-$lang-$VERSION-$ARCH-$BUILD.${PKGTYPE:-txz} > $PRGNAM-$lang-$VERSION-$ARCH-$BUILD.${PKGTYPE:-txz}.md5
+md5sum $PRGNAM-$lang-$VERSION-$ARCH-$BUILD.txz > $PRGNAM-$lang-$VERSION-$ARCH-$BUILD.txz.md5
 cat $PKG/install/slack-desc | grep "^$PRGNAM" | grep -v handy > $OUTPUT/$PRGNAM-$lang-$VERSION-$ARCH-$BUILD.txt
 
 # Restore the original umask:
@@ -147,10 +145,8 @@ rm -rf $PRGNAM/$PRGNAM-$lang
 
 # Install i18n package(s) here because if more than one language pack is built,
 # upgradepkg [in BUILD-TDE.sh] can't process them in one command and the build will exit
-if [ $INST == 1 ]
-then
-upgradepkg --install-new --reinstall $OUTPUT/$PRGNAM-$lang-$VERSION-$ARCH-$BUILD.${PKGTYPE:-txz}
-fi
+[[ $INST == 1 ]] && upgradepkg --install-new --reinstall $OUTPUT/$PRGNAM-$lang-$VERSION-$ARCH-$BUILD.txz
+
 done
 
 echo $lang > $TMPVARS/LASTLANG

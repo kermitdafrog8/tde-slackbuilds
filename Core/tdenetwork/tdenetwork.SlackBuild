@@ -33,9 +33,6 @@ getsource_fn
 
 untar_fn
 
-# If speex is installed, include it in the build for jingle
-[[ -s /usr/include/speex/speex.h ]] && SPX="ON"
-
 listdocs_fn
 
 chown_fn
@@ -44,6 +41,8 @@ cd_builddir_fn
 
 ## If changing any of these options, READ CMakeLists.txt for info on interdependencies ..
 ## GADU & MEANWHILE require libgadu and meanwhile installed.
+# If speex is installed, include it in the build for jingle
+[[ -s /usr/include/speex/speex.h ]] && SPX="ON"
 
 cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
@@ -52,8 +51,6 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_ARTS="ON" \
     -DWITH_JINGLE="ON" \
     -DWITH_SPEEX=${SPX:-"OFF"} \

@@ -47,7 +47,6 @@ chown_fn
 
 cd_builddir_fn 
 
-# Fails with clang =[
 LDFLAGS=$SLKLDFLAGS \
 CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
 CXXFLAGS=$SLKCFLAGS \
@@ -55,8 +54,6 @@ CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 

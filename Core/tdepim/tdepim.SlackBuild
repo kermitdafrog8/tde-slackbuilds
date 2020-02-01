@@ -33,17 +33,17 @@ getsource_fn
 
 untar_fn
 
-# If libcaldav is installed, include it in the build for korganizer
-[[ -s $INSTALL_TDE/include/libcaldav/caldav.h ]] 2>/dev/null && LCALDAV="ON"
-
-# If libcarddav is installed, include it in the build for korganizer
-[[ -s $INSTALL_TDE/include/libcarddav/carddav.h ]] 2>/dev/null && LCARDDAV="ON"
-
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
+
+# If libcaldav is installed, include it in the build for korganizer
+[[ -s $INSTALL_TDE/include/libcaldav/caldav.h ]] 2>/dev/null && LCALDAV="ON"
+
+# If libcarddav is installed, include it in the build for korganizer
+[[ -s $INSTALL_TDE/include/libcarddav/carddav.h ]] 2>/dev/null && LCARDDAV="ON"
 
 cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
@@ -55,8 +55,6 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_ARTS="ON" \
     -DWITH_BIRTHDAYS="ON" \
     -DWITH_CALDAV=${LCALDAV:-"OFF"} \

@@ -33,8 +33,6 @@ getsource_fn
 
 untar_fn
 
-listdocs_fn
-
 # there is a Spanish language file in the source, but it has no translations in it ..
 # the included es.po file is a Google translation - if you're happy to use it,
 # then to include it in the build, put it in the same directory as this SB script
@@ -48,6 +46,8 @@ sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
 langs=$(echo $langs | sed "s|.po||g")
 [[ $langs != "" ]] && TRANS=ON
 
+listdocs_fn
+
 chown_fn
 
 cd_builddir_fn
@@ -59,17 +59,21 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DBUILD_DOC=ON \
-    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
+    -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     ..
 
 make_fn
 
 installdocs_fn
 
+mangzip_fn
+
 strip_fn
 
 mkdir_install_fn
+
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:

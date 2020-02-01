@@ -80,7 +80,7 @@ listdocs_fn
 
 chown_fn
 
-#cd_builddir_fn
+#cd_builddir_fn - don't use
 
 echo "yes" | CFLAGS=$SLKCFLAGS CXXFLAGS=$SLKCFLAGS \
  ./configure \
@@ -144,10 +144,43 @@ ln -s linux-g++ default
 installdocs_fn
 
 mkdir -p $PKG/etc/profile.d
-# JD: adapt these to the correct value of LIBDIRSUFFIX
-# later changed to TQTDIR
-sed "s|\$TQTDIR|$TQTDIR|g" < $SRCDIR/profile.d/$PRGNAM.sh > $PKG/etc/profile.d/$PRGNAM.sh
-sed "s|\$TQTDIR|$TQTDIR|g" < $SRCDIR/profile.d/$PRGNAM.csh > $PKG/etc/profile.d/$PRGNAM.csh
+#
+echo '#!'"/bin/sh
+# Environment variables for the tQt package.
+#
+# It's best to use the generic directory to avoid
+# compiling in a version-containing path:
+if [ -d $TQTDIR ]; then
+  QTDIR=$TQTDIR
+else
+  # Find the newest Qt directory and set \$QTDIR to that:
+  for qtd in $TQTDIR-* ; do
+    if [ -d \$qtd ]; then
+      QTDIR=\$qtd
+    fi
+  done
+fi
+export QTDIR
+" > $PKG/etc/profile.d/tqt3.sh
+#
+echo '#!'"/bin/csh
+# Environment path variables for the tQt package:
+if ( ! \$?QTDIR ) then
+    # It's best to use the generic directory to avoid
+    # compiling in a version-containing path:
+    if ( -d $TQTDIR ) then
+        setenv QTDIR $TQTDIR
+    else
+        # Find the newest Qt directory and set \$QTDIR to that:
+        foreach qtd ( $TQTDIR-* )
+            if ( -d \$qtd ) then
+                setenv QTDIR \$qtd
+            endif
+        end
+    endif
+endif
+" > $PKG/etc/profile.d/tqt3.csh
+#
 chmod 755 $PKG/etc/profile.d/*
 
 strip_fn
@@ -157,20 +190,18 @@ mkdir -p $PKG$INSTALL_TDE/bin
 ( cd $PKG$INSTALL_TDE/bin
   ln -sf ../lib$LIBDIRSUFFIX/$PRGNAM-$VERSION/bin/* .
 )
-
+#
 mkdir -p $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig
 ( cd $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig
   ln -sf ../$PRGNAM-$VERSION/lib/pkgconfig/tqt-mt.pc .
 )
 
-[[ ! $TQT_OPTS == *minimal* ]] && {
-# Add desktop files to launch some programs:
+[[ $TQT_OPTS != *minimal* ]] && {
+## move .desktop files to where the other TDE .desktop files are installed
 mkdir -p $PKG$INSTALL_TDE/share/applications/tde
-cp -a $SRCDIR/apps/tqtconfig.desktop $PKG$INSTALL_TDE/share/applications/tde/tqtconfig.desktop
-cp -a $SRCDIR/apps/tqlinguist.desktop $PKG$INSTALL_TDE/share/applications/tde/tqlinguist.desktop
-cp -a $SRCDIR/apps/tqdesigner.desktop $PKG$INSTALL_TDE/share/applications/tde/tqdesigner.desktop
-cp -a $SRCDIR/apps/tqassistant.desktop $PKG$INSTALL_TDE/share/applications/tde/tqassistant.desktop
+mv $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/$PRGNAM-$TDEVERSION/share/applications/* $PKG$INSTALL_TDE/share/applications/tde/
 }
+rm -rf $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/$PRGNAM-$TDEVERSION/share/applications
 
 # Symlink tqt3 includes to qt3, to provide it for non-tde software as well =]
 mkdir -p $PKG$INSTALL_TDE/include
@@ -196,12 +227,8 @@ if [ -x /sbin/ldconfig ]; then
 fi
 
 # Update PKG_CONFIG_PATH:
-if ! grep $INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig /etc/profile.d/pkgconfig.sh
-then
-sed -i "s|pkgconfig$|pkgconfig:$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig|g" /etc/profile.d/pkgconfig.sh
-sed -i "s|pkgconfig$|pkgconfig:$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig|g" /etc/profile.d/pkgconfig.csh
-fi
-
+[[ ! \$( grep $INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig /etc/profile.d/pkgconfig.sh ) ]] && \\
+sed -i "s|pkgconfig$|pkgconfig:$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig|" /etc/profile.d/pkgconfig.{,c}sh
 EOINS
 
 ## Removing any existing TDE libs paths and re-installing prevents duplication -
@@ -217,10 +244,10 @@ if [ -x /sbin/ldconfig ]; then
 fi
 
 # Update PKG_CONFIG_PATH:
-sed -i "s|$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig||g;s|:$||g" /etc/profile.d/pkgconfig.{,c}sh
-sed -i "s|PKG_CONFIG_PATH=|PKG_CONFIG_PATH=$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig:|g;s|::|:|g" /etc/profile.d/pkgconfig.sh
-sed -i "s|PKG_CONFIG_PATH |PKG_CONFIG_PATH $INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig:|g;s|::|:|g" /etc/profile.d/pkgconfig.csh
-
+[[ ! \$( grep PKG_CONFIG_PATH=$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig: /etc/profile.d/pkgconfig.sh ) ]] && {
+sed -i "s|PKG_CONFIG_PATH=|PKG_CONFIG_PATH=$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig:|" /etc/profile.d/pkgconfig.sh
+sed -i "s| PKG_CONFIG_PATH | PKG_CONFIG_PATH $INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig:|" /etc/profile.d/pkgconfig.csh
+}
 EOINS
 
 doinst_sh_fn
@@ -235,7 +262,7 @@ echo "
        |-----handy-ruler------------------------------------------------------|
 $PRGNAM: tqt3 (C++ GUI application framework)
 $PRGNAM:
-$PRGNAM: Qt is a multiplatform C++ GUI application framework
+$PRGNAM: tQt is a multiplatform C++ GUI application framework
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

@@ -33,8 +33,6 @@ getsource_fn
 
 untar_fn
 
-listdocs_fn
-
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang/gtkqtengine.po";done
@@ -42,6 +40,8 @@ sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
 langs=$(echo $langs|sed "s|/gtkqtengine.po||g")
 ## There is no BUILD_TRANSLATIONS option for this build
 ## [[ $langs != "" ]] && TRANS=ON
+
+listdocs_fn
 
 chown_fn
 
@@ -58,8 +58,6 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -Wno-dev \
     ..
 

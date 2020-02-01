@@ -28,6 +28,8 @@ VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-4}
 TAG=${TAG:-_tde}
 
+## ignore this if pre-downloading sources
+[[ $PRE_DOWNLOAD != yes ]] && {
 ## build with libpng-1.4 - set in BUILD-TDE.sh - loading pngs in chalk/krita crashes with libpng16
 LIBPNG_VERSION=$(grep VERSION:- ../../Misc/libpng/libpng.SlackBuild | grep -o [.0-9]*)
 [[ ${USE_PNG14:-} == yes ]] && \
@@ -37,6 +39,7 @@ LIBPNG_VERSION=$(grep VERSION:- ../../Misc/libpng/libpng.SlackBuild | grep -o [.
 exit
 }
 } || true
+}
 
 source ../../get-source.sh
 getsource_fn
@@ -93,8 +96,6 @@ CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
-   --sysconfdir=$SYS_CNF_DIR \
-   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    --enable-closure
 

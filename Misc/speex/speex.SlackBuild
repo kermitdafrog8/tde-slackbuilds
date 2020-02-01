@@ -67,6 +67,7 @@ make_fn
 
 installdocs_fn
 
+INSTALL_TDE=/usr
 mangzip_fn
 
 # Fix libspeex.la Thanks SBo script:

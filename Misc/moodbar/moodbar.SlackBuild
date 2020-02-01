@@ -50,14 +50,11 @@ CXX=$COMPILER_CXX \
 ../configure \
   --prefix=/usr \
   --libdir=/usr/lib$LIBDIRSUFFIX \
-  --mandir=/usr/man \
   --disable-static
 
 make_fn
 
 installdocs_fn
-
-mangzip_fn
 
 strip_fn
 

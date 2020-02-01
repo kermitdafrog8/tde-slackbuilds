@@ -4,36 +4,44 @@
 exec 2>/dev/null
 
 export TMPVARS=/tmp/build/vars
-if [ ! -d $TMPVARS ]; then
-  mkdir -p $TMPVARS
-fi
+[[ ! -d $TMPVARS ]] && mkdir -p $TMPVARS
 
 ## remove marker for git admin/cmake to update or clone only once per run of this script
 rm -f $TMPVARS/admin-cmake-done
+## remove any PRE_DOWNLOAD record to allow BUILD-TDE.sh to be run in Re-use mode after a pre-download
+rm -f $TMPVARS/PRE_DOWNLOAD
+## .. and if building 14.1.0, turn off cgit downloads
+[[ $(cat $TMPVARS/CGIT) == yes ]] && echo \\Z0\\Zbno > $TMPVARS/CGIT
 
+
+## don't need this if this script has already been run
+## test on $TMPVARS/TDEbuilds, whether or not it has content
+[[ -e $TMPVARS/TDEbuilds ]] || {
 dialog --cr-wrap --no-shadow --colors --title " Introduction " --msgbox \
 "
- This is the set up script for TDE SlackBuilds on Slackware 14.2/current for setting user preferences and options.
+ Build selected TDE packages and non-TDE dependencies for Slackware 14.2/current.
 
- Source archives must be placed in the 'src' directory or will be downloaded during the build from a geoIP located mirror site.
+ Source archives will be downloaded from a geoIP located mirror site and saved to the 'src' directory.
 
- A package build list is created, and successfully built and installed packages are removed from that list as the build progresses.
+ A package build list is created, and successfully built packages are removed from that list as the build progresses.
 
- US English is the default language and support for additional languages can be added.
+ US English is the default language and support for additional languages can be included in the packages.
 
- There is an option to abort the build on the final setup screen - so just run through the options and familiarize yourself with them before an actual build. " \
-21 75
+ The final screen gives a summary of the build setup, with an option to cancel." \
+20 75
+}
 
 
 rm -f $TMPVARS/build-new
 dialog --cr-wrap --yes-label "Re-use" --no-label "New" --defaultno --no-shadow --colors --title " TDE Build " --yesno \
 "
-Select \Zr\Z4\ZbNew\Zn if:
-               This is a new build - OR
-               Additional packages are being built
-\Zr\Z4\ZbNew\Zn will delete any previous build list.
+\Zr\Z4\ZbNew\Zn
+ Create a new build list.
 
-Selecting <\Z1R\Zb\Z0e-use\Zn> avoids having to create the build list again when re-running the build for any SlackBuilds that failed." \
+\Z1R\Zb\Z0e-use\Zn
+ Use the existing build list when re-running the build
+ * for any SlackBuilds that failed - or
+ * after only downloading the sources" \
 13 75
 [[ $? == 0 ]] && echo no > $TMPVARS/build-new
 [[ $? == 1 ]] && rm -f $TMPVARS/TDEbuilds
@@ -104,8 +112,8 @@ Any other option will have to be edited into BUILD-TDE.sh
  
 " \
 15 75 3 \
-"/opt/trinity" "" \
 "/opt/tde" "" \
+"/opt/trinity" "" \
 "/usr" "" \
 2> $TMPVARS/INSTALL_TDE
 
@@ -120,8 +128,8 @@ otherwise the defaults of TDEHOME=~/.trinity and TDEROOTHOME=/root/.trinity will
  
 " \
 18 75 2 \
-"/etc/trinity" "" \
 "/etc/tde" "" \
+"/etc/trinity" "" \
 2> $TMPVARS/SYS_CNF_DIR
 
 
@@ -229,7 +237,7 @@ dialog --cr-wrap --nocancel --no-shadow --colors --help-button --help-label "REA
 "
  This is the complete list of additional languages supported by TDE.
 
- Other package sources may not have support for all these additional languages, but they will be included in the build for that package when the translations are included in its source.
+ A package source may not have support for all these additional languages, but any chosen will be included in the build for that package when its source includes the translation.
  If any other translation is included in the package source, it can be added here but won't be supported by TDE.
 
  Multiple selections may be made - space separated.
@@ -270,36 +278,43 @@ done
 
 
 rm -f $TMPVARS/EXIT_FAIL
-dialog --cr-wrap --defaultno --yes-label "Continue" --no-label "Stop" --no-shadow --colors --title " Action on failure " --yesno \
+dialog --cr-wrap --defaultno --yes-label "Stop" --no-label "Continue" --no-shadow --colors --title " Action on failure " --yesno \
 "
-Do you want the build to \Zr\Z4\ZbStop\Zn at a failure or <\Z1C\Zb\Z0ontinue\Zn> to the next SlackBuild?
+Do you want the build to <\Z1S\Zb\Z0top\Zn> at a failure or \Zr\Z4\ZbContinue\Zn to the next SlackBuild?
 
-Build logs are $TMP/'program'-*-build-log, and configure/cmake error logs will be in $TMP/build/tmp-'program'.
+Build logs are \Zu$TMP/<program>-*-build-log\ZU,
+and configure[cmake] logs will be in
+\Zu$TMP/build/tmp-<program>/<program>/build-<program>[/CMakeFiles]\ZU.
 
 A practical build method could be:
 
- 1] build the \Zb\Zr\Z4R\Znequired packages with the \Zr\Z4\ZbStop\Zn option - if any SlackBuild fails, the temporary files for that build will be kept and the problem can be identified and the build restarted.
-Any problems with the build environment will also become apparent here.
+ 1] build the \Zb\Zr\Z4R\Znequired packages with the <\Z1S\Zb\Z0top\Zn> option.
+    This script will then exit on a failure. When the problem has been
+    fixed, restart the build with the \Z3\ZbTDE build\Zn|<Re-use> option.
 
- 2] then build other packages with the <\Z1C\Zb\Z0ontinue\Zn> option which deletes the temporary build files while the successful package builds are completing.
-Any failures here are likely to be related to dependencies not found.
+ 2] then build other packages with the \Zr\Z4\ZbContinue\Zn option which allows
+    this script to continue to the end of the build list whether or
+    not any particular SlackBuild has failed.
+    \Zr\Z4\ZbContinue\Zn is probably the better choice if only downloading sources.
 
- 3] re-run the build for the failed programs from [2] by re-using the build list and with the \Zr\Z4\ZbStop\Zn option ...
+ 3] re-run the build for the remaining programs with the
+    \Z3\ZbTDE build\Zn|<Re-use> option and select <Stop> in the confirmation
+    screen.
  " \
-26 75
-[[ $? == 0 ]] && 2> $TMPVARS/EXIT_FAIL
-[[ $? == 1 ]] && echo "exit 1" > $TMPVARS/EXIT_FAIL
+27 75
+[[ $? == 0 ]] && echo "exit 1" > $TMPVARS/EXIT_FAIL
+[[ $? == 1 ]] && 2> $TMPVARS/EXIT_FAIL
 
 
 rm -f $TMPVARS/KEEP_BUILD
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Temporary Build Files " --yesno \
 "
-'tmp' & 'package' files from a previous package build are removed at the start of building the next package to keep the build area clear.
+The default is to remove 'tmp' & 'package' files from a previous package build at the start of building the next package to keep the build area clear.
 
 If following the build method on the previous screen, the answer here should probably be \Zr\Z4\ZbNo\Zn.
 
 Keep \ZuALL\ZU the temporary files, including for successfully built packages?" \
-14 75
+15 75
 [[ $? == 0 ]] && echo yes > $TMPVARS/KEEP_BUILD
 [[ $? == 1 ]] && echo no > $TMPVARS/KEEP_BUILD
 
@@ -332,7 +347,7 @@ EXITVAL=$?
 [[ $EXITVAL == 1 ]] && 2> $TMPVARS/PREPEND
 [[ $EXITVAL == 2 ]] && dialog --cr-wrap --no-shadow --colors --ok-label "Return" --msgbox \
 "
-The default with the tqt3 build is to append the TDE lib paths to /etc/ld.so.conf.
+The default with the tqt3 build is to append the TDE libs paths to /etc/ld.so.conf.
 
 This means that TDE libs will be at the end of the search path. If the package configuration sets up the search path without using the shell variables set up in this script, those TDE libs will not be used if a library of the same name exists - a conflict which could arise if another DE is installed.
 
@@ -349,7 +364,7 @@ dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Packages Selectio
 "
 Required builds for a basic working TDE are marked \Zb\Zr\Z4R\Zn.
 
-The packages selected form the build list and so dependencies are listed before the packages that need them. After the \Zb\Zr\Z4R\Znequired packages, the listing is grouped Core/Libs/Apps and then alphabetically within those groups, excluding tde prefixes added to package names, and the dependencies.
+The packages selected form the build list and so dependencies are listed before the packages that need them. After the \Zb\Zr\Z4R\Znequired packages, the listing is grouped Core/Libs/Apps and then alphabetically within those groups.
 
 Look out for messages in the bottom line of the screen, especially relating to dependencies.
 
@@ -387,26 +402,26 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Core/tdevelop" "TDE development programs" off "\Zb\Z6 Requires tdesdk  \Zn" \
 " Misc/tidy-html5" "Corrects and cleans up HTML and XML documents" off "\Zb\Z6 Runtime option for Quanta+ [tdewebdev] \Zn" \
 "Core/tdewebdev" "Quanta Plus and other applications" off "\Zb\Z6   \Zn" \
-"Libs/tdelibkdcraw" "Decode RAW picture files" off "\Zb\Z6 Required for digikam, tdegwenview and ksquirrel \Zn" \
-"Libs/tdelibkexiv2" "Library to manipulate picture metadata" off "\Zb\Z6 Required for digikam, tdegwenview and ksquirrel. Needs l/exiv2... \Zn" \
-"Libs/tdelibkipi" "A common plugin structure" off "\Zb\Z6 Required for digikam, tdegwenview and ksquirrel \Zn" \
-"Libs/kipi-plugins" "Additional functions for digiKam, ksquirrel and gwenview" off "\Zb\Z6 Required for digikam, tdegwenview and ksquirrel. Requires tdelibkdcraw tdelibkexiv2 tdelibkipi. \Zn" \
+"Libs/libkdcraw" "Decode RAW picture files" off "\Zb\Z6 Required for digikam, gwenview and ksquirrel \Zn" \
+"Libs/libkexiv2" "Library to manipulate picture metadata" off "\Zb\Z6 Required for digikam, gwenview and ksquirrel. Needs l/exiv2... \Zn" \
+"Libs/libkipi" "A common plugin structure" off "\Zb\Z6 Required for digikam, gwenview and ksquirrel \Zn" \
+"Libs/kipi-plugins" "Additional functions for digiKam, gwenview and ksquirrel" off "\Zb\Z6 Requires libkdcraw libkexiv2 libkipi. \Zn" \
 " Misc/xmedcon" "A medical image conversion utility & library" off "\Zb\Z6 Buildtime option for libksquirrel \Zn" \
 "Libs/libksquirrel" "A set of image codecs for KSquirrel" off "\Zb\Z6 Required for ksquirrel. Buildtime options include l/netpbm, t/transfig [fig2dev], Misc/xmedcon \Zn" \
 "Apps/abakus" "PC calculator" off "\Zb\Z6 optional dependency l/mpfr which requires l/gmp \Zn" \
-" Misc/libmp4v2" "Create and modify mp4 files" off "\Zb\Z6 Buildtime option for Amarok  \Zn" \
+" Misc/mp4v2" "Create and modify mp4 files" off "\Zb\Z6 Buildtime option for Amarok  \Zn" \
 " Misc/moodbar" "GStreamer plugin for Amarok for moodbar feature" off "\Zb\Z6 Runtime option for Amarok \Zn" \
-" Misc/yauap" "simple commandline audio player" off "\Zb\Z6 Provides an optional engine for Amarok \Zn" \
-"Apps/tdeamarok" "A Music Player" off "\Zb\Z6 Optional dependencies - xine-lib, libmp4v2, speex, moodbar \Zn" \
-"Apps/digikam" "A digital photo management application + Showfoto viewer" off "\Zb\Z6 Requires kipi-plugins tdelibkdcraw tdelibkexiv2 tdelibkipi.  \Zn" \
+" Misc/yauap" "A simple commandline audio player" off "\Zb\Z6 Provides an optional engine for Amarok \Zn" \
+"Apps/amarok" "A Music Player" off "\Zb\Z6 Optional dependencies - xine-lib, mp4v2, speex, moodbar \Zn" \
+"Apps/digikam" "A digital photo management application + Showfoto viewer" off "\Zb\Z6 Requires kipi-plugins libkdcraw libkexiv2 libkipi.  \Zn" \
 "Apps/dolphin" "Dolphin file manager for TDE" off "\Zb\Z6 A d3lphin.desktop file is included - see dolphin.SlackBuild.  \Zn" \
-"Apps/tdefilelight" "Graphical diskspace display" off "\Zb\Z6 Runtime requirement x/xdpyinfo \Zn" \
+"Apps/filelight" "Graphical diskspace display" off "\Zb\Z6 Runtime requirement x/xdpyinfo \Zn" \
 "Apps/gtk-qt-engine" "A GTK+2 theme engine" off "\Zb\Z6   \Zn" \
 "Apps/gtk3-tqt-engine" "A GTK+3 theme engine" off "\Zb\Z6   \Zn" \
-"Apps/tdegwenview" "An image viewer" off "\Zb\Z6 Requires kipi-plugins tdelibkdcraw tdelibkexiv2 tdelibkipi.  \Zn" \
-"Apps/tdegwenview-i18n" "Internationalization files for gwenview." off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for tdegwenview  \Zn" \
-"Apps/tdek3b" "The CD Creator" off "\Zb\Z6   \Zn" \
-"Apps/tdek3b-i18n" "Internationalization files for tdek3b." off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for tdek3b  \Zn" \
+"Apps/gwenview" "An image viewer" off "\Zb\Z6 Requires kipi-plugins libkdcraw libkexiv2 libkipi.  \Zn" \
+"Apps/gwenview-i18n" "Internationalization files for gwenview." off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for gwenview  \Zn" \
+"Apps/k3b" "The CD Creator" off "\Zb\Z6   \Zn" \
+"Apps/k3b-i18n" "Internationalization files for k3b." off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for k3b  \Zn" \
 "Apps/k9copy" "A DVD backup utility" off "\Zb\Z6 Requires [tde]k3b and ffmpeg \Zn" \
 "Apps/kaffeine" "Media player for TDE" off "\Zb\Z6   \Zn" \
 "Apps/kbfx" "Alternate menu for TDE" off "\Zb\Z6   \Zn" \
@@ -427,28 +442,28 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/kscope" "A source-editing environment for C and C-style languages." off "\Zb\Z6 Runtime options cscope [d/cscope], ctags [ap/vim], dot [graphviz] \Zn" \
 "Apps/ksensors" "A graphical interface for sensors" off "\Zb\Z6 Runtime requirement ap/lm_sensors \Zn" \
 "Apps/kshutdown" "Shutdown utility for TDE" off "\Zb\Z6   \Zn" \
-"Apps/ksquirrel" "An image viewer with OpenGL and KIPI support." off "\Zb\Z6 Requires kipi-plugins tdelibkdcraw tdelibkexiv2 tdelibkipi libksquirrel. \Zn" \
-"Apps/tdektorrent" "A BitTorrent client for TDE" off "\Zb\Z6   \Zn" \
+"Apps/ksquirrel" "An image viewer with OpenGL and KIPI support." off "\Zb\Z6 Requires kipi-plugins libkdcraw libkexiv2 libkipi libksquirrel. \Zn" \
+"Apps/ktorrent" "A BitTorrent client for TDE" off "\Zb\Z6   \Zn" \
 "Apps/kvkbd" "A virtual keyboard for TDE" off "\Zb\Z6   \Zn" \
 "Apps/kvpnc" "TDE frontend for various vpn clients" off "\Zb\Z6 Miscellaneous documentation will be in $(cat $TMPVARS/INSTALL_TDE)/doc/kvpnc-$(cat $TMPVARS/TDEVERSION)  \Zn" \
 "Apps/piklab" "IDE for PIC microcontrollers" off "\Zb\Z6   \Zn" \
 " Misc/potrace" "For tracing bitmaps to a vector graphics format" off "\Zb\Z6 Required for potracegui, optional for inkscape \Zn" \
 "Apps/potracegui" "A GUI for potrace" off "\Zb\Z6 Requires potrace \Zn" \
 "Apps/rosegarden" "Audio sequencer and musical notation editor" off "\Zb\Z6 Requires jack-audio-connection-kit liblo and dssi for proper functionality \Zn" \
-"Apps/soundkonverter" "frontend to various audio converters" off "\Zb\Z6   \Zn" \
-"Apps/tde-style-lipstik" "lipstik theme" off "\Zb\Z6   \Zn" \
+"Apps/soundkonverter" "Frontend to various audio converters" off "\Zb\Z6   \Zn" \
+"Apps/tde-style-lipstik" "Lipstik theme" off "\Zb\Z6   \Zn" \
 "Apps/tde-style-qtcurve" "QtCurve theme" off "\Zb\Z6   \Zn" \
 "Apps/tdeio-locate" "TDE frontend for the locate command" off "\Zb\Z6   \Zn" \
 "Apps/tdesudo" "Graphical frontend for the sudo command" off "\Zb\Z6   \Zn" \
-"Apps/tdmtheme" "tdm theme editor module" off "\Zb\Z6   \Zn" \
-"Apps/twin-style-crystal" "twin theme" off "\Zb\Z6   \Zn" \
+"Apps/tdmtheme" "TDM theme editor module" off "\Zb\Z6   \Zn" \
+"Apps/twin-style-crystal" "Twin theme" off "\Zb\Z6   \Zn" \
 "Apps/yakuake" "Quake-style terminal emulator" off "\Zb\Z6   \Zn" \
 " Misc/lxml" "Python bindings for libxml2 and libxslt" off "\Zb\Z6 Required to use Inkscape online help \Zn" \
 " Misc/inkscape" "SVG editor - an alternative to potrace, potracegui [and GraphicsMagick]." off "\Zb\Z6 Requires lxml if online help facility is required, potrace is a build-time option. \Zn" \
 2> $TMPVARS/TDEbuilds
 # successful builds are removed from the TDEbuilds list by '$dir ' so add a space to the last entry
 # and the " needs to be removed because the Misc entries are double-quoted
-sed -i -e 's|$| |' -e 's|"||g' $TMPVARS/TDEbuilds
+sed -i 's|$| |;s|" M|M|g;s|"||g' $TMPVARS/TDEbuilds
 
 
 ## only run this if tqt3 has been selected
@@ -480,9 +495,9 @@ dialog --cr-wrap --no-shadow --yes-label "4" --no-label "3" --help-button --help
 "
 TDM is included in the tdebase build.
 
-Choose whether to boot into the GUI and login with TDM - runlevel \Zb\Z64\Zn
-or
-boot into a terminal - runlevel \Zb\Z63\Zn - the Slackware default.
+Select:
+runlevel \Zb\Z64\Zn - to login with TDM and boot into the GUI
+runlevel \Zb\Z63\Zn - to boot into a terminal - the Slackware default.
 
 This option can be overridden later by editing /etc/inittab.
 " \
@@ -534,6 +549,28 @@ sed -i 's|Apps/koffice|Misc/libpng &|' $TMPVARS/TDEbuilds
 }
 
 
+## option to prefix some package names
+FILE=""
+for file in ktorrent k3b-i18n k3b gwenview-i18n gwenview filelight amarok libkipi libkexiv2 libkdcraw
+do
+[[ $(cat $TMPVARS/TDEbuilds) == *"$file "* ]] && FILE="$file $FILE"
+done
+#
+rm -f $TMPVARS/TDEPFX
+[[ $FILE ]] && {
+dialog --aspect 7 --cr-wrap --yes-label "tde" --no-label "None" --defaultno --no-shadow --colors --title " tde prefix " --yesno \
+"
+A 'tde' prefix can be added to some package names
+[ \Zb\Z6$FILE\Zn]
+to avoid confusion with identical packages which might be installed for KDE.
+
+" \
+0 0
+[[ $? == 0 ]] && echo tde > $TMPVARS/TDEPFX
+[[ $? == 1 ]] && touch $TMPVARS/TDEPFX
+}
+
+
 ## this dialog will only run if any of the selected packages has a README
 rm -f $TMPVARS/READMEs
 ## generate list of READMEs ..
@@ -568,46 +605,71 @@ rm -f $TMPVARS/CGIT  # place this here to facilitate testing for summary screen
 [[ $(grep -o [ACDLM][a-z]*/ $TMPVARS/TDEbuilds | sort | head -n1) != Misc/ ]] && {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " TDE development build " --yesno \
 "
-This routine creates and updates the git repositories local copies.
+Create and/or update the git repositories local copies.
 
-If this is a first run, answer 'yes' - be patient, downloads from git are slowwww...
+\Z1Y\Zb\Z0es\Zn
+ * For a first run - will clone the git repositories
+ * For subsequent runs - will update only
+ * If the current build list includes new apps, and you don't want the
+   existing repos updated, the new apps should be run as a new group
+   initially as selective updating is not supported
+ * Local repositories will be created/updated as each package is built
+   OR can be downloaded before the build -> see next screen
 
-For subsequent runs, 'yes' will update only.
-
-Local repositories are created/updated as each package is built.
-If the current build list includes new apps, and you don't want the existing repos updated, the new apps should be run as a new group initially as selective updating is not supported.
-
-Do you want to create or update the git repositories?
+\Zr\Z4\ZbNo\Zn
+ * The build will use sources already downloaded
  
 " \
-20 75
+19 75
 [[ $? == 0 ]] && echo yes > $TMPVARS/CGIT
 [[ $? == 1 ]] && echo no > $TMPVARS/CGIT
 }
 
 
+#rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
+[[ $(cat $TMPVARS/TDEVERSION) == 14.0.7 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
+[[ $(cat $TMPVARS/TDEVERSION) == cgit ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'." && LINES=18
+## testing for cgit!=no will allow =yes or null, which is the 14.0.7 build case
+[[ $(cat $TMPVARS/CGIT) != no ]] &&  {
+dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
+"
+This would be useful for running the build off-line.
+
+\Z1Y\Zb\Z0es\Zn
+ Download the sources for the build list without building packages.
+ The build list will be retained, and BUILD-TDE.sh will need to be
+ re-run selecting the \Z3\ZbTDE build\Zn|<Re-use> option to build the packages.
+
+\Zr\Z4\ZbNo\Zn
+ Download sources as each package is built.
+
+$PRE_DOWNLOAD_MESSAGE
+ 
+" \
+${LINES:-17} 75
+[[ $? == 0 ]] && echo yes > $TMPVARS/PRE_DOWNLOAD
+[[ $? == 1 ]] && echo no > $TMPVARS/PRE_DOWNLOAD
+}
+
 }
 
 [[ ! -e $TMPVARS/TDEbuilds ]] && run_dialog
 
-
 # option to change to stop the build when it fails
 if [[ $(cat $TMPVARS/build-new) == no ]] ; then
 if [[ $(cat $TMPVARS/EXIT_FAIL) == "" ]] ; then
-if [[ $(cat $TMPVARS/KEEP_BUILD) == no ]] ; then
-dialog --cr-wrap --defaultno --yes-label "Stop" --no-label "Continue" --no-shadow --colors --title " Action on failure - 2 " --yesno \
+
+dialog --cr-wrap --defaultno --yes-label "Stop" --no-label "Continue" --no-shadow --colors --title " Confirm action on failure " --yesno \
 "
-You have chosen to re-use the TDE build list, which now contains only those programs that failed to build.
+If there is a failure, this script is set up to continue to the next SlackBuild in the re-used build list.
 
-But this script is set to Continue in the event of a failure, which will delete all but the last build record. It will be easier to investigate each failure if the build is stopped when it fails.
-
-Do you still want the build to \Zr\Z4\ZbContinue\Zn at a failure
- or change to \Z1S\Zb\Z0top\Zn ?
+Do you still want it to do that or change to <\Z1S\Zb\Z0top\Zn> ?
  " \
-15 75
+10 60
 [[ $? == 0 ]] && echo "exit 1" > $TMPVARS/EXIT_FAIL
-fi;fi;fi
 
+fi
+fi
 
 
 ######################
@@ -628,6 +690,8 @@ export EXIT_FAIL=$(cat $TMPVARS/EXIT_FAIL)
 export KEEP_BUILD=$(cat $TMPVARS/KEEP_BUILD)
 export PREPEND=$(cat $TMPVARS/PREPEND)
 export RUNLEVEL=$(cat $TMPVARS/RUNLEVEL)
+export PRE_DOWNLOAD=$(cat $TMPVARS/PRE_DOWNLOAD)
+export TDEPFX=$(cat $TMPVARS/TDEPFX)
 # these exports are for koffice.SB
 [[ $(cat $TMPVARS/Krita_OPTS) == *krita* ]] && export REVERT=yes
 [[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && export USE_PNG14=yes
@@ -659,9 +723,9 @@ export ARM_FABI=$(readelf -Ah $(which bash)|grep -oE "soft|hard")
 
 ### set up variables for the summary list:
 ## New build
-[[ $(cat $TMPVARS/build-new) != no ]] && NEW_BUILD=yes || NEW_BUILD='no - re-use existing'
+[[ $(cat $TMPVARS/build-new) != no ]] && NEW_BUILD=yes || NEW_BUILD='no - re-using existing'
 ## Action on failure
-AOF=$(echo $EXIT_FAIL|cut -d" " -f1)
+[[ $EXIT_FAIL == "exit 1" ]] && AOF=stop
 ## if tdebase selected
 [[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && TDMRL=\\Zb\\Z6$RUNLEVEL\\Zn && SHADERL=" "
 ## koffice - only if it is being built
@@ -678,16 +742,24 @@ TQT_DOCS=no && [[ $TQT_OPTS != *nodocs* ]] && TQT_DOCS=yes
 }
 ## whether cloning or updating cgit
 CLONE=$(cat $TMPVARS/CGIT)
+## whether installing packages as they are built
+INST_PACKAGE=yes && [[ $INST == 0 ]] && INST_PACKAGE=no
+## emphasise downloading only, not building
+[[ $PRE_DOWNLOAD == yes ]] && DL_BLD_MSG="Download sources"
+## whether using tde prefix
+[[ -e $TMPVARS/TDEPFX ]] && tde_prefix=$(cat $TMPVARS/TDEPFX) && [[ ! -s $TMPVARS/TDEPFX ]] && tde_prefix="not used"
+
 ## start dialog
 EXITVAL=2
 until [[ $EXITVAL -lt 2 ]] ; do
-dialog --aspect 3 --no-collapse --cr-wrap --yes-label "Start" --no-label "Abort" --help-button --help-label "Build List" --no-shadow --defaultno --colors --title " Start TDE Build " --yesno \
+dialog --aspect 3 --no-collapse --cr-wrap --yes-label "${DL_BLD_MSG:-Start}" --no-label "Cancel" --help-button --help-label "Build List" --no-shadow --defaultno --colors --title " ${DL_BLD_MSG:-Start TDE Build} " --yesno \
 "
 Setup is complete - these are the build options:
 
 New build list                          \Zb\Z6$NEW_BUILD\Zn
 TDE version                             \Zb\Z6$TDEVERSION\Zn
 Clone/update cgit local repositories    \Zb\Z6${CLONE:-\Z0\Zbn/a}\Zn
+Only download sources                   \Zb\Z6${PRE_DOWNLOAD:-\Z0\Zbno}\Zn
 TDE installation directory              \Zb\Z6$INSTALL_TDE\Zn
 TDE system configuration directory      \Zb\Z6$SYS_CNF_DIR\Zn
 Compiler                                \Zb\Z6$COMPILER\Zn
@@ -704,8 +776,8 @@ koffice:
  revert chalk to krita                  ${RVT:-n/a}
  build with libpng14                    ${USE_PNG:-n/a}
  build with GraphicsMagick              ${USE_GM:-n/a}\Zn
-
- <\Z1S\Zb\Z0tart\Zn> building the packages or \Zr\Z4\ZbAbort\Zn
+Install packages as they are built      \Zb\Z6$INST_PACKAGE\Zn
+Prefix for packages common to KDE       \Zb\Z6${tde_prefix:-\Z0\Zbn/a}\Zn
  
 " \
 0 0
@@ -719,7 +791,7 @@ $(cat $TMPVARS/TDEbuilds | tr -s " " "\n"|sed 's|^|\\Z0\\Zb|;s|/|\\Zn  |'|sort -
 " \
 0 0
 [[ $EXITVAL == 0 ]] && break
-[[ $EXITVAL == 1 ]] && echo -e "\n\nBuild aborted\n" && exit 1
+[[ $EXITVAL == 1 ]] && echo -e "\n\nBuild Cancelled\n" && exit 1
 echo
 done
 
@@ -755,52 +827,46 @@ do
   # The real build starts here
   echo -e "\033[39;1m
 
-  Starting $package.SlackBuild ..
-  $(printf '%0.s\"' $(seq 1 $[${#package}+20]))
+ Starting $package.SlackBuild
+ $(printf '%0.s\"' $(seq 1 $[${#package}+20]))
   \033[0m"
-
-  script -c "sh $package.SlackBuild" $TMP/$package-$(eval echo $version)-$ARCH-$build-build-log || ${EXIT_FAIL:-"true"}
+  ARCH_i18n="" && [[ $package == *i18n* ]] && ARCH_i18n=noarch
+  TDE_PFX="" && [[ " ktorrent k3b-i18n k3b gwenview-i18n gwenview filelight amarok libkipi libkexiv2 libkdcraw " == *$package* ]] && TDE_PFX=$TDEPFX
+  script -c "sh $package.SlackBuild" $TMP/$TDE_PFX$package-$(eval echo $version)-${ARCH_i18n:-$ARCH}-$build-build-log || ${EXIT_FAIL:-"true"}
 
 # remove colorizing escape sequences from build-log
 # Re: http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
-  sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$package-$(eval echo $version)-$ARCH-$build-build-log || ${EXIT_FAIL:-"true"}
+  sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$TDE_PFX$package-$(eval echo $version)-${ARCH_i18n:-$ARCH}-$build-build-log || ${EXIT_FAIL:-"true"}
 
-checkinstall ()
+checkmakepkg ()
 {
-## test for what package is being built .. 
-## if it's not libpng, test for the package installed
-## otherwise test for the libpng package only, not installed
-{
-{
-[[ $package != libpng ]] && [[ $(ls /var/log/packages/$package-*$(eval echo $version)-*-$build*) ]]
-} || {
-[[ $package == libpng ]] && [[ $(ls $LIBPNG_TMP/$package-$(eval echo $version)-*-$build*.txz) ]]
-}
-} && \
-## if either test is successful, the above will exit 0, then remove 'package' from the build list \
-sed -i "s|$dir ||" $TMPVARS/TDEbuilds || \
+## test whether the Slackware package has been built .. 
+[[ $(ls $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz) ]] && \
+sed -i "s|$dir ||" $TMPVARS/TDEbuilds || {
 ## if unsuccessful, display error message \
-{
 echo "
-      Error:  $package package build failed
-      Check the build log $TMP/$package-$(eval echo $version)-$ARCH-$build-build-log
+      Error:  $TDE_PFX$package package build failed
+      Check the build log $TMP/$TDE_PFX$package-$(eval echo $version)-${ARCH_i18n:-$ARCH}-$build-build-log
       "
 ## if koffice was building with libpng14, restore the libpng16 headers for any following builds
 [[ ${USE_PNG14:-} == yes ]] && source $BUILD_TDE_ROOT/get-source.sh && libpng16_fn || true
 ${EXIT_FAIL:-":"}
 }
 }
-# tde-i18n package installation is handled in tde-i18n.SlackBuild because if more than one i18n package is being built, only the last one will be installed by upgradepkg
-## tidy-html5 is a special case because the version number is not in the archive name
+
+## skip build/packaging check if only downloading sources
+[[ $PRE_DOWNLOAD == yes ]] || {
+## install packages
+[[ $INST == 1 ]] && [[ $package != tde-i18n ]] && [[ $package != libpng ]] && upgradepkg --install-new --reinstall $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz && \
+checkmakepkg
+## tde-i18n package installation is handled in tde-i18n.SlackBuild because if more than one i18n package is being built, only the last one will be installed by upgradepkg here - test for last language in the I18N list to ensure they've all been built
+[[ $package == tde-i18n ]] && package=$package-$(cat $TMPVARS/LASTLANG) && \
+checkmakepkg
 ## create libpng-1.4 package only - it will be installed by the koffice.SB because it overrides libpng headers which for Sl14.2/current point to libpng16.
-[[ $package == tidy-html5 ]] && version=$(unzip -c tidy-html5-master.zip | grep -A 1 version.txt | tail -n 1)
-if [[ $INST == 1 ]] && [[ $package != tde-i18n ]] && [[ $package != libpng ]]; then upgradepkg --install-new --reinstall $TMP/$package-$(eval echo $version)-*-$build*.txz
-checkinstall
-## test for last language in the I18N list to ensure they've all been built
-elif [[ $INST == 1 ]] && [[ $package == tde-i18n ]]; then package=$package-$(cat $TMPVARS/LASTLANG)
-checkinstall
-elif [[ $package == libpng ]]; then checkinstall
-fi
+## if building only, and/or libpng, just check that the package has been created
+[[ $INST == 0 ]] || [[ $package == libpng ]] && \
+checkmakepkg
+}
 
   # back to original directory
   cd $BUILD_TDE_ROOT

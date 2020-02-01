@@ -54,17 +54,22 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DBUILD_TRANSLATIONS=${TRANS:-OFF} \
-    -DCMAKE_SKIP_RPATH=ON \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DCMAKE_SKIP_RPATH="ON" \
     ..
 
 make_fn
 
 installdocs_fn
 
+mangzip_fn
+
 strip_fn
 
 mkdir_install_fn
+
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:

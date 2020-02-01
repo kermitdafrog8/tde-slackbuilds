@@ -24,7 +24,6 @@
 #   SUCH DAMAGE.
 
 PRGNAM=mp4v2
-PKGNAM=lib$PRGNAM
 VERSION=${VERSION:-2.0.0}
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
@@ -37,12 +36,12 @@ getsource_fn
 
 untar_fn
 
+## patch for gcc7 ../src/rtphint.cpp:342:35: error: ISO C++ forbids comparison between pointer and integer [-fpermissive]
+sed -i "s|(pSlash != '|(*pSlash != '|" src/rtphint.cpp
+
 listdocs_fn
 
 chown_fn
-
-## patch for gcc7 ../src/rtphint.cpp:342:35: error: ISO C++ forbids comparison between pointer and integer [-fpermissive]
-sed -i "s|pSlash != '|*pSlash != '|" src/rtphint.cpp
 
 cd_builddir_fn
 
@@ -61,13 +60,15 @@ make_fn
 
 installdocs_fn
 
+## can't work out why man pages aren't being installed, so use this work-around
+cp ../doc/man/man1/* $PKG/usr/man/man1/
+INSTALL_TDE=/usr
 mangzip_fn
 
 strip_fn
 
 mkdir_install_fn
 
-PRGNAM=$PKGNAM
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -85,7 +86,7 @@ $PRGNAM: used as a multimedia file format in a variety of platforms and
 $PRGNAM: applications. It is a very powerful and extensible format that can
 $PRGNAM: accommodate practically any type of media.
 $PRGNAM:
-$PRGNAM: Home: http://code.google.com/p/mp4v2/
+$PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc
 

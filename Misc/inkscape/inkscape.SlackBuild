@@ -50,6 +50,10 @@ sed -i 's|lib/inkscape|lib${LIB_SUFFIX}/inkscape|' CMakeScripts/HelperMacros.cma
 
 ## only build for required locales
 {
+## set up a directory to store the required locale files temporarily
+TEMP_DIR=$TMP_BUILD/tmp-$PRGNAM/loc_tmp
+mkdir $TEMP_DIR
+
 ## .. for po/LINGUAS
 LOCALES=$(cat po/LINGUAS)
 rm po/LINGUAS
@@ -58,10 +62,14 @@ for locale in $I18N
  [[ $LOCALES == *$locale* ]] && \
  echo $locale >> po/LINGUAS
  done
-
-## set up a directory to store the required locale files temporarily
-TEMP_DIR=$TMP_BUILD/tmp-$PRGNAM/loc_tmp
-mkdir $TEMP_DIR
+## .. for translations
+locas="" ## for slack-desc
+for locale in $I18N
+ do
+ mv po/$locale.po $TEMP_DIR && locas="$locas $locale"
+ done
+rm -rf po/*.po
+mv $TEMP_DIR/* po/
 
 ## .. for READMEs
 for locale in $I18N
@@ -81,14 +89,6 @@ rm doc/keys.*.html
 mv $TEMP_DIR/* doc/
 KEYS_LIST=$(ls -1 doc/keys.*)
 
-## .. for translations
-for locale in $I18N
- do
- mv po/$locale.po $TEMP_DIR
- done
-rm -rf po/*.po
-mv $TEMP_DIR/* po/
-
 ## .. for tutorials
 for locale in $I18N
  do
@@ -106,10 +106,9 @@ rm share/templates/*.*.*
 mv $TEMP_DIR/* share/templates/
 } || true
 
+listdocs_fn
 
 chown_fn
-
-listdocs_fn
 
 cd_builddir_fn
 
@@ -146,30 +145,29 @@ cmake \
 
 make_fn
 
-## only package man pages for required locales
-{ for locale in $I18N
- do
- mv $PKG/usr/local/share/man/man1/inkscape.$locale.1 $TEMP_DIR
- done
-rm $PKG/usr/local/share/man/man1/inkscape.*.1
-mv $TEMP_DIR/* $PKG/usr/local/share/man/man1/
-} || true
-
 installdocs_fn
 
-#mangzip_fn
+## only package man pages for required locales
+mkdir -p $PKG/usr/man/man1/
+mv $PKG/usr/local/share/man/man1/* $PKG/usr/man/man1/
+rm -rf $PKG/usr/local/share/man
+{ for locale in $I18N
+ do
+ [[ -s $PKG/usr/man/man1/inkscape.$locale.1 ]] && mv $PKG/usr/man/man1/inkscape.$locale.1 $TEMP_DIR
+ done
+rm $PKG/usr/man/man1/inkscape.*.1
+mv $TEMP_DIR/* $PKG/usr/man/man1/
+rm -rf $TEMP_DIR
+} || true
+INSTALL_TDE=/usr
+mangzip_fn
 
 strip_fn
 
 mkdir_install_fn
 
-echo "
-# Update the desktop database:
-/usr/bin/update-desktop-database usr/local/share/applications
-
-# Update hicolor theme cache:
-/usr/bin/gtk-update-icon-cache -f -t usr/local/share/icons/hicolor
-" >> $PKG/install/doinst.sh
+INSTALL_TDE=/usr/local
+doinst_sh_fn
 
 echo "
 # HOW TO EDIT THIS FILE:
@@ -186,9 +184,9 @@ $PRGNAM: similar to Illustrator, Freehand, CorelDraw, or Xara X using the W3C
 $PRGNAM: standard Scalable Vector Graphics (SVG) file format.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en $(echo $(cat ../po/LINGUAS))
+$PRGNAM: en$locas
 $PRGNAM:
-$PRGNAM: Homepage: http://www.inkscape.org/
+$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc

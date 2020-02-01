@@ -39,7 +39,7 @@ chown_fn
 
 cd_builddir_fn 
 
-## all locales and html docs built by default
+## all locales and html docs built by default, actually only en_US
 cmake \
     -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
@@ -50,7 +50,6 @@ cmake \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DCMAKE_SKIP_RPATH=ON \
     ..
-
 
 make_fn
 

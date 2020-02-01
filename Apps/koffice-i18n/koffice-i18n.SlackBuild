@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=koffice-i18n
-[[ $I18N == "" ]] && echo -e "\nYou have tried to build $PRGNAM without selecting any language(s)\n" && exit
+[[ $PRE_DOWNLOAD != yes ]] && [[ $I18N == "" ]] && echo -e "\033[39;1m\nYou have tried to build $PRGNAM without selecting any language(s)\n\033[0m" && exit
 VERSION=${VERSION:-$TDEVERSION}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -38,18 +38,11 @@ untar_fn
 # but only for languages available with this package
 langdir="";for Lang in $I18N;do [[ -d koffice-i18n-$Lang ]] && langdir="${langdir}koffice-i18n-$Lang ";done
 
-# update admin for installed version of libtool
-cp /$(grep -h ltmain.sh /var/log/packages/libtool*) admin/
-cp /$(grep -h libtool.m4 /var/log/packages/libtool*) admin/libtool.m4.in
-## configure complains about an 'Unknown `--is-lightweight' option' but including
-## updated 'missing' doesn't seem to affect the resultant build
-cp /$(grep -h missing /var/log/packages/libtool*) admin/
-
 for dir in $langdir
 do
 cd $dir
 
-make -f admin/Makefile.common
+ltoolupdate_fn
 
 chown_fn
 

@@ -47,6 +47,7 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DMAN_INSTALL_DIR=/usr/man \
     -DWITH_GCC_VISIBILITY="OFF" \
     -DBUILD_DOC="ON" \
     ..
@@ -54,6 +55,9 @@ cmake \
 make_fn
 
 installdocs_fn
+
+INSTALL_TDE=/usr
+mangzip_fn
 
 strip_fn
 

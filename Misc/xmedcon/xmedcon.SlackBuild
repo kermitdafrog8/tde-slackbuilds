@@ -27,7 +27,7 @@
 PRGNAM=xmedcon
 VERSION=${VERSION:-0.16.2}
 BUILD=${BUILD:-1}
-TAG=${TAG:-_tde}
+TAG=${TAG:-}
 
 SRCURL="https://downloads.sourceforge.net/project/xmedcon/XMedCon-Source/$VERSION/xmedcon-$VERSION.tar.bz2"
 ARCHIVE_TYPE="tar.bz2"
@@ -41,7 +41,7 @@ listdocs_fn
 
 chown_fn
 
-#cd_builddir_fn
+#cd_builddir_fn - don't use
 
 CFLAGS=$SLKCFLAGS \
 CXXFLAGS=$SLKCFLAGS \
@@ -60,6 +60,7 @@ make_fn
 
 installdocs_fn
 
+INSTALL_TDE=/usr
 mangzip_fn
 
 strip_fn
@@ -83,6 +84,8 @@ Exec=xmedcon
 Icon=xmedcon.png
 Categories=Graphics;Utility;" > $PKG/usr/share/applications/xmedcon.desktop
 
+INSTALL_TDE=/usr
+doinst_sh_fn
 echo $'config() {
   NEW="$1"
   OLD="$(dirname $NEW)/$(basename $NEW .new)"
@@ -96,25 +99,8 @@ echo $'config() {
   # Otherwise, we leave the .new copy for the admin to consider...
 }
 
-preserve_perms() {
-  NEW="$1"
-  OLD="$(dirname $NEW)/$(basename $NEW .new)"
-  if [ -e $OLD ]; then
-    cp -a $OLD ${NEW}.incoming
-    cat $NEW > ${NEW}.incoming
-    mv ${NEW}.incoming $NEW
-  fi
-  config $NEW
-}
-
 config etc/xmedconrc.new
-
-# Update the desktop database:
-/usr/bin/update-desktop-database usr/share/applications
-
-# Update the mime database:
-/usr/bin/update-mime-database usr/share/mime
-' > $PKG/install/doinst.sh
+' >> $PKG/install/doinst.sh
 
 echo "
 # HOW TO EDIT THIS FILE:

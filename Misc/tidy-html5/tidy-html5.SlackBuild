@@ -24,37 +24,21 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tidy-html5
-# VERSION is entered in this way to work around setting version= in BUILD-TDE.sh
-VERSION=master
-VERSION=${VERSION:-*}
+VERSION=${VERSION:-5.6.0}
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-# override download option in get-source.sh because there is no version # in the file name
-[[ ! -s ../../src/$PRGNAM-$VERSION.zip ]] && {
-wget -nv -T 20 -O ../../src/$PRGNAM-$VERSION.zip https://github.com/htacg/$PRGNAM/archive/$VERSION.zip || {
-echo -e "\033[39;1m"
-echo " $PRGNAM-$VERSION.zip isn't in 'src' and hasn't been downloaded "
-echo -e "\033[0m"
-exit
-}
-}
-ARCHIVE_TYPE="zip"
+SRCURL="https://github.com/htacg/tidy-html5/archive/$VERSION.tar.gz"
+ARCHIVE_TYPE="tar.gz"
 
 source ../../get-source.sh
 getsource_fn
 
-cd $TMP_BUILD/tmp-$PRGNAM
-unzip $SOURCE
+untar_fn
 
-cd $PRGNAM-$VERSION
-VERSION=$(head -n 1 version.txt)
-
-listdocs_fn
-
-# Include tidy support only for additional languages set by I18N
-## Set SUPPORT_LOCALIZATIONS default option to OFF
-sed -i 's|languages." ON|languages." OFF|' CMakeLists.txt
+# Include localization only for additional languages set by I18N
+## Set SUPPORT_LOCALIZATIONS default option to OFF in cmake
+## and set localization(s) in src/language.c
 I18N=$(echo $I18N | tr '[:upper:]' '[:lower:]')
 for lang in $I18N
 do
@@ -65,25 +49,33 @@ sed -i "s|        \&language_en,|& \&language_$lang,|" src/language.c
 }
 done
 
-cd build/cmake
-
-cmake ../.. \
--DCMAKE_C_COMPILER=$COMPILER \
--DCMAKE_CXX_COMPILER=$COMPILER_CXX \
--DCMAKE_BUILD_TYPE=Release \
--DCMAKE_INSTALL_PREFIX=/usr/local \
--DLIB_SUFFIX=$LIBDIRSUFFIX \
--DBUILD_SHARED_LIB="ON" \
--DTIDY_CONSOLE_SHARED="ON" \
--DBUILD_TAB2SPACE="ON" \
--DBUILD_SAMPLE_CODE="OFF"
+## listdocs_fn - don't use
+DOCDIR=$PWD
+DOCS=$(ls README.md localize/README.md README/*)
 
 chown_fn
+
+cd build
+
+cmake \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DMAN_INSTALL_DIR=/usr/man \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DBUILD_SHARED_LIB="ON" \
+    -DTIDY_CONSOLE_SHARED="ON" \
+    -DBUILD_TAB2SPACE="ON" \
+    -DBUILD_SAMPLE_CODE="OFF" \
+    -DSUPPORT_LOCALIZATIONS="OFF" \
+    ..
 
 make_fn
 
 installdocs_fn
 
+INSTALL_TDE=/usr
 mangzip_fn
 
 strip_fn
@@ -105,7 +97,7 @@ $PRGNAM:
 $PRGNAM: For languages:
 $PRGNAM: en ${langs:-}
 $PRGNAM:
-$PRGNAM: http://www.html-tidy.org
+$PRGNAM: https://github.com/htacg
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
