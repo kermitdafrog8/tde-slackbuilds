@@ -25,7 +25,7 @@
 
 PRGNAM=koffice
 VERSION=${VERSION:-$TDEVERSION}
-BUILD=${BUILD:-4}
+BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
 ## ignore this if pre-downloading sources

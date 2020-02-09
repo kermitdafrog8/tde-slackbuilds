@@ -550,18 +550,21 @@ sed -i 's|Apps/koffice|Misc/libpng &|' $TMPVARS/TDEbuilds
 
 
 ## option to prefix some package names
+## get a list of packages that have SlackBuilds set up to use the prefix 'tde'
+grep TDEPFX [ACDL]???/*/*SlackBuild | grep PKGNAM | cut -d/ -f2 > $TMPVARS/TDEPFX_packages
+## then create a list of those being built
 FILE=""
-for file in ktorrent k3b-i18n k3b gwenview-i18n gwenview filelight amarok libkipi libkexiv2 libkdcraw
+for file in $(cat $TMPVARS/TDEPFX_packages)
 do
-[[ $(cat $TMPVARS/TDEbuilds) == *"$file "* ]] && FILE="$file $FILE"
+[[ $(cat $TMPVARS/TDEbuilds) == *"$file "* ]] && FILE="$FILE $file"
 done
-#
+## and then if there is anything in that list, run this dialog
 rm -f $TMPVARS/TDEPFX
 [[ $FILE ]] && {
 dialog --aspect 7 --cr-wrap --yes-label "tde" --no-label "None" --defaultno --no-shadow --colors --title " tde prefix " --yesno \
 "
 A 'tde' prefix can be added to some package names
-[ \Zb\Z6$FILE\Zn]
+[\Zb\Z6$FILE\Zn ]
 to avoid confusion with identical packages which might be installed for KDE.
 
 " \
@@ -747,7 +750,7 @@ INST_PACKAGE=yes && [[ $INST == 0 ]] && INST_PACKAGE=no
 ## emphasise downloading only, not building
 [[ $PRE_DOWNLOAD == yes ]] && DL_BLD_MSG="Download sources"
 ## whether using tde prefix
-[[ -e $TMPVARS/TDEPFX ]] && tde_prefix=$(cat $TMPVARS/TDEPFX) && [[ ! -s $TMPVARS/TDEPFX ]] && tde_prefix="not used"
+[[ -e $TMPVARS/TDEPFX ]] && tde_prefix=\\Zn\\Zb\\Z2tde\\Zn && [[ ! -s $TMPVARS/TDEPFX ]] && tde_prefix=no
 
 ## start dialog
 EXITVAL=2
@@ -784,7 +787,10 @@ Prefix for packages common to KDE       \Zb\Z6${tde_prefix:-\Z0\Zbn/a}\Zn
 EXITVAL=$?
 [[ $EXITVAL == 2 ]] && dialog --aspect 5 --cr-wrap --no-shadow --colors --scrollbar --ok-label "Return" --msgbox \
 "
-The packages to be built are:
+The packages to be built are -
+\Z0\Zb[sorted list, see
+$TMPVARS/TDEbuilds
+for the build order]\Zn
 
 $(cat $TMPVARS/TDEbuilds | tr -s " " "\n"|sed 's|^|\\Z0\\Zb|;s|/|\\Zn  |'|sort -k 2)
 
@@ -830,13 +836,18 @@ do
  Starting $package.SlackBuild
  $(printf '%0.s\"' $(seq 1 $[${#package}+20]))
   \033[0m"
+## set 'noarch' for i18n packages
   ARCH_i18n="" && [[ $package == *i18n* ]] && ARCH_i18n=noarch
-  TDE_PFX="" && [[ " ktorrent k3b-i18n k3b gwenview-i18n gwenview filelight amarok libkipi libkexiv2 libkdcraw " == *$package* ]] && TDE_PFX=$TDEPFX
-  script -c "sh $package.SlackBuild" $TMP/$TDE_PFX$package-$(eval echo $version)-${ARCH_i18n:-$ARCH}-$build-build-log || ${EXIT_FAIL:-"true"}
+## TDEPFX could be set '' from null [n/a], in which case set TDE_PFX="", or
+## if building one of these packages, can be set [tde] or '' [None=no]
+  TDE_PFX="" && [[ $(cat $TMPVARS/TDEPFX_packages) == *$package* ]] && TDE_PFX=$TDEPFX
+## set up separate log for source downloads
+  LOG="" && [[ $PRE_DOWNLOAD == yes ]] && LOG="source_download"
+  script -c "sh $package.SlackBuild" $TMP/$TDE_PFX$package-$(eval echo $version)-${LOG:-"${ARCH_i18n:-$ARCH}-$build-build"}-log || ${EXIT_FAIL:-"true"}
 
 # remove colorizing escape sequences from build-log
 # Re: http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
-  sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$TDE_PFX$package-$(eval echo $version)-${ARCH_i18n:-$ARCH}-$build-build-log || ${EXIT_FAIL:-"true"}
+  sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$TDE_PFX$package-$(eval echo $version)-${LOG:-"${ARCH_i18n:-$ARCH}-$build-build"}-log || ${EXIT_FAIL:-"true"}
 
 checkmakepkg ()
 {
@@ -845,8 +856,8 @@ checkmakepkg ()
 sed -i "s|$dir ||" $TMPVARS/TDEbuilds || {
 ## if unsuccessful, display error message \
 echo "
-      Error:  $TDE_PFX$package package build failed
-      Check the build log $TMP/$TDE_PFX$package-$(eval echo $version)-${ARCH_i18n:-$ARCH}-$build-build-log
+      Error:  $TDE_PFX$package package ${LOG:-build} failed
+      Check the ${LOG:-build} log $TMP/$TDE_PFX$package-$(eval echo $version)-${LOG:-"${ARCH_i18n:-$ARCH}-$build-build"}-log
       "
 ## if koffice was building with libpng14, restore the libpng16 headers for any following builds
 [[ ${USE_PNG14:-} == yes ]] && source $BUILD_TDE_ROOT/get-source.sh && libpng16_fn || true

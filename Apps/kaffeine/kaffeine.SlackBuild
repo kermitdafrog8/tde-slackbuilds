@@ -33,6 +33,48 @@ getsource_fn
 
 untar_fn
 
+[[ $TDEVERSION != 14.0.7 ]] && {
+
+# set support for additional language(s) as per I18N variable
+# but only for languages available with this package
+langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
+## this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
+sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
+[[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs | sed "s|.po||g")
+
+listdocs_fn
+
+chown_fn
+
+cd_builddir_fn
+
+cmake \
+    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_DPMS="ON" \
+    -DWITH_XTEST="ON" \
+    -DWITH_XINERAMA="ON" \
+    -DWITH_XCB="ON" \
+    -DWITH_GSTREAMER="ON" \
+    -DWITH_OGGVORBIS="ON" \
+    -DWITH_LAME="ON" \
+    -DWITH_DVB="ON" \
+    -DUSE_TQT_ONLY="OFF" \
+    -DWITH_XINIT_WORKAROUND="OFF" \
+    ..
+
+: # don't go to autotools build if this fails - set exit 0 always
+
+} || {
+
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
@@ -57,9 +99,13 @@ CXX=$COMPILER_CXX \
    --disable-rpath \
    --enable-closure
 
+}
+
 make_fn
 
 installdocs_fn
+
+[[ $TDEVERSION != 14.0.7 ]] && mangzip_fn
 
 strip_fn
 
