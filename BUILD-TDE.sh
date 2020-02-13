@@ -354,8 +354,10 @@ This means that TDE libs will be at the end of the search path. If the package c
 If you experience any problems of this nature, then try the \Z1P\Zb\Z0repend\Zn option, which will set up doinst.sh for tqt3 to add the TDE libs paths to the beginning of the search path.
 
  Then \Zb\Z2rebuild tqt3\Zn. This build option only applies to that package.
+OR
+ Edit /etc/ld.so.conf ..
 " \
- 20 75
+ 22 75
 done
 
 
@@ -377,7 +379,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Deps/dbus-1-tqt" "\Zb\Zr\Z4R\Zn D-Bus bindings" ${SELECT:-off} "\Zb\Z6   \Zn" \
 "Deps/libart-lgpl" "\Zb\Zr\Z4R\Zn The LGPL'd component of libart" ${SELECT:-off} "\Zb\Z6   \Zn" \
 "Deps/tqca-tls" "\Zb\Zr\Z4R\Zn Plugin to provide SSL/TLS capability" ${SELECT:-off} "\Zb\Z6   \Zn" \
-"Deps/avahi-tqt" "Avahi support" off "\Zb\Z6 Requires Avahi. Optional for tdelibs and used by default if installed. \Zn" \
+"Deps/avahi-tqt" "Avahi support" off "\Zb\Z6 Optional for tdelibs and used if installed. Requires Avahi. \Zn" \
 "Core/tdelibs" "\Zb\Zr\Z4R\Zn TDE libraries" ${SELECT:-off} "\Zb\Z6 Will build with Avahi support if avahi/avahi-tqt are installed. \Zn" \
 "Core/tdebase" "\Zb\Zr\Z4R\Zn TDE base" ${SELECT:-off} "\Zb\Z6   \Zn" \
 "Core/tde-i18n" "Additional language support for TDE" off "\Zb\Z6 Required when any \Zb\Z3Additional language support\Zb\Z6 has been selected \Zn" \
@@ -591,7 +593,7 @@ done
 [[ $(cat $TMPVARS/READMEs) ]] && {
 dialog --cr-wrap --defaultno --no-shadow --colors --title " READMEs " --yesno \
 "
-A number of selected packages have READMEs in their SlackBuilds directories.
+Some of the selected packages have READMEs in their SlackBuilds directories.
 
 Do you want to read them?
  " \

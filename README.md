@@ -4,7 +4,7 @@
 ---
 ***Build TDE [Trinity Desktop Environment]***  
 for Slackware 14.2 or current on i586+ and x86_64.  
-Native building for Raspberry Pi3 [see [README-Raspberry-Pi3.md](./README-Raspberry-Pi3.md)] is now rather dated and cross compiling is preferred - see 'Cross compiling for RPi3' for armv7/aarch64 builds.
+See 'Cross compiling for RPi3' for armv7/aarch64 builds. Native building for Raspberry Pi3 [[README-Raspberry-Pi3.md](./README-Raspberry-Pi3.md)] is now rather dated and cross compiling is preferred.
 
 Build the release version R14.0.7 from tar archives; or the development version R14.1.0 from trinitydesktop cgit.  
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input.  
@@ -21,7 +21,11 @@ Information about dependencies for some packages has been added at the bottom of
 R14.0.7 source archives will be downloaded from a geoIP located mirror site, or the development sources [R14.1.0] cloned or updated from cgit.  
 Downloading can be done pre-build [useful for an off-line build], or during the build.
 
-The directory structure for the SlackBuild scripts is in line with the Trinity release source repositories:  
+If you're curious about what this might involve, [take a look at a sample build set up](https://ray-v.github.io/A_typical_TDE_SlackBuild.html).
+
+---
+
+***The directory structure*** for the SlackBuild scripts is in line with the Trinity release source repositories:  
 ```
 Deps [dependencies/]
 Core []
@@ -31,16 +35,18 @@ Apps [applications/]
 Other directories are:  
 ```
 Misc - for non-Trinity package builds
-src - to hold all the source tarballs, either pre-downloaded or downloaded during the build.
+src - to hold all the sources, either pre-downloaded or downloaded during the build.
 ```
 Other scripts:  
 ```
-get-source.sh - a chunk of common code for the SlackBuilds - used for getting the source archive,  
-                setting FLAGS, creating build directories.
+get-source.sh - a chunk of common code for the SlackBuilds
+              - used for getting the sources, setting FLAGS, creating build directories, ...
 ```
 There is an override in the Misc SlackBuilds for non-trinity source archive URLs. Non-trinity builds have been included where a TDE package requires a dependency that is not in Slackware, or where it's an alternative to a TDE package.
 
-Required packages for a basic working TDE are:  
+---
+
+***Required packages*** for a basic working TDE are:  
 ```
 Deps/tqt3
 Deps/tqtinterface
@@ -52,7 +58,11 @@ Deps/libart-lgpl
 Core/tdelibs
 Core/tdebase
 ```
-i18n support [locale and html/help docs] in the packages is restricted to whatever is selected in the BUILD-TDE.sh 'Select Additional Languages' screen and, of that, to whatever is available in any individual package source.
+---
+
+***Internationalization***
+
+i18n support [locale and html/help docs] in the packages is restricted to whatever is selected in the ./BUILD-TDE.sh 'Select Additional Languages' screen and, of that, to whatever is available in any individual package source.
 
 There is an option in tde-i18n.SlackBuild to include a user created language specific patch file in the build.  
 It needs to be named tde-i18n-{lang}-patch and will then automatically be included for the build for that language.  
@@ -82,12 +92,13 @@ git checkout gh-pages
 or @ https://ray-v.github.io/tde-slackbuilds/cross-compiling-TDE-for-the-RPi3.html
 
 Includes:
-* Setting parameters for a 32-bit [armv7 hard float], or 64-bit [aarch64], build
-* Building a cross compiler toolchain
-* Building a 64-bit kernel which can be used for the 32-bit system
-* Building qemu to run the TDE binaries built and used during compilation
-* The required TDE apps
-* ... and a few other TDE and non-TDE apps to provide a basic, but useful, TDE desktop.
+* Setting parameters for a 32-bit [armv7 hard float], or 64-bit [aarch64], build,  
+   and building ..
+*  a cross compiler toolchain
+*  a 64-bit kernel which can be used for the 32-bit system
+*  qemu to run the TDE binaries built and used during compilation
+*  the required TDE apps
+*  a few other TDE and non-TDE apps to provide a basic, but useful, TDE desktop.
 
 ---
 
@@ -97,10 +108,10 @@ See https://wiki.trinitydesktop.org/How_to_Build_TDE_Core_Modules for more infor
 
 ***Known issues***
 
-[1] TDM may need some manual setting up - see Core/tdebase/README, which can also be viewed while running BUILD-TDE.sh if tdebase is selected.
+[1] TDM may need some manual setting up - see Core/tdebase/README, which can also be viewed while running ./BUILD-TDE.sh if tdebase is selected.
 
 [2] The i18n downloads with wget can't be updated because cgit produces 'current time' timestamps. The consequence is that if tde-i18n-$lang is a part of the build after its initial download, it will be downloaded again. As updates are infrequent, once built, there will probably be no need to do so again and so tde-i18n for a particular language will probably only be run once. On that basis I don't see this being a significant issue.
 
-[3] If Slackware's KDE is installed as well as TDE, there might be an issue with TDE launching the KDE4 Konsole and attempting to use it's ark. To fix, adjust the PATH so that the TDE directories come before /usr/share/bin.
+[3] If Slackware's KDE is installed as well as TDE, there might be an issue with TDE launching the KDE4 Konsole and attempting to use it's ark. To fix, adjust the PATH so that the TDE directories come before /usr/bin.
 
 [4] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.

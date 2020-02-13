@@ -54,13 +54,15 @@ OUTPUT=/tmp
 
 # remove any previous builds if option chosen
 [[ $KEEP_BUILD != "yes" ]] && [[ $PRE_DOWNLOAD != yes ]] && echo -e "\n removing previous build data ..\n" && rm -rf $TMP_BUILD/{tmp,package}*
-# Create working directories:
+# Only create working directories if building packages:
+[[ $PRE_DOWNLOAD != yes ]] && {
 mkdir -p $OUTPUT
 mkdir -p $TMP_BUILD/tmp-$PRGNAM
 mkdir -p $PKG
 rm -rf $PKG/*
 rm -rf $TMP_BUILD/tmp-$PRGNAM/*
 rm -rf $OUTPUT/{checkout,configure,make,install,error,makepkg,patch}-$PRGNAM.log
+}
 
 # Where do we look for sources?
 SRCDIR=$(cd $(dirname $0); pwd)

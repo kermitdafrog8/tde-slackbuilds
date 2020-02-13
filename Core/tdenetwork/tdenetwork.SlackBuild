@@ -55,8 +55,10 @@ cmake \
     -DWITH_JINGLE="ON" \
     -DWITH_SPEEX=${SPX:-"OFF"} \
     -DWITH_GSM="OFF" \
+    -DWITH_LIBXSLT="OFF" \
     -DWITH_XMMS="OFF" \
     -DWITH_SLP="OFF" \
+    -DWITH_WEBCAM="OFF" \
     -DBUILD_DCOPRSS="ON" \
     -DBUILD_DOC="ON" \
     -DBUILD_FILESHARING="ON" \

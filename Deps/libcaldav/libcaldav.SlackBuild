@@ -37,18 +37,21 @@ listdocs_fn
 
 chown_fn
 
-#cd_builddir_fn - don't use
+cd_builddir_fn
 
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-./autogen.sh \
-   --prefix=$INSTALL_TDE \
-   --libdir=$INSTALL_TDE/lib$LIBDIRSUFFIX \
-   --disable-rpath \
-   --enable-closure
+cmake \
+    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DBUILD_DOC="ON" \
+    -DBUILD_CALDAV_TEST="OFF" \
+    -DBUILD_UNITTEST="OFF" \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    ..
 
 make_fn
 

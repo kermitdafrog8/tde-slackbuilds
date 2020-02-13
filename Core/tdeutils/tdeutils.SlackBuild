@@ -33,6 +33,9 @@ getsource_fn
 
 untar_fn
 
+## set installation directory for superkaramba.desktop file
+sed -i 's|DESTINATION ${APPS_INSTALL_DIR}/Utilities|DESTINATION ${XDG_APPS_INSTALL_DIR}|' superkaramba/src/CMakeLists.txt
+
 listdocs_fn
 
 chown_fn
@@ -97,7 +100,7 @@ mkdir_install_fn
 
 doinst_sh_fn
 
-[[ $TDEVERSION == cgit ]] && TDEFileReplace="* TDEFileReplace: powerful search and replace in multiple files"
+[[ $TDEVERSION == cgit ]] && TDEFileReplace=" * TDEFileReplace: powerful search and replace in multiple files"
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -127,7 +130,7 @@ $PRGNAM: * ktimer: execute programs after some time
 $PRGNAM: * superkaramba: a version of Karamba with python scripting
 $PRGNAM: * tdelirc: a TDE frontend for the Linux Infrared Remote Control system
 $PRGNAM: * tdewallet: a convenient and secure way to manage all your passwords
-$PRGNAM: ${TDEFileReplace:-}
+$PRGNAM:${TDEFileReplace:-}
 " > $PKG/install/slack-desc
 
 makepkg_fn
