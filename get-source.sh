@@ -245,7 +245,7 @@ cd $TMP_BUILD/tmp-$PRGNAM
 ##
 [[ $TDEVERSION == 14.0.? || $TDEMIR_SUBDIR == misc ]] && {
 ## unpack R14 or misc
-echo -e " unpacking $(basename $SOURCE) ... \n"
+echo -e "\n unpacking $(basename $SOURCE) ... \n"
 tar -xf $SOURCE
 true # if this fails, go to [4] and let SlackBuild fail from there
 } || {
@@ -254,7 +254,7 @@ true # if this fails, go to [4] and let SlackBuild fail from there
 ##
 [[ $TDEVERSION == r14.0.? ]] && {
 ## unpack r14
-echo -e " unpacking $(basename $SOURCE) ... \n"
+echo -e "\n unpacking $(basename $SOURCE) ... \n"
 tar -xf $SOURCE
 ## unpack all needed common sources ..
 (cd $PRGNAM-$TDEVERSION
@@ -273,7 +273,7 @@ true # if this fails, go to [4] and let SlackBuild fail from there
 ##
 ## [3] not [rR]14 nor misc, so must be cgit ..
 ## copy git repo but don't copy .git directory:
-echo -e " copying $PRGNAM source files to build area ... \n"
+echo -e "\n copying $PRGNAM source files to build area ... \n"
 (cd $BUILD_TDE_ROOT/src/cgit
 cp -a --parents $PRGNAM/* $TMP_BUILD/tmp-$PRGNAM/
 cp -a --parents {admin,cmake}/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/

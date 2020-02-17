@@ -49,12 +49,14 @@ sed -i '/tde_create_handbook/,+3d' doc/??{,_??}/CMakeLists.txt || true
 #
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langs="" # the *.po file list
+lpos="" # the *.po files list
+langs="" # the languages
 ldocs="" # the help docs
 for Lang in $I18N
 do
 [[ -d po/$Lang ]] && {
-langs="$langs $Lang/$PRGNAM.po"
+lpos="$lpos $Lang/$PRGNAM.po"
+langs="$langs $Lang"
 ## ... and restore help documentation for the selected and available locales
 [[ -e doc/$Lang/CMakeLists.txt ]] && {
 [[ $Lang == ru ]] && NOINDEX=NOINDEX
@@ -64,8 +66,7 @@ ldocs="$ldocs $Lang"
 }
 done
 #
-sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
-langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
+sed -i "s|\${po_files}|$lpos|" po/CMakeLists.txt
 [[ $langs != "" ]] && TRANS=ON
 
 listdocs_fn
@@ -84,6 +85,10 @@ cd_builddir_fn
 # Yauap does NOT handle the mp3 format.
 [[ -s $(which yauap) ]] && YAUAP="ON"
 
+## Error: .../arm-slackware-linux-gnueabi/bin/ld: cannot find -ldbus-tqt-1
+## Ref: /usr/share/cmake-3.10/Help/envvar/LDFLAGS.rst - add LDFLAGS=
+#
+LDFLAGS=$SLKLDFLAGS \
 cmake \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
     -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
@@ -108,15 +113,6 @@ cmake \
     -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     ..
 
-<<'Comment'
-Error:
-[ 99%] Linking CXX shared module libamarok_yauap-engine_plugin.so
-/usr/lib/gcc/arm-slackware-linux-gnueabi/7.1.0/../../../../arm-slackware-linux-gnueabi/bin/ld: cannot find -ldbus-tqt-1
-Workaround:
-Point the build to the exact location ..
-Comment
-[[ ${YAUAP:-} == ON ]] && sed -i "s|-ldbus-tqt-1|$INSTALL_TDE/lib$LIBDIRSUFFIX/libdbus-tqt-1.so.0.0.0|" amarok/src/engine/yauap/CMakeFiles/libamarok_yauap-engine_plugin-module.dir/link.txt
-
 make_fn
 
 installdocs_fn
@@ -139,7 +135,7 @@ echo "
 $PRGNAM: Amarok music player for TDE
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en $langs
+$PRGNAM: en$langs
 $PRGNAM:
 $PRGNAM: With help documentation for:
 $PRGNAM: en$ldocs

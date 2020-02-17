@@ -456,6 +456,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/tde-style-lipstik" "Lipstik theme" off "\Zb\Z6   \Zn" \
 "Apps/tde-style-qtcurve" "QtCurve theme" off "\Zb\Z6   \Zn" \
 "Apps/tdeio-locate" "TDE frontend for the locate command" off "\Zb\Z6   \Zn" \
+"Apps/tdepowersave" "Set power consumption and conservation options" off "\Zb\Z6   \Zn" \
 "Apps/tdesudo" "Graphical frontend for the sudo command" off "\Zb\Z6   \Zn" \
 "Apps/tdmtheme" "TDM theme editor module" off "\Zb\Z6   \Zn" \
 "Apps/twin-style-crystal" "Twin theme" off "\Zb\Z6   \Zn" \
