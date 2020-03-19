@@ -28,7 +28,7 @@
 # All rights reserved.
 
 PRGNAM=lxml
-VERSION=${VERSION:-4.4.2}
+VERSION=4.4.2
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 

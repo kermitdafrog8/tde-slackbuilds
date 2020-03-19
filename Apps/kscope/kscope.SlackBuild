@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=kscope
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -47,13 +47,13 @@ chown_fn
 
 cd_builddir_fn
 
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
+CFLAGS="$SLKRCFLAGS" \
+CXXFLAGS="$SLKRCFLAGS" \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
-   --prefix=$INSTALL_TDE
+   --prefix=$INSTALL_TDE \
+   --disable-rpath
 
 make_fn
 

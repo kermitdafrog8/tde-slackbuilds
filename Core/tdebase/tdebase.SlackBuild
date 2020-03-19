@@ -26,7 +26,7 @@
 # Thanks to Slackware 12.2 SlackBuild for kdebase
 
 PRGNAM=tdebase
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -34,9 +34,6 @@ source ../../get-source.sh
 getsource_fn
 
 untar_fn
-
-## allow for configuration files directory != /etc/trinity
-sed -i "s|/etc/trinity/|$SYS_CNF_DIR/|" tdm/kfrontend/gentdmconf.c || true
 
 ## make default tdm screen text clearer against dark background and align login button with clickable area
 ## edit color="#ffff74" and/or color="#ff0000" for your own choice
@@ -104,6 +101,13 @@ do
 patch -N -p0
 done || true
 
+## allow for configuration files directory == /etc/tde
+## and plugins in $INSTALL_TDE/lib$LIBDIRSUFFIX/tde
+sed -i "s|trinity|$PLUGIN_INSTALL_DIR|g" tdm/config.def || true
+sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" tdm/kfrontend/gentdmconf.c || true
+sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" kcontrol/hwmanager/devicepropsdlg.cpp || true
+sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" tdeioslave/trash/testtrash.cpp || true
+
 listdocs_fn
 
 chown_fn
@@ -111,16 +115,15 @@ chown_fn
 cd_builddir_fn
 
 cmake \
-    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
-    -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DWITH_ARTS="ON" \
     -DWITH_ELFICON="OFF" \
     -DWITH_GCC_VISIBILITY="OFF" \
@@ -472,16 +475,15 @@ config .'"$SYS_CNF_DIR"'/tdm/tdmrc.new
 config .'"$SYS_CNF_DIR"'/tdm/backgroundrc.new
 
 # update PATH
-# upgradepkg runs installpkg twice, so even though '"$TQTDIR"'/bin will be
+# upgradepkg runs installpkg twice, so even though '"$TQTDIR"'/bin might be
 # a new PATH, it needs to be tested for the second run
-if ! grep '"$INSTALL_TDE"'/bin /etc/profile
-then
-echo "PATH=\$PATH:'"$INSTALL_TDE"'/bin:'"$TQTDIR"'/bin" >> /etc/profile
-else
 if ! grep '"$TQTDIR"'/bin /etc/profile
 then
-echo "PATH=\$PATH:'"$TQTDIR"'/bin" >> /etc/profile
+echo "PATH='"$TQTDIR"'/bin:\$PATH" >> /etc/profile
 fi
+if ! grep '"$INSTALL_TDE"'/bin /etc/profile
+then
+echo "PATH='"$INSTALL_TDE"'/bin:\$PATH" >> /etc/profile
 fi
 
 # update MANPATH

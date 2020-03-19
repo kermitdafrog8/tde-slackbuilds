@@ -24,17 +24,16 @@
 #   SUCH DAMAGE.
 
 PRGNAM=koffice
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
 ## ignore this if pre-downloading sources
 [[ $PRE_DOWNLOAD != yes ]] && {
 ## build with libpng-1.4 - set in BUILD-TDE.sh - loading pngs in chalk/krita crashes with libpng16
-LIBPNG_VERSION=$(grep VERSION:- ../../Misc/libpng/libpng.SlackBuild | grep -o [.0-9]*)
-[[ ${USE_PNG14:-} == yes ]] && \
+[[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && \
 [[ $(ls -l /usr/include/png.h) != *libpng14* ]] && \
-{ installpkg $LIBPNG_TMP/libpng-$LIBPNG_VERSION-$ARCH-1.txz || \
+{ installpkg $LIBPNG_TMP/libpng-1.4.22-$ARCH-*.txz || \
 { echo -e "\033[39;1m\n (re)install libpng-1.4 \n\033[0m" && \
 exit
 }
@@ -46,22 +45,22 @@ getsource_fn
 
 untar_fn
 
-## fix chalk crashing - set liblcms as a direct dependency - see issue 37 for details
+## fix chalk crashing -
+## - set liblcms as a direct dependency - see issue 37 for details
 sed -i '23iKDE_CXXFLAGS = $(LCMS_LIBS)' chalk/Makefile.am
+## - when launched from Applications menu
+sed -i "s|Exec=.*$|Exec=$INSTALL_TDE/bin/chalk %U|" chalk/chalk.desktop
 
 ## building with installation directory /usr - see issue #43 for details
 [[ $INSTALL_TDE == /usr ]] && \
-{ mv $TQTDIR/lib/libtqt-mt.la $TQTDIR/lib/libtqt-mt.la-bak 2>/dev/null || true
+{ mv $TQTDIR/lib$LIBDIRSUFFIX/libtqt-mt.la $TQTDIR/lib$LIBDIRSUFFIX/libtqt-mt.la-bak 2>/dev/null || true
 }
-
-## fix chalk crashing when launched from Applications menu
-sed -i "s|Exec=.*$|Exec=$INSTALL_TDE/bin/chalk %U|" chalk/chalk.desktop
 
 ## fix build problem for karbon - see issue 40 for details
 sed -i 's|(Magick-config|(Wand-config|' configure.in.in
 
 ## revert name 'chalk' to 'krita' - option set in BUILD-TDE.sh
-[[ ${REVERT:-} == yes ]] && APP=krita && \
+[[ $(cat $TMPVARS/Krita_OPTS) == *krita* ]] && APP=krita && \
 (echo -e "\n Reverting chalk to krita .. \n"
 ## Rename directories and files:
 mv chalk krita
@@ -81,6 +80,9 @@ find . -type f -exec sed -i -e 's/CHALK/KRITA/g' {} \;
 find . -type f -exec sed -i -e 's/Chalk/Krita/g' {} \;
 sed -i 's|Swedish for krita|Swedish for chalk|' krita/README)
 
+## Don't need translation files unless additional language == Polish
+[[ I18N != *pl* ]] && sed -i '/pl/d' kexi/tools/{add,delete}_column/Makefile.am
+
 listdocs_fn
 
 ltoolupdate_fn
@@ -89,9 +91,8 @@ chown_fn
 
 cd_builddir_fn
 
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
+CFLAGS="$SLKRCFLAGS" \
+CXXFLAGS="$SLKRCFLAGS" \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
@@ -133,9 +134,9 @@ $PRGNAM:
 makepkg_fn
 
 ## restore libpng16 links
-[[ ${USE_PNG14:-} == yes ]] && libpng16_fn || true
+[[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && libpng16_fn || true
 
 ## restore libtqt-mt.la
 [[ $INSTALL_TDE == /usr ]] && \
-{ mv $TQTDIR/lib/libtqt-mt.la-bak $TQTDIR/lib/libtqt-mt.la 2>/dev/null || true
+{ mv $TQTDIR/lib$LIBDIRSUFFIX/libtqt-mt.la-bak $TQTDIR/lib$LIBDIRSUFFIX/libtqt-mt.la 2>/dev/null || true
 }

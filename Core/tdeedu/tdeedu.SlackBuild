@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tdeedu
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -58,6 +58,9 @@ USE_CMAKE_EDU=${USE_CMAKE_EDU:-no}
 
 ## patch for the libboost_python soname as used in Slackware
 sed -i 's|for bplib in|& "-lboost_python${PYVERSHORT%.*}${PYVERSHORT#*.}"|' kig/configure.in.in
+## and for kig python scripting support with cgit build
+[[ $TDEVERSION == cgit ]] && \
+sed -i 's|$qt_libraries|$tqt_libraries|' kig/configure.in.in
 
 ## include all keyboards for ktouch
 (cd ktouch/keyboards/
@@ -70,16 +73,21 @@ cat klatin/klatin/data/vocab/pl/Makefile.am | sed 's|pl|sk|g' > klatin/klatin/da
 ## install kig examples
 sed -i 's|noinst_DATA|examplesdir = $(kde_datadir)/kig/examples\nexamples_DATA|' kig/examples/Makefile.am
 
+## /usr/bin/ld: cannot find -ltqt-mt/-ltqt - for kstars/indi build
+[[ $TDEVERSION == cgit ]] && \
+sed -i 's|(QT_LDFLAGS|(TQT_LDFLAGS|' kstars/kstars/indi/Makefile.am
+
 ltoolupdate_fn
 
 chown_fn
 
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
+cd_builddir_fn
+
+CFLAGS="$SLKRCFLAGS" \
+CXXFLAGS="$SLKRCFLAGS" \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
-./configure \
+../configure \
    --prefix=$INSTALL_TDE \
    --disable-rpath \
    --enable-closure
@@ -96,14 +104,15 @@ cd_builddir_fn
 OCAML=OFF
 
 cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_GCC_VISIBILITY="OFF" \
     -DWITH_ARTS="ON" \
     -DWITH_OCAML_SOLVER=$OCAML \
@@ -129,6 +138,7 @@ cmake \
     -DBUILD_KVOCTRAIN="ON" \
     -DBUILD_KWORDQUIZ="ON" \
     -DBUILD_DOC="ON" \
+    -Wno-dev \
     ..
 
 }

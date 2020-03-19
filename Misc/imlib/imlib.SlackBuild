@@ -21,7 +21,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=imlib
-VERSION=${VERSION:-1.9.15}
+VERSION=1.9.15
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
@@ -495,7 +495,7 @@ chown_fn
 
 cd_builddir_fn
 
-CFLAGS=$SLKCFLAGS \
+CFLAGS="$SLKCFLAGS" \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \

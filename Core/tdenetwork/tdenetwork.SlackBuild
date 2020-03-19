@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tdenetwork
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -45,12 +45,14 @@ cd_builddir_fn
 [[ -s /usr/include/speex/speex.h ]] && SPX="ON"
 
 cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DWITH_ARTS="ON" \
     -DWITH_JINGLE="ON" \
     -DWITH_SPEEX=${SPX:-"OFF"} \
@@ -107,15 +109,6 @@ cmake \
     -DBUILD_KOPETE_PLUGIN_SMPPPDCS="ON" \
     -Wno-dev \
     ..
-
-## CPLUS_INCLUDE_PATH=$TQTDIR/include:${CPLUS_INCLUDE_PATH:-};export CPLUS_INCLUDE_PATH
-## set in BUILD-TDE.sh is causing a build error with Slackware current:
-## libvncserver/main.h:26:3: error: ‘rfbScreenInfoPtr’ does not name a type; did you mean ‘rfbServerInitMsg’?
-##    rfbScreenInfoPtr d;
-##    ^~~~~~~~~~~~~~~~
-## It doesn't have any use here, so unset it
-## and $TQT_INCLUDE_PATH has been added to CMAKE_CXX_FLAGS for subsequent ntqglobal.h not found error
-export CPLUS_INCLUDE_PATH=""
 
 make_fn
 

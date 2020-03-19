@@ -53,7 +53,7 @@ PKG=$TMP_BUILD/package-$PRGNAM
 OUTPUT=/tmp
 
 # remove any previous builds if option chosen
-[[ $KEEP_BUILD != "yes" ]] && [[ $PRE_DOWNLOAD != yes ]] && echo -e "\n removing previous build data ..\n" && rm -rf $TMP_BUILD/{tmp,package}*
+[[ $KEEP_BUILD != "yes" ]] && [[ $PRE_DOWNLOAD != yes ]] && echo -e "\n removing previous build data .." && rm -rf $TMP_BUILD/{tmp,package}*
 # Only create working directories if building packages:
 [[ $PRE_DOWNLOAD != yes ]] && {
 mkdir -p $OUTPUT
@@ -134,7 +134,7 @@ fi
 ## if not creating/updating git, nothing to do in this function for git builds
 ## otherwise, now not R14.0.? or misc, and we are creating/updating git,
 ## so [1] start with admin/cmake:
-[[ $(cat $TMPVARS/CGIT) == yes ]] && {
+[[ $(cat $TMPVARS/DL_CGIT) == yes ]] && {
 cd $BUILD_TDE_ROOT/src/cgit
 
 [[ ! -e $TMPVARS/admin-cmake-done ]] && {
@@ -218,11 +218,20 @@ done
 }
 }
 
-# Set CFLAGS/CXXFLAGS and LIBDIRSUFFIX:
-   { [[ $ARCH == x86_64 ]]  && SLKCFLAGS="-O2 -fPIC ${SET_march:-}" \
-                               SLKLDFLAGS="-L$INSTALL_TDE/lib$LIBDIRSUFFIX -L/usr/lib64"; } \
-|| {                           SLKCFLAGS="-O2 ${SET_march:-}" \
-                               SLKLDFLAGS="-L$INSTALL_TDE/lib$LIBDIRSUFFIX"; }
+## Installation RPATH:
+## Set this to ensure TDE libs have priority when installed
+## For tqt3, the configure -R option is used
+## Add -Wl,-rpath for gcc/g++ -
+## - use --disable-rpath in autotools builds to avoid paths set by configure
+## - double quote $SLK[R]CFLAGS with cmake in the SBs for it to recognize the whole string
+INST_RPATH="$TQTDIR/lib$LIBDIRSUFFIX"
+[[ $TQTDIR != $INSTALL_TDE ]] && INST_RPATH="$INST_RPATH:$INSTALL_TDE/lib$LIBDIRSUFFIX"
+SLKCFLAGS="-O2 ${SET_march:-}" # for Misc and libart-lgpl
+SLKRCFLAGS="$SLKCFLAGS -Wl,-rpath,'$INST_RPATH'" # for TQt/TDE
+[[ $ARCH == x86_64 ]] && \
+SLKCFLAGS="$SLKCFLAGS -fPIC" && \
+SLKRCFLAGS="$SLKRCFLAGS -fPIC"
+
 # Exit the script on errors:
 set -e
 trap 'echo "$0 FAILED at line $LINENO" | tee $OUTPUT/error-$PRGNAM.log' ERR
@@ -301,6 +310,12 @@ chmod -R u+w,go+r-w,a+rX-st .
 
 ltoolupdate_fn ()
 {
+## edit hard coded tqt directory for tqt3/tqtinterface installed to TQTDIR [!= /usr]
+sed -i "s|/usr/include/tqt\"|$TQTDIR/include/tqt\"|" admin/acinclude.m4.in
+sed -i "s|/usr/include/tqt3|$TQTDIR/include/tqt|" admin/acinclude.m4.in
+## edit hard coded plugins installation directories - could be 'tde'
+sed -i "s|trinity|$PLUGIN_INSTALL_DIR|g" admin/acinclude.m4.in
+
 cp /$(grep -h ltmain.sh /var/log/packages/libtool*) admin/
 cp /$(grep -h libtool.m4 /var/log/packages/libtool*) admin/libtool.m4.in
 cp /$(grep -h missing /var/log/packages/libtool*) admin/

@@ -24,10 +24,10 @@
 #   SUCH DAMAGE.
 
 # Much help from the 12.2 SlackBuild script of qt3. And from SBo qt3 script
-# Man pages are not installed, so they won't overwrite Qt4's
+# Man pages are not installed by 'make install' and have not been manually installed
 
 PRGNAM=tqt3
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -39,8 +39,12 @@ untar_fn
 ## add -march and -mtune options to CFLAGS where they've been set in BUILD-TDE.sh
 sed -i "s|^QMAKE_CFLAGS[^_].*$|& $SET_march|" mkspecs/linux-g++/qmake.conf
 
-## $ORIGIN/../lib is to be added to RPATH, so don't need absolute libs directory built in:
+## RPATH is set to $ORIGIN/../lib to locate libs during the build
+## and added during configure to apply only to tqt3 build
 sed -i "s|QMAKE_RPATH.*$|QMAKE_RPATH =|" mkspecs/linux-g++/qmake.conf
+
+## tqt libs might be installed in $([T]QTDIR)/lib64
+sed -i "s|QTDIR)/lib|&$LIBDIRSUFFIX|" mkspecs/linux-g++/qmake.conf
 
 ## allow building with clang
 [[ ! $(grep COMPILER mkspecs/linux-g++/qmake.conf) ]] && {
@@ -70,11 +74,20 @@ done
 sed -i '/translations/d' src/qt_install.pri
 sed -i '/phrasebooks/d' tools/linguist/linguist/linguist.pro
 sed -i '/templates/d' tools/designer/designer/designer.pro
+}
+
 ## only need linux-g++
+[[ $TQT_OPTS == *mkspecs* ]] && {
 mv mkspecs/linux-g++ ../
 rm -rf mkspecs/*
 mv ../linux-g++ mkspecs/
 }
+
+## install desktop files to applications/tde as for the other TDE desktop files
+sed -i 's|desktop.path = $$share.path/applications|&/tde|' tools/assistant/assistant.pro
+sed -i 's|desktop.path = $$share.path/applications|&/tde|' tools/qtconfig/qtconfig.pro
+sed -i 's|desktop.path = $$share.path/applications|&/tde|' tools/designer/designer/designer.pro
+sed -i 's|desktop.path = $$share.path/applications|&/tde|' tools/linguist/linguist/linguist.pro
 
 listdocs_fn
 
@@ -82,10 +95,17 @@ chown_fn
 
 #cd_builddir_fn - don't use
 
-echo "yes" | CFLAGS=$SLKCFLAGS CXXFLAGS=$SLKCFLAGS \
+## datadir is where mkspecs is installed
+echo "yes" | \
  ./configure \
  -no-exceptions \
- -prefix $TQTDIR-$VERSION \
+ -prefix $TQTDIR \
+ -libdir $TQTDIR/lib$LIBDIRSUFFIX \
+ -bindir $TQTDIR/bin \
+ -headerdir $TQTDIR/include/tqt \
+ -plugindir $TQTDIR/lib$LIBDIRSUFFIX/tqt/plugins \
+ -datadir $TQTDIR/lib$LIBDIRSUFFIX/tqt \
+ -translationdir $TQTDIR/share/tqt/translations \
  -release \
  -verbose \
  -I/usr/include/freetype2 \
@@ -114,7 +134,7 @@ echo "yes" | CFLAGS=$SLKCFLAGS CXXFLAGS=$SLKCFLAGS \
  -plugin-style-sgi \
  -plugin-style-windows \
  -fast \
- -R-Wl,-rpath,\'\\\$\$ORIGIN/../lib\'
+ -R-Wl,-rpath,\'\\\$\$ORIGIN/../lib:$INST_RPATH\'
 
 ## don't build tutorial and examples which won't be installed because the release version is being built
 make -i $NUMJOBS symlinks src-qmake src-moc sub-src sub-tools || exit 1
@@ -122,132 +142,77 @@ make install INSTALL_ROOT=$PKG || exit 1
 
 ## for a minimal build
 [[ $TQT_OPTS == *minimal* ]] && {
-(cd $PKG$TQTDIR-$VERSION/
-rm lib/libtqt[de]*
-[[ $TQT_OPTS != *tdevel* ]] && rm lib/libtqas* && {
-[[ $TQT_OPTS != *pim_ksq* ]] && rm lib/libtqui*
+(cd $PKG$TQTDIR/
+rm lib$LIBDIRSUFFIX/libtqt[de]*
+[[ $TQT_OPTS != *tdevel* ]] && rm lib$LIBDIRSUFFIX/libtqas* && {
+[[ $TQT_OPTS != *pim_ksq* ]] && rm lib$LIBDIRSUFFIX/libtqui*
 }
 rm bin/???????*
 rm bin/tqm2ts
 rm -rf plugins/designer
-(cd mkspecs
-ln -s linux-g++ default
-))}
-
-# Link the shared libraries
-( cd $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX
-  for file in $PRGNAM-$VERSION/lib/*.so* ; do
-    ln -sf $file .
-  done
-)
+)}
 
 installdocs_fn
 
 mkdir -p $PKG/etc/profile.d
 #
-echo '#!'"/bin/sh
-# Environment variables for the tQt package.
+[[ $TDEVERSION == cgit ]] && QTDIR_PFX=T
 #
-# It's best to use the generic directory to avoid
-# compiling in a version-containing path:
-if [ -d $TQTDIR ]; then
-  QTDIR=$TQTDIR
-else
-  # Find the newest Qt directory and set \$QTDIR to that:
-  for qtd in $TQTDIR-* ; do
-    if [ -d \$qtd ]; then
-      QTDIR=\$qtd
-    fi
-  done
-fi
-export QTDIR
+echo '#!'"/bin/sh
+# Environment path variable for the tQt package.
+export ${QTDIR_PFX:-}QTDIR=$TQTDIR
 " > $PKG/etc/profile.d/tqt3.sh
 #
 echo '#!'"/bin/csh
-# Environment path variables for the tQt package:
-if ( ! \$?QTDIR ) then
-    # It's best to use the generic directory to avoid
-    # compiling in a version-containing path:
-    if ( -d $TQTDIR ) then
-        setenv QTDIR $TQTDIR
-    else
-        # Find the newest Qt directory and set \$QTDIR to that:
-        foreach qtd ( $TQTDIR-* )
-            if ( -d \$qtd ) then
-                setenv QTDIR \$qtd
-            endif
-        end
-    endif
-endif
+# Environment path variable for the tQt package:
+setenv ${QTDIR_PFX:-}QTDIR $TQTDIR
 " > $PKG/etc/profile.d/tqt3.csh
 #
 chmod 755 $PKG/etc/profile.d/*
 
 strip_fn
 
-# Put a ton of links to more "normal" places.
-mkdir -p $PKG$INSTALL_TDE/bin
-( cd $PKG$INSTALL_TDE/bin
-  ln -sf ../lib$LIBDIRSUFFIX/$PRGNAM-$VERSION/bin/* .
-)
-#
-mkdir -p $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig
-( cd $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig
-  ln -sf ../$PRGNAM-$VERSION/lib/pkgconfig/tqt-mt.pc .
-)
-
-[[ $TQT_OPTS != *minimal* ]] && {
-## move .desktop files to where the other TDE .desktop files are installed
-mkdir -p $PKG$INSTALL_TDE/share/applications/tde
-mv $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/$PRGNAM-$TDEVERSION/share/applications/* $PKG$INSTALL_TDE/share/applications/tde/
-}
-rm -rf $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/$PRGNAM-$TDEVERSION/share/applications
-
-# Symlink tqt3 includes to qt3, to provide it for non-tde software as well =]
-mkdir -p $PKG$INSTALL_TDE/include
-( cd $PKG$INSTALL_TDE/include ; ln -sf $TQTDIR-$VERSION/include qt3 )
-
-# Symlink all of it:
-( cd $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX ; ln -sf $PRGNAM-$VERSION $PRGNAM)
-
 mkdir_install_fn
 
 # Add this to the doinst.sh:
-[[ $PREPEND != yes ]] && \
 cat <<EOINS >> $PKG/install/doinst.sh
-# Add TQt library directories to /etc/ld.so.conf:
-if ! grep $INSTALL_TDE/lib$LIBDIRSUFFIX /etc/ld.so.conf 1> /dev/null 2> /dev/null ; then
-  echo "$INSTALL_TDE/lib$LIBDIRSUFFIX" >> /etc/ld.so.conf
-fi
-if ! grep $TQTDIR-$VERSION/lib /etc/ld.so.conf 1> /dev/null 2> /dev/null ; then
-  echo "$TQTDIR-$VERSION/lib" >> /etc/ld.so.conf
-fi
-if [ -x /sbin/ldconfig ]; then
-  /sbin/ldconfig 2> /dev/null
-fi
+# Add TDE library directory:
+[[ \$(cat etc/ld.so.conf|head -n1) != $INSTALL_TDE/lib$LIBDIRSUFFIX ]] && \
+sed -i "1i $INSTALL_TDE/lib$LIBDIRSUFFIX" etc/ld.so.conf
 
-# Update PKG_CONFIG_PATH:
-[[ ! \$( grep $INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig /etc/profile.d/pkgconfig.sh ) ]] && \\
-sed -i "s|pkgconfig$|pkgconfig:$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig|" /etc/profile.d/pkgconfig.{,c}sh
+# Add TQt library directory:
+[[ \$(cat etc/ld.so.conf|head -n1) != $TQTDIR/lib$LIBDIRSUFFIX ]] && \
+sed -i "1i $TQTDIR/lib$LIBDIRSUFFIX" etc/ld.so.conf
+
+[[ -x /sbin/ldconfig ]] && /sbin/ldconfig
+
 EOINS
 
-## Removing any existing TDE libs paths and re-installing prevents duplication -
-## upgradepkg runs installpkg, and hence doinst.sh, twice, also generating the double colon.
-[[ $PREPEND == yes ]] && \
+[[ $(cat $TMPVARS/PKG_CONFIG_PATH_MOD) != set ]] && PC_HASH="#"
 cat <<EOINS >> $PKG/install/doinst.sh
-# Add TQt library directories to /etc/ld.so.conf:
-sed -i "\|$INSTALL_TDE/lib$LIBDIRSUFFIX|d" /etc/ld.so.conf
-sed -i "1i $INSTALL_TDE/lib$LIBDIRSUFFIX" /etc/ld.so.conf
-sed -i "1i $TQTDIR-$VERSION/lib" /etc/ld.so.conf
-if [ -x /sbin/ldconfig ]; then
-  /sbin/ldconfig 2> /dev/null
-fi
+## This could be a rebuild or upgradepkg running installpkg twice,
+## so delete any previous routine
+sed -i '/Update PKG_CONFIG_PATH for TDE/,+11d' etc/profile.d/pkgconfig.sh
 
+echo '# Update PKG_CONFIG_PATH for TDE:
+## remove duplicated paths:
+${PC_HASH:-}PKG_CONFIG_PATH=\$(echo \$PKG_CONFIG_PATH| tr : \\\\n | awk '"'!seen[\\\$0]++'"' | tr \\\\n :|sed '"'s|:\$||'"')
+#
+## add path for INSTALL_TDE ..
+[[ ! \$PKG_CONFIG_PATH == *$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig* ]] && \\
+PKG_CONFIG_PATH=\$PKG_CONFIG_PATH:$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig
+## .. and for TQTDIR if different
+[[ ! \$PKG_CONFIG_PATH == *$TQTDIR/lib$LIBDIRSUFFIX/pkgconfig* ]] && \\
+PKG_CONFIG_PATH=\$PKG_CONFIG_PATH:$TQTDIR/lib$LIBDIRSUFFIX/pkgconfig
+#
+export PKG_CONFIG_PATH' >> etc/profile.d/pkgconfig.sh
+
+## csh
 # Update PKG_CONFIG_PATH:
-[[ ! \$( grep PKG_CONFIG_PATH=$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig: /etc/profile.d/pkgconfig.sh ) ]] && {
-sed -i "s|PKG_CONFIG_PATH=|PKG_CONFIG_PATH=$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig:|" /etc/profile.d/pkgconfig.sh
-sed -i "s| PKG_CONFIG_PATH | PKG_CONFIG_PATH $INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig:|" /etc/profile.d/pkgconfig.csh
-}
+[[ ! \$( grep $INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig etc/profile.d/pkgconfig.csh ) ]] && \\
+sed -i "s|pkgconfig$|pkgconfig:$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig|" etc/profile.d/pkgconfig.csh
+[[ ! \$( grep $TQTDIR/lib$LIBDIRSUFFIX/pkgconfig etc/profile.d/pkgconfig.csh ) ]] && \\
+sed -i "s|pkgconfig$|pkgconfig:$TQTDIR/lib$LIBDIRSUFFIX/pkgconfig|" etc/profile.d/pkgconfig.csh
 EOINS
 
 doinst_sh_fn

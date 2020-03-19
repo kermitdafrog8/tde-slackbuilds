@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tdelibs
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -65,6 +65,26 @@ do
 patch -N -p0
 done || true
 
+## allow for configuration files directory == /etc/tde
+## and plugins in $INSTALL_TDE/lib$LIBDIRSUFFIX/tde
+for file in \
+tdecore/kstandarddirs.cpp \
+tdecore/kcrash.cpp \
+tdeinit/lnusertemp.c \
+tdeinit/tdeinit.cpp \
+tdeinit/wrapper.c \
+tdelfeditor/tdelfeditor.cpp \
+tdeio/tests/kurifiltertest.cpp \
+tdeio/tests/kmimetypetest.sh.cmake \
+tdeio/tests/jobtest.cpp \
+tdeio/kssl/kopenssl.cc \
+tdeinit/tdestartupconfig.cpp \
+tdecore/tdeconfig_compiler/tests/test9main.cpp
+do
+sed -i "s|trinity|$PLUGIN_INSTALL_DIR|g" $file || true
+done
+sed -i "s|\"trinity\"|\"$PLUGIN_INSTALL_DIR\"|"  tdecore/tdeapplication.cpp || true
+
 listdocs_fn
 
 chown_fn
@@ -72,20 +92,21 @@ chown_fn
 cd_builddir_fn
 
 # Check for avahi-tqt
-[[ -s $INSTALL_TDE/include/avahi-tqt/qt-watch.h ]] && AVAHI="ON"
+[[ -s $INSTALL_TDE/include/avahi-tqt/qt-watch.h ]] && AVAHI="ON" && {
+## dnssd/responder.cpp:28:10: fatal error: avahi-tqt/qt-watch.h: No such file or directory
+sed -i 's|TQT_INCLUDE_DIRS}|&\n  ${AVAHI_TQT_INCLUDE_DIRS}|' ../dnssd/CMakeLists.txt
+}
 
 cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
-    -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DCMAKE_SKIP_RPATH="OFF" \
+    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DTDE_MALLOC="OFF" \
     -DTDE_MALLOC_DEBUG="OFF" \
     -DTDE_MALLOC_FULL="OFF" \

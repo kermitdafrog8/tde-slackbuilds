@@ -25,7 +25,7 @@
 #
 # 
 PRGNAM=xmedcon
-VERSION=${VERSION:-0.16.2}
+VERSION=0.16.2
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
@@ -43,8 +43,8 @@ chown_fn
 
 #cd_builddir_fn - don't use
 
-CFLAGS=$SLKCFLAGS \
-CXXFLAGS=$SLKCFLAGS \
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ./configure \

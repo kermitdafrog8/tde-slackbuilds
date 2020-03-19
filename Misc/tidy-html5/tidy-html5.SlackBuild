@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tidy-html5
-VERSION=${VERSION:-5.6.0}
+VERSION=5.6.0
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
@@ -69,6 +69,7 @@ cmake \
     -DBUILD_TAB2SPACE="ON" \
     -DBUILD_SAMPLE_CODE="OFF" \
     -DSUPPORT_LOCALIZATIONS="OFF" \
+    -Wno-dev \
     ..
 
 make_fn

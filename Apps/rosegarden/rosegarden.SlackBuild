@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=rosegarden
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -71,10 +71,11 @@ cd_builddir_fn
 [[ $(grep -E "dssi.h" /var/log/packages/*) ]] && DSSI="ON"
 
 cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DBUILD_DOC="ON" \
@@ -87,6 +88,7 @@ cmake \
     -DWANT_LIRC="OFF" \
     -DWANT_PCH="OFF" \
     -DWANT_TEST="OFF" \
+    -Wno-dev \
     ..
 
 make_fn

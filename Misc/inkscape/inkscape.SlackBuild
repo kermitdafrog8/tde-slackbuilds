@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=inkscape
-VERSION=${VERSION:-0.92.4}
+VERSION=0.92.4
 BUILD=${BUILD:-1}
 
 SRCURL="https://media.inkscape.org/dl/resources/file/inkscape-$VERSION.tar.bz2"
@@ -114,10 +114,8 @@ cd_builddir_fn
 
 ## default options have been pulled from CMakeLists.txt
 cmake \
-    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
-    -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
@@ -141,6 +139,7 @@ cmake \
     -DWITH_GTK3_EXPERIMENTAL="OFF" \
     -DWITH_GTKSPELL="OFF" \
     -DENABLE_BINRELOC="OFF" \
+    -Wno-dev \
     ..
 
 make_fn

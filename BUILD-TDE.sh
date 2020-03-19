@@ -11,7 +11,7 @@ rm -f $TMPVARS/admin-cmake-done
 ## remove any PRE_DOWNLOAD record to allow BUILD-TDE.sh to be run in Re-use mode after a pre-download
 rm -f $TMPVARS/PRE_DOWNLOAD
 ## .. and if building 14.1.0, turn off cgit downloads
-[[ $(cat $TMPVARS/CGIT) == yes ]] && echo \\Z0\\Zbno > $TMPVARS/CGIT
+[[ $(cat $TMPVARS/DL_CGIT) == yes ]] && echo \\Z0\\Zbno > $TMPVARS/DL_CGIT
 
 
 ## don't need this if this script has already been run
@@ -121,13 +121,18 @@ Any other option will have to be edited into BUILD-TDE.sh
 rm -f $TMPVARS/SYS_CNF_DIR
 dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE System Configuration " --menu \
 "
-Select the directory that the TDE System Configuration files should be installed in.
+Select the directory that the TDE System Configuration files
+should be installed in.
 
-Selecting '/etc/tde' will also set TDEHOME=~/.tde and TDEROOTHOME=/root/.tde,
-otherwise the defaults of TDEHOME=~/.trinity and TDEROOTHOME=/root/.trinity will apply.
+Selecting '/etc/tde' will also:
+* set TDEHOME=~/.tde and TDEROOTHOME=/root/.tde
+    \Z0\Zbotherwise defaults to
+    TDEHOME=~/.trinity and TDEROOTHOME=/root/.trinity\Zn
+* install plugins in $(cat $TMPVARS/INSTALL_TDE)/lib$LIBDIRSUFFIX/tde
+    \Z0\Zbotherwise defaults to $(cat $TMPVARS/INSTALL_TDE)/lib$LIBDIRSUFFIX/trinity\Zn
  
 " \
-18 75 2 \
+20 75 2 \
 "/etc/tde" "" \
 "/etc/trinity" "" \
 2> $TMPVARS/SYS_CNF_DIR
@@ -319,48 +324,6 @@ Keep \ZuALL\ZU the temporary files, including for successfully built packages?" 
 [[ $? == 1 ]] && echo no > $TMPVARS/KEEP_BUILD
 
 
-rm -f $TMPVARS/SELECT
-dialog --cr-wrap --no-shadow --colors --defaultno --title " Required dependencies " --yesno \
-"
-Pre-select TDE core modules and required dependencies for the build list?
-
-Select \Zr\Zb\Z4No\Zn here if they have already been built and installed and you are building additional packages.
-" \
-11 75
-[[ $? == 0 ]] && echo on > $TMPVARS/SELECT
-[[ $? == 1 ]] && echo off > $TMPVARS/SELECT
-export SELECT=$(cat $TMPVARS/SELECT)
-
-
-rm -f $TMPVARS/PREPEND
-EXITVAL=2
-until [[ $EXITVAL -lt 2 ]] ; do
-dialog --cr-wrap --no-shadow --yes-label "Prepend" --help-button --help-label "README" --no-label "Default" --colors --defaultno --title " Libraries Search Path " --yesno \
-"
-Select <\Z1P\Zb\Z0repend\Zn> to add the TDE libs paths to the beginning of the search path.
-
-Try \Zr\Zb\Z4Default\Zn first - in most cases this will work.
-" \
-10 75
-EXITVAL=$?
-[[ $EXITVAL == 0 ]] && echo yes > $TMPVARS/PREPEND
-[[ $EXITVAL == 1 ]] && 2> $TMPVARS/PREPEND
-[[ $EXITVAL == 2 ]] && dialog --cr-wrap --no-shadow --colors --ok-label "Return" --msgbox \
-"
-The default with the tqt3 build is to append the TDE libs paths to /etc/ld.so.conf.
-
-This means that TDE libs will be at the end of the search path. If the package configuration sets up the search path without using the shell variables set up in this script, those TDE libs will not be used if a library of the same name exists - a conflict which could arise if another DE is installed.
-
-If you experience any problems of this nature, then try the \Z1P\Zb\Z0repend\Zn option, which will set up doinst.sh for tqt3 to add the TDE libs paths to the beginning of the search path.
-
- Then \Zb\Z2rebuild tqt3\Zn. This build option only applies to that package.
-OR
- Edit /etc/ld.so.conf ..
-" \
- 22 75
-done
-
-
 rm -f $TMPVARS/TDEbuilds
 dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Packages Selection " --item-help --checklist \
 "
@@ -372,16 +335,16 @@ Look out for messages in the bottom line of the screen, especially relating to d
 
 Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TDE packages." \
 0 0 0 \
-"Deps/tqt3" "\Zb\Zr\Z4R\Zn The Qt package for TDE" ${SELECT:-off} "\Zb\Z6  \Zn" \
-"Deps/tqtinterface" "\Zb\Zr\Z4R\Zn TDE bindings to tqt3." ${SELECT:-off} "\Zb\Z6  \Zn" \
-"Deps/arts" "\Zb\Zr\Z4R\Zn Sound server for TDE" ${SELECT:-off} "\Zb\Z6   \Zn" \
-"Deps/dbus-tqt" "\Zb\Zr\Z4R\Zn A simple IPC library" ${SELECT:-off} "\Zb\Z6   \Zn" \
-"Deps/dbus-1-tqt" "\Zb\Zr\Z4R\Zn D-Bus bindings" ${SELECT:-off} "\Zb\Z6   \Zn" \
-"Deps/libart-lgpl" "\Zb\Zr\Z4R\Zn The LGPL'd component of libart" ${SELECT:-off} "\Zb\Z6   \Zn" \
-"Deps/tqca-tls" "\Zb\Zr\Z4R\Zn Plugin to provide SSL/TLS capability" ${SELECT:-off} "\Zb\Z6   \Zn" \
+"Deps/tqt3" "\Zb\Zr\Z4R\Zn The Qt package for TDE" off "\Zb\Z6  \Zn" \
+"Deps/tqtinterface" "\Zb\Zr\Z4R\Zn TDE bindings to tqt3." off "\Zb\Z6  \Zn" \
+"Deps/arts" "\Zb\Zr\Z4R\Zn Sound server for TDE" off "\Zb\Z6   \Zn" \
+"Deps/dbus-tqt" "\Zb\Zr\Z4R\Zn A simple IPC library" off "\Zb\Z6   \Zn" \
+"Deps/dbus-1-tqt" "\Zb\Zr\Z4R\Zn D-Bus bindings" off "\Zb\Z6   \Zn" \
+"Deps/libart-lgpl" "\Zb\Zr\Z4R\Zn The LGPL'd component of libart" off "\Zb\Z6   \Zn" \
+"Deps/tqca-tls" "\Zb\Zr\Z4R\Zn Plugin to provide SSL/TLS capability" off "\Zb\Z6   \Zn" \
 "Deps/avahi-tqt" "Avahi support" off "\Zb\Z6 Optional for tdelibs and used if installed. Requires Avahi. \Zn" \
-"Core/tdelibs" "\Zb\Zr\Z4R\Zn TDE libraries" ${SELECT:-off} "\Zb\Z6 Will build with Avahi support if avahi/avahi-tqt are installed. \Zn" \
-"Core/tdebase" "\Zb\Zr\Z4R\Zn TDE base" ${SELECT:-off} "\Zb\Z6   \Zn" \
+"Core/tdelibs" "\Zb\Zr\Z4R\Zn TDE libraries" off "\Zb\Z6 Will build with Avahi support if avahi/avahi-tqt are installed. \Zn" \
+"Core/tdebase" "\Zb\Zr\Z4R\Zn TDE base" off "\Zb\Z6   \Zn" \
 "Core/tde-i18n" "Additional language support for TDE" off "\Zb\Z6 Required when any \Zb\Z3Additional language support\Zb\Z6 has been selected \Zn" \
 "Core/tdeaccessibility" "Accessibility programs" off "\Zb\Z6  \Zn" \
 "Core/tdeadmin" "System admin packages" off "\Zb\Z6  \Zn" \
@@ -390,8 +353,8 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Core/tdegames" "Games for TDE - atlantik, kasteroids, katomic, etc." off "\Zb\Z6   \Zn" \
 " Misc/imlib" "An image loading and rendering library" off "\Zb\Z6 Build-time option for tdegraphics - needed for kuickshow \Zn" \
 "Core/tdegraphics" "Misc graphics apps" off "\Zb\Z6   \Zn" \
-"Deps/akode" "A player and plugins for aRts music formats" off "\Zb\Z6 For tdemultimedia - aRts-plugin and Juk \Zn" \
-"Core/tdemultimedia" "Multimedia packages for TDE" off "\Zb\Z6   \Zn" \
+"Deps/akode" "A player and plugins for aRts music formats" off "\Zb\Z6 For tdemultimedia - aRts-plugin and Juk, and amarok engine \Zn" \
+"Core/tdemultimedia" "Multimedia packages for TDE" off "\Zb\Z6 Optional build-time dependency - akode \Zn" \
 " Misc/speex" "Audio compression format designed for speech" off "\Zb\Z6 Buildtime option for tdenetwork and amarok. Requires l/speexdsp  \Zn" \
 "Core/tdenetwork" "Networking applications for TDE" off "\Zb\Z6 Optional build-time dependency - speex \Zn" \
 "Deps/libcaldav" "Calendaring Extensions to WebDAV" off "\Zb\Z6 Optional dependency for korganizer [tdepim] \Zn" \
@@ -414,7 +377,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 " Misc/mp4v2" "Create and modify mp4 files" off "\Zb\Z6 Buildtime option for Amarok  \Zn" \
 " Misc/moodbar" "GStreamer plugin for Amarok for moodbar feature" off "\Zb\Z6 Runtime option for Amarok \Zn" \
 " Misc/yauap" "A simple commandline audio player" off "\Zb\Z6 Provides an optional engine for Amarok \Zn" \
-"Apps/amarok" "A Music Player" off "\Zb\Z6 Optional dependencies - xine-lib, mp4v2, speex, moodbar \Zn" \
+"Apps/amarok" "A Music Player" off "\Zb\Z6 Optional dependencies - xine-lib, mp4v2, speex, moodbar, akode, yauap \Zn" \
 "Apps/digikam" "A digital photo management application + Showfoto viewer" off "\Zb\Z6 Requires kipi-plugins libkdcraw libkexiv2 libkipi.  \Zn" \
 "Apps/dolphin" "Dolphin file manager for TDE" off "\Zb\Z6 A d3lphin.desktop file is included - see dolphin.SlackBuild.  \Zn" \
 "Apps/filelight" "Graphical diskspace display" off "\Zb\Z6 Runtime requirement x/xdpyinfo \Zn" \
@@ -471,6 +434,7 @@ sed -i 's|$| |;s|" M|M|g;s|"||g' $TMPVARS/TDEbuilds
 
 ## only run this if tqt3 has been selected
 rm -f $TMPVARS/TQT_OPTS
+rm -f $TMPVARS/PKG_CONFIG_PATH_MOD
 [[ $(grep -o tqt3 $TMPVARS/TDEbuilds) ]] && {
 dialog --cr-wrap --nocancel --no-shadow --colors --title " TQt options " --item-help --checklist \
 "
@@ -479,15 +443,44 @@ A minimal packaging of tqt3 will install only the run-time library required for 
 But tdepim, ksquirrel, and tdevelop need additional libraries. If you select minimal packaging and intend to build any of those at any time, select keeping their required libs now.
 
 TQt html documentation is ~21M, and can be excluded from the package.
+
+mkspecs is only required for linux-g++
  
 " \
-21 75 4 \
+25 75 5 \
 " minimal" "Minimal packaging" off "\Zb\Z6 Exclude libs and binaries not required for TDE \Zn" \
-" pim_ksq" "Keep lib for tdepim and/or ksquirrel" off "\Zb\Z6 Only required if minimal build selected \Zn" \
-" tdevel" "Keep libs for tdevelop" off "\Zb\Z6 Only required if minimal build selected \Zn" \
+" pim_ksq" " ├─ Keep lib for tdepim and/or ksquirrel" off "\Zb\Z6 Only required if minimal build selected \Zn" \
+" tdevel" " └─ Keep libs for tdevelop" off "\Zb\Z6 Only required if minimal build selected \Zn" \
 " nodocs" "Exclude html documentation" on "\Zb\Z6  \Zn" \
+" mkspecs" "linux-g++ only" on "\Zb\Z6 Uncheck for the complete set \Zn" \
 2> $TMPVARS/TQT_OPTS
+
+
+PKG_CONFIG_PATH_MOD=$(echo $PKG_CONFIG_PATH| tr : \\n | awk '!seen[$0]++' | tr \\n :|sed 's|:$||')
+#
+[[ $PKG_CONFIG_PATH != $PKG_CONFIG_PATH_MOD ]] && \
+PKGCF_MESSAGE="PKG_CONFIG_PATH is:
+\Zb\Z6$PKG_CONFIG_PATH\Zn
+
+This can be set to:
+\Zb\Z6$PKG_CONFIG_PATH_MOD\Zn
+to remove duplicated paths." || {
+PKGCF_MESSAGE="PKG_CONFIG_PATH can be set to remove duplicated paths in its string." && DLG_BOX="14 65"
 }
+dialog --aspect 3 --cr-wrap --yes-label "Set" --no-label "Leave" --defaultno --no-shadow --colors --title " Setting PKG_CONFIG_PATH " --yesno \
+"
+$PKGCF_MESSAGE
+
+This will be done with doinst.sh -> pkgconfig.sh and it will therefore apply whenever this build of tqt3 is installed.
+
+Either way, the TDE and TQT pkgconfig paths will be added if not already included.
+
+" \
+${DLG_BOX:-0 0}
+[[ $? == 0 ]] && echo set > $TMPVARS/PKG_CONFIG_PATH_MOD
+[[ $? == 1 ]] && echo leave >  $TMPVARS/PKG_CONFIG_PATH_MOD
+}
+
 
 ## only run this if tdebase has been selected
 rm -f $TMPVARS/RUNLEVEL
@@ -606,7 +599,7 @@ $(cat $TMPVARS/READMEs)" \
 }
 
 
-rm -f $TMPVARS/CGIT  # place this here to facilitate testing for summary screen
+rm -f $TMPVARS/DL_CGIT  # place this here to facilitate testing for summary screen
 [[ $(cat $TMPVARS/TDEVERSION) == cgit ]] && \
 [[ $(grep -o [ACDLM][a-z]*/ $TMPVARS/TDEbuilds | sort | head -n1) != Misc/ ]] && {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " TDE development build " --yesno \
@@ -627,8 +620,8 @@ Create and/or update the git repositories local copies.
  
 " \
 19 75
-[[ $? == 0 ]] && echo yes > $TMPVARS/CGIT
-[[ $? == 1 ]] && echo no > $TMPVARS/CGIT
+[[ $? == 0 ]] && echo yes > $TMPVARS/DL_CGIT
+[[ $? == 1 ]] && echo no > $TMPVARS/DL_CGIT
 }
 
 
@@ -636,7 +629,7 @@ Create and/or update the git repositories local copies.
 [[ $(cat $TMPVARS/TDEVERSION) == 14.0.7 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
 [[ $(cat $TMPVARS/TDEVERSION) == cgit ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'." && LINES=18
 ## testing for cgit!=no will allow =yes or null, which is the 14.0.7 build case
-[[ $(cat $TMPVARS/CGIT) != no ]] &&  {
+[[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "
 This would be useful for running the build off-line.
@@ -658,6 +651,10 @@ ${LINES:-17} 75
 }
 
 }
+
+# Is this a 32 or 64 bit system?
+# 'uname -m' won't identify a 32 bit system with a 64 bit kernel
+[[ $(getconf LONG_BIT) == 64 ]] && LIBDIRSUFFIX="64" || LIBDIRSUFFIX=""
 
 [[ ! -e $TMPVARS/TDEbuilds ]] && run_dialog
 
@@ -694,67 +691,70 @@ export I18N=$(cat $TMPVARS/I18N)
 export TQT_OPTS=$(cat $TMPVARS/TQT_OPTS)
 export EXIT_FAIL=$(cat $TMPVARS/EXIT_FAIL)
 export KEEP_BUILD=$(cat $TMPVARS/KEEP_BUILD)
-export PREPEND=$(cat $TMPVARS/PREPEND)
 export RUNLEVEL=$(cat $TMPVARS/RUNLEVEL)
 export PRE_DOWNLOAD=$(cat $TMPVARS/PRE_DOWNLOAD)
 export TDEPFX=$(cat $TMPVARS/TDEPFX)
-# these exports are for koffice.SB
-[[ $(cat $TMPVARS/Krita_OPTS) == *krita* ]] && export REVERT=yes
-[[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && export USE_PNG14=yes
 
-# Is this a 64 bit system?
-# 'uname -m' won't identify a 32 bit system with a 64 bit kernel
-[[ ! -d /lib64 ]] && LIBDIRSUFFIX="" || LIBDIRSUFFIX="64"
-
-TQTDIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/tqt3
-
-CPLUS_INCLUDE_PATH=$TQTDIR/include:${CPLUS_INCLUDE_PATH:-}
+## Set installation directory for tqt
+TQTDIR=$INSTALL_TDE
 
 PKG_CONFIG_PATH=$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig:${PKG_CONFIG_PATH:-}
+[[ $TQTDIR != $INSTALL_TDE ]] && PKG_CONFIG_PATH=$TQTDIR/lib$LIBDIRSUFFIX/pkgconfig:$PKG_CONFIG_PATH
 
-PATH=$TQTDIR/bin:$INSTALL_TDE/bin:$PATH
-
-# needed for CMAKE_C_FLAGS
-# and used for CFLAGS instead of 'configure --with-qt-includes=' option which doesn't always work
-TQT_INCLUDE_PATH="-I$TQTDIR/include"
+PATH=$INSTALL_TDE/bin:$PATH
+[[ $TQTDIR != $INSTALL_TDE ]] && PATH=$TQTDIR/bin:$PATH
 
 export LIBDIRSUFFIX
 export TQTDIR
-export CPLUS_INCLUDE_PATH
 export PKG_CONFIG_PATH
 export PATH
-export TQT_INCLUDE_PATH
 ## to provide an ARCH suffix for the package name - see makepkg_fn in get-source.sh
 export ARM_FABI=$(readelf -Ah $(which bash)|grep -oE "soft|hard")
+## override hard coded trinity plugins directory - used for:
+## autotools: get-source.sh|ltoolupdate_fn
+## cmake: -DPLUGIN_INSTALL_DIR=
+export PLUGIN_INSTALL_DIR=$(cat $TMPVARS/SYS_CNF_DIR | cut -d/ -f3)
 
 ### set up variables for the summary list:
 ## New build
 [[ $(cat $TMPVARS/build-new) != no ]] && NEW_BUILD=yes || NEW_BUILD='no - re-using existing'
+#
 ## Action on failure
 [[ $EXIT_FAIL == "exit 1" ]] && AOF=stop
+#
 ## if tdebase selected
-[[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && TDMRL=\\Zb\\Z6$RUNLEVEL\\Zn && SHADERL=" "
+[[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && TDMRL=$RUNLEVEL
+#
 ## koffice - only if it is being built
-[[ $(sed 's|koffice-||' $TMPVARS/TDEbuilds | grep -o Apps/koffice) ]] && {
-[[ $REVERT == yes ]] && RVT=\\Zb\\Z6yes\\Zn || RVT=\\Zb\\Z6no\\Zn
-[[ $(cat $TMPVARS/Krita_OPTS) == *useGM* ]] && USE_GM=\\Zb\\Z6yes\\Zn || USE_GM=\\Zb\\Z6no\\Zn
-[[ $USE_PNG14 == yes ]] && USE_PNG=\\Zb\\Z6yes\\Zn || USE_PNG=\\Zb\\Z6no\\Zn
-SHADEKO=" "
-}
+[[ $(grep -o "Apps/koffice " $TMPVARS/TDEbuilds) ]] && {
+[[ $(cat $TMPVARS/Krita_OPTS) == *krita* ]] && RVT=yes || RVT=no
+[[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && USE_PNG=yes || USE_PNG=no
+[[ $(cat $TMPVARS/Krita_OPTS) == *useGM* ]] && USE_GM=yes || USE_GM=no
+} && \
+KOFFICE="
+koffice:
+ revert chalk to krita                  \Zb\Z6$RVT\Zn
+ build with libpng14                    \Zb\Z6$USE_PNG\Zn
+ build with GraphicsMagick              \Zb\Z6$USE_GM\Zn"
+#
 ## tqt3 options, if tqt3 is being built
 [[ $(grep -o tqt3 $TMPVARS/TDEbuilds) ]] && {
 TQT_BLD=yes && [[ $TQT_OPTS != *minimal* ]] && TQT_BLD=no
 TQT_DOCS=no && [[ $TQT_OPTS != *nodocs* ]] && TQT_DOCS=yes
 }
+#
 ## whether cloning or updating cgit
-CLONE=$(cat $TMPVARS/CGIT)
+CLONE=$(cat $TMPVARS/DL_CGIT)
+#
 ## whether installing packages as they are built
 INST_PACKAGE=yes && [[ $INST == 0 ]] && INST_PACKAGE=no
+#
 ## emphasise downloading only, not building
 [[ $PRE_DOWNLOAD == yes ]] && DL_BLD_MSG="Download sources"
+#
 ## whether using tde prefix
 [[ -e $TMPVARS/TDEPFX ]] && tde_prefix=\\Zn\\Zb\\Z2tde\\Zn && [[ ! -s $TMPVARS/TDEPFX ]] && tde_prefix=no
-
+#
 ## start dialog
 EXITVAL=2
 until [[ $EXITVAL -lt 2 ]] ; do
@@ -765,23 +765,18 @@ Setup is complete - these are the build options:
 New build list                          \Zb\Z6$NEW_BUILD\Zn
 TDE version                             \Zb\Z6$TDEVERSION\Zn
 Clone/update cgit local repositories    \Zb\Z6${CLONE:-\Z0\Zbn/a}\Zn
-Only download sources                   \Zb\Z6${PRE_DOWNLOAD:-\Z0\Zbno}\Zn
+Only download sources                   \Zb\Z6${PRE_DOWNLOAD:-\Z0\Zbn/a}\Zn
 TDE installation directory              \Zb\Z6$INSTALL_TDE\Zn
 TDE system configuration directory      \Zb\Z6$SYS_CNF_DIR\Zn
 Compiler                                \Zb\Z6$COMPILER\Zn
 gcc cpu optimization                    \Zb\Z6$SET_march\Zn
 Number of parallel jobs                 \Zb\Z6$(echo $NUMJOBS|sed 's|-j||')\Zn
-Additional languages                    \Zb\Z6${I18N:-\Z0\Zbnone}\Zn
+Additional languages                    \Zb\Z6${I18N:-none}\Zn
 Minimal tqt build                       \Zb\Z6${TQT_BLD:-\Z0\Zbn/a}\Zn
 Include tqt html docs                   \Zb\Z6${TQT_DOCS:-\Z0\Zbn/a}\Zn
 Action on failure                       \Zb\Z6${AOF:-continue}\Zn
 Keep the temporary build files          \Zb\Z6$KEEP_BUILD\Zn
-Prepend TDE libs paths                  \Zb\Z6${PREPEND:-no}\Zn${SHADERL:-\Z0\Zb}
-Runlevel for TDM                        ${TDMRL:-n/a}\Zn${SHADEKO:-\Z0\Zb}
-koffice:
- revert chalk to krita                  ${RVT:-n/a}
- build with libpng14                    ${USE_PNG:-n/a}
- build with GraphicsMagick              ${USE_GM:-n/a}\Zn
+Runlevel for TDM                        \Zb\Z6${TDMRL:-\Z0\Zbn/a}\Zn${KOFFICE:-}\Zn
 Install packages as they are built      \Zb\Z6$INST_PACKAGE\Zn
 Prefix for packages common to KDE       \Zb\Z6${tde_prefix:-\Z0\Zbn/a}\Zn
  
@@ -828,10 +823,10 @@ do
   cd $BUILD_TDE_ROOT/$dir || ${EXIT_FAIL:-"true"}
 
   # Get the version
-  version=$(cat $package.SlackBuild | grep "VERSION:" | head -n1 | cut -d "-" -f2 | rev | cut -c 2- | rev)
+  version=$(grep "VERSION=" $package.SlackBuild | head -n1 | cut -d "=" -f2)
 
   # Get the build
-  build=$(cat $package.SlackBuild | grep "BUILD:" | cut -d "-" -f2 | rev | cut -c 2- | rev)
+  build=${BUILD:-$(grep "BUILD:" $package.SlackBuild | cut -d "-" -f2 | sed 's|}||')}
 
   # The real build starts here
   echo -e "\033[39;1m
@@ -863,7 +858,7 @@ echo "
       Check the ${LOG:-build} log $TMP/$TDE_PFX$package-$(eval echo $version)-${LOG:-"${ARCH_i18n:-$ARCH}-$build-build"}-log
       "
 ## if koffice was building with libpng14, restore the libpng16 headers for any following builds
-[[ ${USE_PNG14:-} == yes ]] && source $BUILD_TDE_ROOT/get-source.sh && libpng16_fn || true
+[[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && source $BUILD_TDE_ROOT/get-source.sh && libpng16_fn || true
 ${EXIT_FAIL:-":"}
 }
 }
@@ -872,7 +867,7 @@ ${EXIT_FAIL:-":"}
 [[ $PRE_DOWNLOAD == yes ]] || {
 ## install packages
 [[ $INST == 1 ]] && [[ $package != tde-i18n ]] && [[ $package != libpng ]] && upgradepkg --install-new --reinstall $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz && \
-checkmakepkg
+checkmakepkg || ${EXIT_FAIL:-"true"}
 ## tde-i18n package installation is handled in tde-i18n.SlackBuild because if more than one i18n package is being built, only the last one will be installed by upgradepkg here - test for last language in the I18N list to ensure they've all been built
 [[ $package == tde-i18n ]] && package=$package-$(cat $TMPVARS/LASTLANG) && \
 checkmakepkg

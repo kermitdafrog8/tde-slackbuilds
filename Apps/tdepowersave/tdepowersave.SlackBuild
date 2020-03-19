@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tdepowersave
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -67,20 +67,19 @@ chown_fn
 
 cd_builddir_fn
 
-## /usr/bin/ld: cannot find -ldbus-1-tqt, firstly for a library, then for executable
-## Needs all <TYPE>_LINKER_FLAGS_INIT strings, so just set LDFLAGS ..
-## Ref: /usr/share/cmake-3.10/Help/envvar/LDFLAGS.rst
-LDFLAGS=$SLKLDFLAGS \
 cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -Wno-dev \
     ..
 
 make_fn

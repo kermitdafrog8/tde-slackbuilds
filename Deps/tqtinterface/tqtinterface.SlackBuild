@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tqtinterface
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -37,27 +37,23 @@ listdocs_fn
 
 chown_fn
 
-# Until the cmake migration is fully completed, tqtinterface should be 
-# built to install with a $PREFIX of /usr rather than $INSTALL_TDE, 
-# even if everything else is being installed to $INSTALL_TDE.
 cd_builddir_fn
 
+[[ $TDEVERSION == cgit ]] && QTINC_PFX=T
 cmake \
-    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_PREFIX=$TQTDIR \
+    -DQT_PREFIX_DIR=$TQTDIR \
+    -D${QTINC_PFX:-}QT_INCLUDE_DIR=$TQTDIR/include/tqt \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DQT_PREFIX_DIR=$INSTALL_TDE \
-    -DQT_INCLUDE_DIR=$TQTDIR/include \
-    -DQT_LIBRARY_DIR=$TQTDIR/lib \
-    -DQT_BINARY_DIR=$TQTDIR/bin \
     -DQT_VERSION=3 \
-    -DWITH_QT3="ON" \
+    -DWITH_QT3="OFF" \
     -DWITH_QT4="OFF" \
+    -Wno-dev \
     ..
 
 make_fn

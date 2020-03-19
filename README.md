@@ -12,16 +12,25 @@ For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series
 [<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png)
 
 The default is to install the packages as they are built, which is necessary initially for the required packages and for some interdependencies [for example, tdesdk requires tdepim].  
-Run **INST=0 ./BUILD-TDE.sh** to build only.
+
+Run **INST=0 ./BUILD-TDE.sh** to build only.  
+This is a global option so can't be used where the build list includes packages requiring dependencies that haven't been installed.
 
 Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.  
-The TDE mandatory packages can be pre-selected.  
 Information about dependencies for some packages has been added at the bottom of the dialog screen.
 
 R14.0.7 source archives will be downloaded from a geoIP located mirror site, or the development sources [R14.1.0] cloned or updated from cgit.  
 Downloading can be done pre-build [useful for an off-line build], or during the build.
 
 If you're curious about what this might involve, [take a look at a sample build set up](https://ray-v.github.io/A_typical_TDE_SlackBuild.html).
+
+---
+
+There are other command line options that can be used to set some build parameters:
+* BUILD= - sets the package build identifier, overriding the SlackBuild default of 1
+* USE_CMAKE_EDU=yes - to build tdeedu with cmake - see Core/tdeedu/README.
+* USE_CMAKE_MM=yes - to build tdemultimedia with cmake - see Core/tdemultimedia/README.
+* VERBOSE=1 - show command lines during cmake builds
 
 ---
 
@@ -112,6 +121,4 @@ See https://wiki.trinitydesktop.org/How_to_Build_TDE_Core_Modules for more infor
 
 [2] The i18n downloads with wget can't be updated because cgit produces 'current time' timestamps. The consequence is that if tde-i18n-$lang is a part of the build after its initial download, it will be downloaded again. As updates are infrequent, once built, there will probably be no need to do so again and so tde-i18n for a particular language will probably only be run once. On that basis I don't see this being a significant issue.
 
-[3] If Slackware's KDE is installed as well as TDE, there might be an issue with TDE launching the KDE4 Konsole and attempting to use it's ark. To fix, adjust the PATH so that the TDE directories come before /usr/bin.
-
-[4] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.
+[3] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.

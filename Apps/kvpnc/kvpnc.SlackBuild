@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=kvpnc
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -41,6 +41,10 @@ sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
 langs=$(echo $langs | sed "s|.po||g")
 [[ $langs != "" ]] && TRANS=ON
 
+## set up doc/CMakeLists.txt as per all others
+## and make compatible with the following edit
+[[ $TDEVERSION == cgit ]] && echo "tde_auto_add_subdirectories( )" > doc/CMakeLists.txt
+
 ## always build 'en' docs ...
 langdoc="en man tdeioslave"
 ## ... and find other html docs required and available ...
@@ -53,14 +57,16 @@ chown_fn
 cd_builddir_fn
 
 cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -Wno-dev \
     ..
 
 make_fn

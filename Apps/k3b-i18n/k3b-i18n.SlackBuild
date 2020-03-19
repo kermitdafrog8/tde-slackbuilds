@@ -26,7 +26,7 @@
 PRGNAM=k3b-i18n
 PKGNAM=$TDEPFX$PRGNAM
 [[ $PRE_DOWNLOAD != yes ]] && [[ $I18N == "" ]] && echo -e "\033[39;1m\nYou have tried to build $PRGNAM without selecting any language(s)\n\033[0m" && exit
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -66,9 +66,11 @@ cd_builddir_fn
 cmake \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DBUILD_DOC="ON" \
     -DBUILD_MESSAGES="ON" \
+    -Wno-dev \
     ..
 
 make_fn

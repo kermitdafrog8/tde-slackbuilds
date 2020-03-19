@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=kbfx
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -40,6 +40,8 @@ langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po
 sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
 langs=$(echo $langs | sed "s|.po||g")
 [[ $langs != "" ]] && TRANS=ON
+## only install html docs
+echo 'add_subdirectory( en )' > doc/CMakeLists.txt
 
 cd doc;listdocs_fn;cd ../
 
@@ -48,16 +50,19 @@ chown_fn
 cd_builddir_fn
 
 cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     -DUSE_STRIGI="OFF" \
     -DUSE_MENUDRAKE="OFF" \
+    -Wno-dev \
     ..
 
 make_fn

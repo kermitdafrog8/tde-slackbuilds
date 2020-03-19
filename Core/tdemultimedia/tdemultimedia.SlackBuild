@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tdemultimedia
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -40,23 +40,23 @@ USE_CMAKE_MM=${USE_CMAKE_MM:-no}
 
 [[ $USE_CMAKE_MM == no ]] && {
 
+## /usr/bin/ld: cannot find -ltqt-mt/-ltqt - for gentable build
+[[ $TDEVERSION == cgit ]] && \
+sed -i 's|(QT_LDFLAGS|(TQT_LDFLAGS|' noatun/library/Makefile.am
+
 ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
 
-# change hard-coded tqt headers directory:
-[[ ! -d /usr/include/tqt ]] && sed -i "s|/usr/include/tqt|$INSTALL_TDE/include/tqt|g" ../configure
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
+CFLAGS="$SLKRCFLAGS" \
+CXXFLAGS="$SLKRCFLAGS" \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
    --disable-rpath \
-   --disable-debug \
    --enable-closure
 
 true # don't go to cmake if ./configure fails
@@ -73,14 +73,14 @@ AKODE=OFF && [[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && AKODE=ON
 JUK=OFF && [[ $AKODE == ON ]] && :
 
 cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DWITH_ALSA="ON" \
     -DWITH_ARTS_AKODE="$AKODE" \
     -DWITH_ARTS_AUDIOFILE="ON" \
@@ -91,7 +91,7 @@ cmake \
     -DWITH_GSTREAMER="ON" \
     -DWITH_KSCD_CDDA="ON" \
     -DWITH_LAME="ON" \
-    -DWITH_MUSICBRAINZ="ON" \
+    -DWITH_MUSICBRAINZ="OFF" \
     -DWITH_TAGLIB="ON" \
     -DWITH_THEORA="ON" \
     -DWITH_VORBIS="ON" \
@@ -110,6 +110,7 @@ cmake \
     -DBUILD_TDEFILE_PLUGINS="ON" \
     -DBUILD_TDEIOSLAVE="ON" \
     -DBUILD_TDEMID="ON" \
+    -Wno-dev \
     ..
 
 }

@@ -25,7 +25,7 @@
 
 PRGNAM=amarok
 PKGNAM=$TDEPFX$PRGNAM
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -75,42 +75,52 @@ chown_fn
 
 cd_builddir_fn
 
-# If libmp4v2 is installed, use mp4 metadata sources in build, otherwise use m4a ..
-[[ $(grep -E "mp4\.h|mp4v2\.h" /var/log/packages/*) ]] && LMP4V2="ON" || sed -i 's|tagmp4-static|tagm4a-static|' ../amarok/src/metadata/CMakeLists.txt
+# If mp4v2 is installed, use mp4 metadata sources in build, otherwise use m4a ..
+[[ -s /usr/include/mp4v2/mp4v2.h ]] && MP4V2="ON" || sed -i 's|tagmp4-static|tagm4a-static|' ../amarok/src/metadata/CMakeLists.txt
 
-# See if xine-lib package from Slackware is installed. (Need this to play music so hopefully it is.)
+## Build xine-engine?
 [[ -s /usr/include/xine.h ]] && XINE="ON"
 
-# If yauap is installed this can be used as an engine for music playback as well.
+## Build yauap-engine_plugin?
 # Yauap does NOT handle the mp3 format.
 [[ -s $(which yauap) ]] && YAUAP="ON"
 
-## Error: .../arm-slackware-linux-gnueabi/bin/ld: cannot find -ldbus-tqt-1
-## Ref: /usr/share/cmake-3.10/Help/envvar/LDFLAGS.rst - add LDFLAGS=
-#
-LDFLAGS=$SLKLDFLAGS \
+## Build aKode-engine?
+[[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && AKODE="ON"
+
 cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DWITH_MP4V2=${LMP4V2:-"OFF"} \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DWITH_AKODE=${AKODE:-"OFF"} \
+    -DWITH_AMAZON="ON" \
+    -DWITH_DAAP="OFF" \
+    -DWITH_EMBEDDED_SQLITE="OFF" \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_IFP="OFF" \
+    -DWITH_INOTIFY="OFF" \
+    -DWITH_IPOD="OFF" \
+    -DWITH_KONQSIDEBAR="ON" \
+    -DWITH_LIBVISUAL="ON" \
+    -DWITH_MP4V2=${MP4V2:-"OFF"} \
+    -DWITH_MTP="ON" \
+    -DWITH_MYSQL="OFF" \
+    -DWITH_NJB="OFF" \
+    -DWITH_OPENGL="ON" \
+    -DWITH_POSTGRESQL="OFF" \
+    -DWITH_RIOKARMA="OFF" \
+    -DWITH_SYSTEM_SQLITE="ON" \
     -DWITH_XINE=${XINE:-"OFF"} \
     -DWITH_YAUAP=${YAUAP:-"OFF"} \
-    -DWITH_LIBVISUAL="ON" \
-    -DWITH_KONQSIDEBAR="ON" \
-    -DWITH_AKODE="OFF" \
-    -DWITH_IPOD="OFF" \
-    -DWITH_IFP="OFF" \
-    -DWITH_NJB="OFF" \
-    -DWITH_MTP="ON" \
-    -DWITH_RIOKARMA="OFF" \
-    -DWITH_DAAP="OFF" \
-    -DWITH_INOTIFY="OFF" \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -Wno-dev \
     ..
 
 make_fn

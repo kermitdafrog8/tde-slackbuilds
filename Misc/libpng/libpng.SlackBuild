@@ -21,7 +21,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=libpng
-VERSION=${VERSION:-1.4.22}
+VERSION=1.4.22
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
@@ -39,9 +39,8 @@ chown_fn
 
 cd_builddir_fn
 
-CFLAGS=$SLKCFLAGS \
+CFLAGS="$SLKCFLAGS" \
 CC=$COMPILER \
-CXX=$COMPILER_CXX \
 ../configure \
   --prefix=/usr \
   --libdir=/usr/lib$LIBDIRSUFFIX \

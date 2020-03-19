@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tdevelop
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -33,6 +33,10 @@ getsource_fn
 
 untar_fn
 
+## error: /usr/bin/ld: cannot find -ltqt-mt
+sed -i '18ilink_directories( ${TQT_LIBRARY_DIRS} )' lib/interfaces/external/CMakeLists.txt
+sed -i '18ilink_directories( ${TQT_LIBRARY_DIRS} )' src/newui/CMakeLists.txt
+
 listdocs_fn
 
 chown_fn
@@ -40,15 +44,14 @@ chown_fn
 cd_builddir_fn
 
 cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS -L$TQTDIR/lib" \
-    -DCMAKE_C_FLAGS_RELEASE:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS_RELEASE:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DWITH_BUILDTOOL_ADA="ON" \
     -DWITH_BUILDTOOL_ANT="ON" \
     -DWITH_BUILDTOOL_AUTOTOOLS="ON" \

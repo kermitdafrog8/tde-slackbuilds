@@ -25,7 +25,7 @@
 
 PRGNAM=tde-i18n
 [[ $PRE_DOWNLOAD != yes ]] && [[ $I18N == "" ]] && echo -e "\033[39;1m\nYou have tried to build $PRGNAM without selecting any language(s)\n\033[0m" && exit
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 
 source ../../get-source.sh
@@ -63,7 +63,7 @@ true # don't go to cgit if extracting fails
 } || {
 mkdir -p $PRGNAM # need -p for git builds if more than one lang
 cd $PRGNAM
-echo -e " copying $PRGNAM-$lang source files to build area ... \n"
+echo -e "\n copying $PRGNAM-$lang source files to build area ... \n"
 (cd $BUILD_TDE_ROOT/src/cgit
 cp -a tdei18n/cgit/tde-i18n/plain/tde-i18n-$lang $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
 cp -a --parents {admin,cmake}/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/tde-i18n-$lang/)
@@ -78,8 +78,8 @@ mkdir -p $PRGNAM-$lang/build
 cd $PRGNAM-$lang/build
 
 cmake \
-    -DCMAKE_C_FLAGS:STRING=$SLKCFLAGS \
-    -DCMAKE_CXX_FLAGS:STRING=$SLKCFLAGS \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
@@ -88,15 +88,13 @@ cmake \
     -DBUILD_DOC="ON" \
     -DBUILD_DATA="ON" \
     -DBUILD_MESSAGES="ON" \
+    -Wno-dev \
     ..
 
+## install to $PKG/$PRGNAM-$lang so that the build files can be retained
+PKG1=$PKG
+PKG=$PKG/$PRGNAM-$lang
 make_fn
-
-#mkdir -p $PKG/$INSTALL_TDE/doc/$PRGNAM-$VERSION
-#cp -a $DOCS $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION || true
-#cat $SRCDIR/$(basename $0) > $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION/$PRGNAM-$lang.SlackBuild
-#chown -R root:root $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
-#find $PKG$INSTALL_TDE/doc -type f -exec chmod 644 {} \;
 
 mkdir_install_fn
 
@@ -126,7 +124,6 @@ $PRGNAM-$lang:
 $PRGNAM-$lang:
 $PRGNAM-$lang:
 $PRGNAM-$lang:
-$PRGNAM-$lang:
 " > $PKG/install/slack-desc
 
 ARCH="noarch"
@@ -139,9 +136,15 @@ cat $PKG/install/slack-desc | grep "^$PRGNAM" | grep -v handy > $OUTPUT/$PRGNAM-
 # Restore the original umask:
 umask ${_UMASK_}
 
-rm -rf $PKG/*
+## Reset the packaging directory base
+PKG=$PKG1
+
 cd $TMP_BUILD/tmp-$PRGNAM
-rm -rf $PRGNAM/$PRGNAM-$lang
+# remove any previous builds if option chosen
+[[ $KEEP_BUILD != "yes" ]] && echo -e " removing tde-i18n-$lang build data ..\n" && {
+rm -rf $PKG/*
+rm -rf $PRGNAM*/$PRGNAM-$lang
+}
 
 # Install i18n package(s) here because if more than one language pack is built,
 # upgradepkg [in BUILD-TDE.sh] can't process them in one command and the build will exit
@@ -150,3 +153,5 @@ rm -rf $PRGNAM/$PRGNAM-$lang
 done
 
 echo $lang > $TMPVARS/LASTLANG
+
+[[ $KEEP_BUILD != "yes" ]] && rm -rf $TMP_BUILD/{package,tmp}-$PRGNAM

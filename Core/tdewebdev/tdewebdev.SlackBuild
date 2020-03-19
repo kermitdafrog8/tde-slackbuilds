@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tdewebdev
-VERSION=${VERSION:-$TDEVERSION}
+VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
@@ -32,6 +32,9 @@ source ../../get-source.sh
 getsource_fn
 
 untar_fn
+
+## /usr/bin/ld: quanta.o: undefined reference to symbol '_ZNK6KParts11PartManager5partsEv'
+sed -i 's|-ltdefx|& $(LIB_TDEPARTS)|' quanta/src/Makefile.am
 
 listdocs_fn
 
@@ -41,9 +44,8 @@ chown_fn
 
 cd_builddir_fn
 
-LDFLAGS=$SLKLDFLAGS \
-CFLAGS="$SLKCFLAGS $TQT_INCLUDE_PATH" \
-CXXFLAGS=$SLKCFLAGS \
+CFLAGS="$SLKRCFLAGS" \
+CXXFLAGS="$SLKRCFLAGS" \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
@@ -62,7 +64,7 @@ mkdir_install_fn
 doinst_sh_fn
 
 ## TDEFileReplace has been moved to tdeutils for R14.1.0
-[[ $TDEVERSION == 14.0.7 ]] && TDEFileReplace="* TDEFileReplace: powerful search and replace in multiple files"
+[[ $TDEVERSION == 14.0.7 ]] && TDEFileReplace=" * TDEFileReplace: powerful search and replace in multiple files"
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -80,7 +82,7 @@ $PRGNAM: * Kommander: a GUI script builder and executor tool.
 $PRGNAM: * KXSLDbg: XSL debugger
 $PRGNAM: * KImageMapEditor: image map editor
 $PRGNAM: * KLinkStatus: link checker
-$PRGNAM: ${TDEFileReplace:-}
+$PRGNAM:${TDEFileReplace:-}
 $PRGNAM:
 " > $PKG/install/slack-desc
 
