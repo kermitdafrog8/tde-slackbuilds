@@ -149,7 +149,7 @@ rm lib$LIBDIRSUFFIX/libtqt[de]*
 }
 rm bin/???????*
 rm bin/tqm2ts
-rm -rf plugins/designer
+[[ $TQT_OPTS != *ktorrent* ]] && rm -rf plugins/designer
 )}
 
 installdocs_fn

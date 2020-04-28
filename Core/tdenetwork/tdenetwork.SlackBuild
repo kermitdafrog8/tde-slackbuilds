@@ -58,7 +58,7 @@ cmake \
     -DWITH_SPEEX=${SPX:-"OFF"} \
     -DWITH_GSM="OFF" \
     -DWITH_LIBXSLT="OFF" \
-    -DWITH_XMMS="OFF" \
+    -DWITH_XMMS="ON" \
     -DWITH_SLP="OFF" \
     -DWITH_WEBCAM="OFF" \
     -DBUILD_DCOPRSS="ON" \

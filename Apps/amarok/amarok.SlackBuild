@@ -114,7 +114,6 @@ cmake \
     -DWITH_NJB="OFF" \
     -DWITH_OPENGL="ON" \
     -DWITH_POSTGRESQL="OFF" \
-    -DWITH_RIOKARMA="OFF" \
     -DWITH_SYSTEM_SQLITE="ON" \
     -DWITH_XINE=${XINE:-"OFF"} \
     -DWITH_YAUAP=${YAUAP:-"OFF"} \

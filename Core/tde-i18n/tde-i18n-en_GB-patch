@@ -2,3 +2,12 @@
 +++ tde-i18n-en_GB/messages/tdebase/libkickermenu_prefmenu.po
 @@ -35 +34,0 @@
 -#, fuzzy
+--- tde-i18n-en_GB/messages/tdebase/khelpcenter.po
++++ tde-i18n-en_GB/messages/tdebase/khelpcenter.po
+@@ -36 +35,0 @@
+-#, fuzzy
+@@ -41 +39,0 @@
+-#, fuzzy
+@@ -43 +41 @@
+-msgstr "The TDE Control Centre"
++msgstr "The TDE Help Centre"

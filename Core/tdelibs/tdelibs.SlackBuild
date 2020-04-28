@@ -33,21 +33,7 @@ getsource_fn
 
 untar_fn
 
-## TDE bug 2821
-## patch to enable tdecmshell to find TDE .desktop file in the event of a duplication in file names
-echo $'--- tdecmshell/main.cpp
-+++ tdecmshell/main.cpp
-@@ -106,2 +106,2 @@
--    if ( module.left( 4 ) != "kde-" && service->library().isEmpty() )
--        return locateModule( "kde-" + module );
-+    if ( module.left( 4 ) != "tde-" && service->library().isEmpty() )
-+        return locateModule( "tde-" + module );
-' | while read line
-do
-patch -N -p0
-done || true
-#
-## further patch to make error message more user friendly
+## TDE bug 2821 - further patch to make error message more user friendly
 echo $'--- tdecmshell/main.cpp
 +++ tdecmshell/main.cpp
 @@ -98,0 +99,6 @@

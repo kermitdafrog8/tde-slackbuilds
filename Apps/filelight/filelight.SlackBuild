@@ -34,28 +34,28 @@ getsource_fn
 
 untar_fn
 
-## remove help documentation build instruction from all [non-en] locales ...
-sed -i '/tde_create_handbook/,+3d' doc/??{,_??}/CMakeLists.txt || true
-#
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="" # the *.po file list
-ldocs="" # the help docs
+ldocs="en man" # the help docs - en and man always
 for Lang in $I18N
 do
-[[ -d po/$Lang ]] && {
-langs="$langs $Lang/$PRGNAM.po"
-## ... and restore help documentation for the selected and available locales
-[[ -e doc/$Lang/CMakeLists.txt ]] && {
-echo "tde_create_handbook( LANG $Lang DESTINATION $PRGNAM )" >> doc/$Lang/CMakeLists.txt
+[[ -s translations/messages/$Lang.po ]] && {
+langs="$langs $Lang.po"
+## ... and within that loop as doc locale only exists where translation exists
+[[ -d doc/$Lang ]] && {
 ldocs="$ldocs $Lang"
 }
 }
 done
 #
-sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
-langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
+sed -i "s|\${po_files}|$langs|" translations/messages/CMakeLists.txt
 [[ $langs != "" ]] && TRANS=ON
+#
+sed -i "s|\${_dirs}|$ldocs|" doc/CMakeLists.txt
+## for slack-desc
+langs=$(echo $langs|sed 's|.po||g')
+ldocs=$(echo $ldocs|sed 's| man||')
 
 listdocs_fn
 
@@ -107,7 +107,7 @@ $PRGNAM: With language support for:
 $PRGNAM: en $langs
 $PRGNAM:
 $PRGNAM: With help documentation for:
-$PRGNAM: en$ldocs
+$PRGNAM: $ldocs
 $PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc

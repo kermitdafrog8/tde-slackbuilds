@@ -101,7 +101,7 @@ ln -sf $PRGNAM-trinity-$VERSION.tar.xz $PRGNAM-$VERSION.tar.xz)
 ln -sf $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} $SRCDIR
 SOURCE=$SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"}
 # SRCURL for non-TDE archives, set in the SB, will override the Trinity default *tar.xz URL
-SRCURL=${SRCURL:-"https://$TDE_MIRROR/releases/R$VERSION/main$TDEMIR_SUBDIR/$PRGNAM-trinity-$VERSION.tar.xz"}
+SRCURL=${SRCURL:-"$TDE_MIRROR/releases/R$VERSION/main$TDEMIR_SUBDIR/$PRGNAM-trinity-$VERSION.tar.xz"}
 # Source file availability:
 [[ -f $SOURCE ]] && [[ $PRE_DOWNLOAD == yes ]] && echo "  $(basename $SOURCE) already downloaded ..."
 

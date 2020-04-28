@@ -98,7 +98,7 @@ Set the version of TDE to be built.
  
 " \
 12 75 2 \
-"14.0.7" "the R14.0.7 release - source from archives" \
+"14.0.8" "the R14.0.8 release - source from archives" \
 "cgit" "R14.1.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
 
@@ -257,7 +257,7 @@ dialog --cr-wrap --nocancel --no-shadow --colors --help-button --help-label "REA
 "
 The source unpacked is ~950MB, so to save on build space, the SlackBuild script extracts, builds, and removes source for each language package one at a time.
 
-If you can see the two 'y' like characters, then you've probably got a suitable terminal font installed and can choose \Zr\Z4\ZbUtf-8\Zb\Zn to display the language codes, otherwise choose \Z1A\Zb\Z0scii\Zn.
+If you can see the two 'y' like characters [che and gamma], then you've probably got a suitable terminal font installed and can choose \Zr\Z4\ZbUtf-8\Zb\Zn to display the language codes, otherwise choose \Z1A\Zb\Z0scii\Zn.
 
                             <<\Z3\Zb ҷ ɣ \Zn>>
 
@@ -440,17 +440,19 @@ dialog --cr-wrap --nocancel --no-shadow --colors --title " TQt options " --item-
 "
 A minimal packaging of tqt3 will install only the run-time library required for TDE, and the headers and binaries required to build most of TDE.
 
-But tdepim, ksquirrel, and tdevelop need additional libraries. If you select minimal packaging and intend to build any of those at any time, select keeping their required libs now.
+But tdepim, ksquirrel, tdevelop, and ktorrent need additional libraries.
+If you select minimal packaging and intend to build any of those at any time, select keeping their required libs now.
 
 TQt html documentation is ~21M, and can be excluded from the package.
 
 mkspecs is only required for linux-g++
  
 " \
-25 75 5 \
+25 75 6 \
 " minimal" "Minimal packaging" off "\Zb\Z6 Exclude libs and binaries not required for TDE \Zn" \
 " pim_ksq" " ├─ Keep lib for tdepim and/or ksquirrel" off "\Zb\Z6 Only required if minimal build selected \Zn" \
-" tdevel" " └─ Keep libs for tdevelop" off "\Zb\Z6 Only required if minimal build selected \Zn" \
+" tdevel" " ├─ Keep libs for tdevelop" off "\Zb\Z6 Only required if minimal build selected \Zn" \
+" ktorrent" " └─ Keep designer libs for ktorrent" off "\Zb\Z6 Only required if minimal build selected \Zn" \
 " nodocs" "Exclude html documentation" on "\Zb\Z6  \Zn" \
 " mkspecs" "linux-g++ only" on "\Zb\Z6 Uncheck for the complete set \Zn" \
 2> $TMPVARS/TQT_OPTS
@@ -626,9 +628,9 @@ Create and/or update the git repositories local copies.
 
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
-[[ $(cat $TMPVARS/TDEVERSION) == 14.0.7 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
+[[ $(cat $TMPVARS/TDEVERSION) == 14.0.8 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
 [[ $(cat $TMPVARS/TDEVERSION) == cgit ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'." && LINES=18
-## testing for cgit!=no will allow =yes or null, which is the 14.0.7 build case
+## testing for cgit!=no will allow =yes or null, which is the 14.0.8 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "
@@ -685,7 +687,7 @@ export COMPILER=$(cat $TMPVARS/COMPILER)
 [[ $COMPILER == gcc ]] && export COMPILER_CXX="g++" || export COMPILER_CXX="clang++"
 export SET_march=$(cat $TMPVARS/SET_MARCH)
 export ARCH=$(cat $TMPVARS/ARCH)	# set again for the 'continue' option
-export TDE_MIRROR=mirror.ppa.trinitydesktop.org/trinity
+export TDE_MIRROR=${TDE_MIRROR:-https://mirror.ppa.trinitydesktop.org/trinity}
 export NUMJOBS=$(cat $TMPVARS/NUMJOBS)
 export I18N=$(cat $TMPVARS/I18N)
 export TQT_OPTS=$(cat $TMPVARS/TQT_OPTS)

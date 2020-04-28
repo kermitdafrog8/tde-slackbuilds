@@ -33,8 +33,13 @@ getsource_fn
 
 untar_fn
 
-## set installation directory for kvkbd.desktop file
-[[ $TDEVERSION == 14.0.7 ]] && sed -i 's|DESTINATION ${APPS_INSTALL_DIR}/Utilities|DESTINATION ${XDG_APPS_INSTALL_DIR}|' src/CMakeLists.txt
+# set support for additional language(s) as per I18N variable
+# but only for languages available with this package
+langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
+## this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
+sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
+langs=$(echo $langs | sed "s|.po||g")
+[[ $langs != "" ]] && TRANS=ON
 
 listdocs_fn
 
@@ -49,9 +54,9 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS="OFF" \
     -DWITH_GCC_VISIBILITY="OFF" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     -Wno-dev \
     ..
 
@@ -81,8 +86,8 @@ $PRGNAM:               You should Add : HOME=/root kvkbd --loginhelper &
 $PRGNAM:               to Xsetup to run in xdm/tdm
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: en $langs
 $PRGNAM:
 " > $PKG/install/slack-desc
 

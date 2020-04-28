@@ -33,8 +33,6 @@ getsource_fn
 
 untar_fn
 
-[[ $TDEVERSION != 14.0.7 ]] && {
-
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
@@ -73,35 +71,6 @@ cmake \
     -DWITH_XINIT_WORKAROUND="OFF" \
     -Wno-dev \
     ..
-
-: # don't go to autotools build if this fails - set exit 0 always
-
-} || {
-
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
-sed -i "s|POFILES =.*$|POFILES =$langs|" po/Makefile.am
-langs=$(echo $langs | sed "s|.po||g")
-
-listdocs_fn
-
-ltoolupdate_fn
-
-chown_fn
-
-cd_builddir_fn
-
-CFLAGS="$SLKRCFLAGS" \
-CXXFLAGS="$SLKRCFLAGS" \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --disable-rpath \
-   --enable-closure
-
-}
 
 make_fn
 

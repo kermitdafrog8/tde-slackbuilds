@@ -64,7 +64,7 @@ mkdir_install_fn
 doinst_sh_fn
 
 ## TDEFileReplace has been moved to tdeutils for R14.1.0
-[[ $TDEVERSION == 14.0.7 ]] && TDEFileReplace=" * TDEFileReplace: powerful search and replace in multiple files"
+[[ $TDEVERSION == 14.0.? ]] && TDEFileReplace=" * TDEFileReplace: powerful search and replace in multiple files"
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line

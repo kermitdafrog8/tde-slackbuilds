@@ -37,7 +37,6 @@ untar_fn
 ##/tmp/build/tmp-tdegraphics/tdegraphics/build-tdegraphics/kmrml/kmrml/kcontrol/serverconfigwidget.cpp:37:61: error: invalid use of incomplete type ‘class KComboBox’
 ## .. and more ..
 ## patch based on solution for similar amarok errors, issue #16
-[[ $TDEVERSION == cgit ]] && {
 echo $'
 --- kmrml/kmrml/kcontrol/serverconfigwidget.ui
 +++ kmrml/kmrml/kcontrol/serverconfigwidget.ui
@@ -48,7 +47,6 @@ echo $'
 +    <include location="global" impldecl="in implementation">klineedit.h</include>
 +</includes>
 ' | patch -N -p0 || true
-}
 
 listdocs_fn
 

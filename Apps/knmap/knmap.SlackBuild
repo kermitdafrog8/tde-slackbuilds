@@ -33,6 +33,14 @@ getsource_fn
 
 untar_fn
 
+# set support for additional language(s) as per I18N variable
+# but only for languages available with this package
+langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
+## this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
+sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
+langs=$(echo $langs | sed "s|.po||g")
+[[ $langs != "" ]] && TRANS=ON
+
 listdocs_fn
 
 chown_fn
@@ -48,6 +56,9 @@ cmake \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     -Wno-dev \
     ..
 
@@ -79,8 +90,8 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: en $langs
 $PRGNAM:
 " > $PKG/install/slack-desc
 

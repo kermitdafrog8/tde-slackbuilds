@@ -33,22 +33,13 @@ getsource_fn
 
 untar_fn
 
-## add check for mpfr installed to set HAVE_MPFR, otherwise even if it is installed, abakus won't be built with mpfr
-sed -i 's|HAVE_INOTIFY )|HAVE_INOTIFY )\ncheck_include_file( mpfr.h HAVE_MPFR )|' ConfigureChecks.cmake
-## the linker can't find 'gmp' although it can find 'mpfr' and fails with:
-## [100%] Linking CXX executable abakus c++: error: gmp: No such file or directory
-## As libgmp is linked through libmpfr, do we really need libgmp here?
-sed -i 's|mpfr gmp|mpfr -lgmp|' src/CMakeLists.txt
-
-## set installation directory for abakus.desktop file
-sed -i 's|DESTINATION ${APPS_INSTALL_DIR}/Utilities|DESTINATION ${XDG_APPS_INSTALL_DIR}|' src/CMakeLists.txt
-
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang/$PRGNAM.po";done
-sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
-langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang.po";done
+sed -i "s|\${po_files}|$langs|" translations/messages/CMakeLists.txt
 [[ $langs != "" ]] && TRANS=ON
+## for slack-desc
+langs=$(echo $langs|sed "s|.po||g")
 
 listdocs_fn
 

@@ -41,10 +41,8 @@ sed -i "s|/usr/share/doc/.*/HTML/en/kkbswitch/|$INSTALL_TDE/share/doc/tde/HTML/e
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
-## this GLOB overrides the one in po/CMakeLists.txt:
-sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
-#langs=$(echo $langs | sed "s|.po||g")
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang.po";done
+sed -i "s|\${po_files}|$langs|" translations/messages/CMakeLists.txt
 [[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs | sed "s|.po||g")
 [[ $langs == *ru* || $langs == *uk* ]] && RU_UA=ON
 

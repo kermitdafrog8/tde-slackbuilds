@@ -35,10 +35,9 @@ untar_fn
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
-## this GLOB overrides the one in po/CMakeLists.txt:
-sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
-langs=$(echo $langs | sed "s|.po||g")
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang.po";done
+sed -i "s|\${po_files}|$langs|" translations/messages/CMakeLists.txt
+langs=$(echo $langs|sed "s|.po||g")
 [[ $langs != "" ]] && TRANS=ON
 
 listdocs_fn
