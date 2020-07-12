@@ -67,27 +67,8 @@ rm -rf $OUTPUT/{checkout,configure,make,install,error,makepkg,patch}-$PRGNAM.log
 # Where do we look for sources?
 SRCDIR=$(cd $(dirname $0); pwd)
 
-## if snapshot, need to change some variables:
-[[ $TDEVERSION == r14.0.6 && ! $TDEMIR_SUBDIR == misc ]] && \
-ARCHIVE_TYPE=tar.gz && \
-SRCURL=https://mirror.git.trinitydesktop.org/cgit/$PRGNAM/snapshot/$PRGNAM-$TDEVERSION.$ARCHIVE_TYPE && \
-(
-## download admin/cmake/libltdl/libtdevnc as prerequisites
-cd $SRCDIR/../../src/
-echo 'admin
-cmake
-libltdl
-libtdevnc' | while read line
-do
-[[ ! -s $line-$TDEVERSION.$ARCHIVE_TYPE && ! $line == libtdevnc ]] && \
-wget https://mirror.git.trinitydesktop.org/cgit/$line/snapshot/$line-$TDEVERSION.$ARCHIVE_TYPE
-[[ ! -s $line-r14.0.1.$ARCHIVE_TYPE && $line == libtdevnc ]] && \
-wget https://mirror.git.trinitydesktop.org/cgit/$line/snapshot/$line-r14.0.1.$ARCHIVE_TYPE
-done
-)
-
-## if [r]14.0.? or misc, download archive:
-[[ $TDEVERSION == *14.0.? || $TDEMIR_SUBDIR == misc ]] && {
+## if 14.0.8 or misc, download archive:
+[[ $TDEVERSION == 14.0.8 || $TDEMIR_SUBDIR == misc ]] && {
 ## check for and remove any zero byte archive files
 [[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} ]] && \
 rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} 2>/dev/null || true
@@ -131,8 +112,7 @@ if [ "$P1" == "--download" ]; then
 fi
 } || \
 {
-## if not creating/updating git, nothing to do in this function for git builds
-## otherwise, now not R14.0.? or misc, and we are creating/updating git,
+## otherwise, not R14.0.8 or misc, and we are creating/updating git,
 ## so [1] start with admin/cmake:
 [[ $(cat $TMPVARS/DL_CGIT) == yes ]] && {
 cd $BUILD_TDE_ROOT/src/cgit
@@ -143,12 +123,15 @@ cd $BUILD_TDE_ROOT/src/cgit
 (echo "Updating admin ..."
 cd admin
 git checkout -- *
-git pull)
+git pull
+## repo is in master - update r14.0.x to latest revision
+git fetch origin r14.0.x:r14.0.x)
 [[ -d cmake ]] && \
 (echo "Updating cmake ..."
 cd cmake
 git checkout -- *
-git pull)
+git pull
+git fetch origin r14.0.x:r14.0.x)
 
 ## if admin and cmake don't exist, clone them
 [[ ! -d admin ]] && git clone https://mirror.git.trinitydesktop.org/cgit/admin admin
@@ -167,7 +150,8 @@ touch $TMPVARS/admin-cmake-done
 (echo "Updating $PRGNAM ..."
 cd $PRGNAM
 git checkout -- *
-git pull)
+git pull
+git fetch origin r14.0.x:r14.0.x)
 ## if the local repository for PRGNAM doesn't exist, clone it ..
 [[ ! -d $PRGNAM ]] && \
 git clone https://mirror.git.trinitydesktop.org/cgit/$PRGNAM
@@ -178,25 +162,28 @@ git clone https://mirror.git.trinitydesktop.org/cgit/$PRGNAM
 (echo "Updating libltdl ..."
 cd libltdl
 git checkout -- *
-git pull)
+git pull
+git fetch origin r14.0.x:r14.0.x)
 
 [[ ! -d libltdl ]] && \
 git clone https://mirror.git.trinitydesktop.org/cgit/libltdl
 }
 
-## if tdenetwork, need libtdevnc
+## if tdenetwork, need libtdevnc, but not yet for 14.0.x==14.0.9 which uses krfb/libvncserver
 [[ " tdenetwork " == *$PRGNAM* ]] && {
 [[ -d libtdevnc ]] && \
 (echo "Updating libtdevnc ..."
 cd libtdevnc
 git checkout -- *
-git pull)
+git pull
+# git fetch origin r14.0.x:r14.0.x
+)
 
 [[ ! -d libtdevnc ]] && \
 git clone https://mirror.git.trinitydesktop.org/cgit/libtdevnc
 }
 
-true # stop the following i18n download (attempts) if this routine fails and i18n not required
+true # prevent the following i18n download (attempts) if this routine fails
 } || \
 {
 ## still creating/updating git
@@ -212,6 +199,8 @@ rm -rf cgit/tde-i18n/plain/tde-i18n-$lang
 wget -m --no-parent --no-host-directories https://mirror.git.trinitydesktop.org/cgit/tde-i18n/plain/tde-i18n-$lang/
 ##will download the tde-i18n-$lang files to:
 ##$BUILD_TDE_ROOT/src/cgit/tdei18n/cgit/tde-i18n/plain/tde-i18n-$lang/*
+## remove admin and cmake links which are downloaded as files
+rm cgit/tde-i18n/plain/tde-i18n-$lang/{admin,cmake}
 cd ..
 done
 }
@@ -252,48 +241,77 @@ cd $TMP_BUILD/tmp-$PRGNAM
 ##
 ## [1] firstly test for R14 or misc ..
 ##
-[[ $TDEVERSION == 14.0.? || $TDEMIR_SUBDIR == misc ]] && {
+[[ $TDEVERSION == 14.0.8 || $TDEMIR_SUBDIR == misc ]] && {
+
 ## unpack R14 or misc
 echo -e "\n unpacking $(basename $SOURCE) ... \n"
 tar -xf $SOURCE
-true # if this fails, go to [4] and let SlackBuild fail from there
+
+: # if this fails, don't try a git build, and go to [3]
+
 } || {
-##
-## [2] not R14 nor misc - is it r14 snapshot?
-##
-[[ $TDEVERSION == r14.0.? ]] && {
-## unpack r14
-echo -e "\n unpacking $(basename $SOURCE) ... \n"
-tar -xf $SOURCE
-## unpack all needed common sources ..
-(cd $PRGNAM-$TDEVERSION
-echo 'admin
-cmake
-libltdl
-libtdevnc' | while read line
-do
-[[ -d $line && ! $line == libtdevnc ]] && tar xf $SRCDIR/../../src/$line-$TDEVERSION.$ARCHIVE_TYPE --strip-components=1 -C $line
-[[ -d $line && $line == libtdevnc ]] && tar xf $SRCDIR/../../src/$line-r14.0.1.tar.gz --strip-components=1 -C $line
-done
-true # if this fails, go to [4] and let SlackBuild fail from there
+
+## [2] not 14.0.8 nor misc, so must be git ..
+## but is it [2a] 14.0.x ..
+[[ $TDEVERSION == 14.0.x ]] && {
+
+## copy git r14.0.x content to build area:
+(
+cd $BUILD_TDE_ROOT/src/cgit/$PRGNAM/
+echo -e "\n copying $PRGNAM git sources to build area ... \n"
+## remove any old .git/worktrees records - only being used here as a build source
+rm -rf .git/worktrees/*
+git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/ r14.0.x
+
+## work-around for some cr*p in admin in the r14.0.x branch of tdeio-locate
+## it's a cmake build, so admin isn't needed
+[[ $PRGNAM != tdeio-locate ]] && {
+cd ../admin
+echo -e "\n copying admin git sources to build area ... \n"
+rm -rf .git/worktrees/*
+git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/admin/ r14.0.x
+}
+
+cd ../cmake
+echo -e "\n copying cmake git sources to build area ... \n"
+rm -rf .git/worktrees/*
+git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/cmake/ r14.0.x
+
+[[ " arts tdelibs " == *$PRGNAM* ]] && {
+cd ../libltdl
+echo -e "\n copying libltdl git sources to build area ... \n"
+rm -rf .git/worktrees/*
+git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/libltdl/ r14.0.x
+}
+
+[[ " tdenetwork " == *$PRGNAM* && $TDEVERSION != 14.0.x ]] && {
+cd ../libtdevnc/
+echo -e "\n copying libtdevnc git sources to build area ... \n"
+rm -rf .git/worktrees/*
+git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/libtdevnc/ r14.0.x
+}
+echo # if this fails, SlackBuild will fail from [3]
 )
 }
-} || {
-##
-## [3] not [rR]14 nor misc, so must be cgit ..
+
+## .. or [2b] 14.1.0 ..
+[[ $TDEVERSION == cgit ]] && {
 ## copy git repo but don't copy .git directory:
-echo -e "\n copying $PRGNAM source files to build area ... \n"
+echo -e "\n copying $PRGNAM git sources to build area ... \n"
 (cd $BUILD_TDE_ROOT/src/cgit
 cp -a --parents $PRGNAM/* $TMP_BUILD/tmp-$PRGNAM/
 cp -a --parents {admin,cmake}/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
-[[ " arts tdelibs " == *$PRGNAM* ]] && cp -a --parents libltdl/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/ || true
-[[ " tdenetwork " == *$PRGNAM* ]] && cp -a --parents libtdevnc/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/ || true)
-} && {
-##
-## [4] finally, cd into source directory
-##
-cd $PRGNAM*
+[[ " arts tdelibs " == *$PRGNAM* ]] && cp -a --parents libltdl/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
+[[ " tdenetwork " == *$PRGNAM* ]] && cp -a --parents libtdevnc/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
+#
+echo # if this fails, SlackBuild will fail from [3]
+)
 }
+}
+#
+## [3] finally, cd into source directory
+#
+cd $PRGNAM*
 }
 
 listdocs_fn ()

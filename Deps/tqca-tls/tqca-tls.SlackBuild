@@ -42,8 +42,8 @@ chown_fn
 ## add TQt headers directory to configure search list
 sed -i "s|/usr/include/tqt|$TQTDIR/include/tqt|" configure
 
-## QTDIR is needed for 14.0.7 because configure can't find tqmake
-## from its algorithm - ignored for cgit which needs TQTDIR
+## QTDIR is needed for 14.0.? because configure can't find tqmake
+## from its algorithm - ignored for 14.1.0 which needs TQTDIR
 ## which has been set as a shell variable in BUILD-TDE.sh
 QTDIR=$TQTDIR \
 CXXFLAGS="$SLKRCFLAGS" \

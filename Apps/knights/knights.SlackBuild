@@ -33,18 +33,24 @@ getsource_fn
 
 untar_fn
 
-# there is a Spanish language file in the source, but it has no translations in it ..
-# the included es.po file is a Google translation - if you're happy to use it,
-# then to include it in the build, put it in the same directory as this SB script
-cp $SRCDIR/es.po po || true
-#
-# set support for additional language(s) as per I18N variable
+# for 14.0.8, set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
-## this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
-sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
-langs=$(echo $langs | sed "s|.po||g")
+## for later versions, use the env variable LINGUAS=$I18N - set in BUILD-TDE.sh
+#
+[[ $TDEVERSION != 14.0.8 ]] && PO_PATH=translations/messages
+#
+# there is a Spanish language file in the source, but it has no translations in it ..
+# the included es.po file is a Google translation - if you don't want to use it,
+# then comment out the following line:
+cp $SRCDIR/es.po ${PO_PATH:-po}
+#
+langs="";for Lang in $I18N;do [[ -s ${PO_PATH:-po}/$Lang.po ]] && langs="$langs $Lang.po";done
+#
+## for 14.0.8, this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
+[[ $TDEVERSION == 14.0.8 ]] && sed -i "s| \*.po| $langs|" cmake/modules/TDEMacros.cmake
 [[ $langs != "" ]] && TRANS=ON
+## for slack-desc
+langs=$(echo $langs | sed "s|.po||g")
 
 listdocs_fn
 

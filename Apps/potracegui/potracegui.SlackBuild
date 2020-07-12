@@ -33,22 +33,31 @@ getsource_fn
 
 untar_fn
 
-patch -p0 < $SRCDIR/reformat-message.patch
+[[ $TDEVERSION != 14.0.8 ]] && PO_PATH=translations/messages/
+sed "s|po/|${PO_PATH:-po/}|" $SRCDIR/reformat-message.patch | patch -p0
 
-# set support for additional language(s) as per I18N variable
+# for 14.0.8, set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
-## this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
-sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
-langs=$(echo $langs | sed "s|.po||g")
+## for later versions, use the env variable LINGUAS=$I18N - set in BUILD-TDE.sh
+#
+[[ $TDEVERSION != 14.0.8 ]] && PO_PATH=translations/messages
+#
+langs="";for Lang in $I18N;do [[ -s ${PO_PATH:-po}/$Lang.po ]] && langs="$langs $Lang.po";done
+#
+## for cgit, translations are generated via LINGUAS variable
+## for 14.0.8, this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
+[[ $TDEVERSION == 14.0.8 ]] && sed -i "s| \*.po| $langs|" cmake/modules/TDEMacros.cmake
 [[ $langs != "" ]] && TRANS=ON
-
+## for slack-desc
+langs=$(echo $langs | sed "s|.po||g")
+#
 ## always build 'en' docs ...
-langdoc="en man"
+ldocs="en man"
 ## ... and find other html docs required and available ...
-for Lang in $I18N;do [[ -d doc/$Lang ]] && langdoc="$langdoc $Lang";done
+for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
 ## ... and edit tde_auto_add_subdirectories GLOB:
-sed -i "s|} \* )|} $langdoc )|" cmake/modules/TDEMacros.cmake
+[[ $TDEVERSION == 14.0.8 ]] && sed -i "s|} \* )|} $ldocs )|" cmake/modules/TDEMacros.cmake
+ldocs=$(echo $ldocs | sed 's| man||')
 
 listdocs_fn
 
@@ -95,7 +104,7 @@ $PRGNAM: With language support for:
 $PRGNAM: en $langs
 $PRGNAM:
 $PRGNAM: With help documentation for:
-$PRGNAM: $(echo $langdoc | sed 's| man||')
+$PRGNAM: $ldocs
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

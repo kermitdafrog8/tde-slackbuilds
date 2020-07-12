@@ -10,7 +10,7 @@ export TMPVARS=/tmp/build/vars
 rm -f $TMPVARS/admin-cmake-done
 ## remove any PRE_DOWNLOAD record to allow BUILD-TDE.sh to be run in Re-use mode after a pre-download
 rm -f $TMPVARS/PRE_DOWNLOAD
-## .. and if building 14.1.0, turn off cgit downloads
+## .. and if building 14.0.x/14.1.0, turn off cgit downloads
 [[ $(cat $TMPVARS/DL_CGIT) == yes ]] && echo \\Z0\\Zbno > $TMPVARS/DL_CGIT
 
 
@@ -97,8 +97,9 @@ dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Version " --menu 
 Set the version of TDE to be built.
  
 " \
-12 75 2 \
+12 75 3 \
 "14.0.8" "the R14.0.8 release - source from archives" \
+"14.0.x" "r14.0.9 preview/wip - source from Trinity git" \
 "cgit" "R14.1.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
 
@@ -602,7 +603,7 @@ $(cat $TMPVARS/READMEs)" \
 
 
 rm -f $TMPVARS/DL_CGIT  # place this here to facilitate testing for summary screen
-[[ $(cat $TMPVARS/TDEVERSION) == cgit ]] && \
+[[ $(cat $TMPVARS/TDEVERSION) == cgit || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && \
 [[ $(grep -o [ACDLM][a-z]*/ $TMPVARS/TDEbuilds | sort | head -n1) != Misc/ ]] && {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " TDE development build " --yesno \
 "
@@ -629,7 +630,7 @@ Create and/or update the git repositories local copies.
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
 [[ $(cat $TMPVARS/TDEVERSION) == 14.0.8 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
-[[ $(cat $TMPVARS/TDEVERSION) == cgit ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'." && LINES=18
+[[ $(cat $TMPVARS/TDEVERSION) == cgit || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'." && LINES=18
 ## testing for cgit!=no will allow =yes or null, which is the 14.0.8 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
@@ -690,6 +691,9 @@ export ARCH=$(cat $TMPVARS/ARCH)	# set again for the 'continue' option
 export TDE_MIRROR=${TDE_MIRROR:-https://mirror.ppa.trinitydesktop.org/trinity}
 export NUMJOBS=$(cat $TMPVARS/NUMJOBS)
 export I18N=$(cat $TMPVARS/I18N)
+## for later versions, use the env variable LINGUAS to determine the supported locales -
+## any of I18N not included in translations/... will be ignored -
+[[ $TDEVERSION != 14.0.8 ]] && export LINGUAS=$I18N
 export TQT_OPTS=$(cat $TMPVARS/TQT_OPTS)
 export EXIT_FAIL=$(cat $TMPVARS/EXIT_FAIL)
 export KEEP_BUILD=$(cat $TMPVARS/KEEP_BUILD)

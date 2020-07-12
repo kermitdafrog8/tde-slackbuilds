@@ -33,11 +33,45 @@ getsource_fn
 
 untar_fn
 
+## errors:
+##common/config_file.c:1611:57: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+##                     filename=TQFile::decodeName(cfgDir)+"../"OLD_CONFIG_FILE;
+##                                                         ^
+## and more ..
+patch -N -p0 << EOF || true
+--- common/config_file.c
++++ common/config_file.c
+@@ -1611 +1611 @@
+-                    filename=TQFile::decodeName(cfgDir)+"../"OLD_CONFIG_FILE;
++                    filename=TQFile::decodeName(cfgDir)+"../" OLD_CONFIG_FILE;
+@@ -2303 +2303 @@
+-    static const char * constFiles[]={ /*"/etc/qt4/"OLD_CONFIG_FILE, "/etc/qt3/"OLD_CONFIG_FILE, "/etc/qt/"OLD_CONFIG_FILE,*/ "/etc/"OLD_CONFIG_FILE, NULL };
++    static const char * constFiles[]={ /*"/etc/qt4/"OLD_CONFIG_FILE, "/etc/qt3/"OLD_CONFIG_FILE, "/etc/qt/"OLD_CONFIG_FILE,*/ "/etc/" OLD_CONFIG_FILE, NULL };
+--- config/qtcurveconfig.cpp
++++ config/qtcurveconfig.cpp
+@@ -802 +802 @@
+-    TQStringList  files(TDEGlobal::dirs()->findAllResources("data", "QtCurve/*"EXTENSION, false, true));
++    TQStringList  files(TDEGlobal::dirs()->findAllResources("data", "QtCurve/*" EXTENSION, false, true));
+@@ -1377,2 +1377,2 @@
+-                                              i18n("*"EXTENSION"|QtCurve Settings Files\n"
+-                                                   THEME_PREFIX"*"THEME_SUFFIX"|QtCurve TDE Theme Files"),
++                                              i18n("*" EXTENSION"|QtCurve Settings Files\n"
++                                                   THEME_PREFIX"*" THEME_SUFFIX"|QtCurve TDE Theme Files"),
+@@ -1387 +1387 @@
+-    TQString file(KFileDialog::getSaveFileName(TQString::null, i18n("*"EXTENSION"|QtCurve Settings Files"), this));
++    TQString file(KFileDialog::getSaveFileName(TQString::null, i18n("*" EXTENSION"|QtCurve Settings Files"), this));
+--- config/exportthemedialog.cpp
++++ config/exportthemedialog.cpp
+@@ -67 +67 @@
+-        TQString fileName(themeUrl->url()+"/"THEME_PREFIX+name+".themerc");
++        TQString fileName(themeUrl->url()+"/" THEME_PREFIX+name+".themerc");
+EOF
+
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
 ## this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
-sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
+sed -i "s| \*.po| $langs|" cmake/modules/TDEMacros.cmake
 langs=$(echo $langs | sed "s|.po||g")
 [[ $langs != "" ]] && TRANS=ON
 

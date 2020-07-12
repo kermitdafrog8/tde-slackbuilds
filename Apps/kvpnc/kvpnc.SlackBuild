@@ -33,27 +33,35 @@ getsource_fn
 
 untar_fn
 
-# set support for additional language(s) as per I18N variable
+# for 14.0.8, set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
+## for later versions, use the env variable LINGUAS=$I18N - set in BUILD-TDE.sh
+#
+[[ $TDEVERSION != 14.0.8 ]] && PO_PATH=translations/messages
+## for cgit, this lang variable is only used for slack-desc
+langs="";for Lang in $I18N;do [[ -s ${PO_PATH:-po}/$Lang.po ]] && langs="$langs $Lang.po";done
+#
+## for cgit, translations are generated via LINGUAS variable
+[[ $TDEVERSION == 14.0.8 ]] && {
 ## this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
-sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
-langs=$(echo $langs | sed "s|.po||g")
-[[ $langs != "" ]] && TRANS=ON
-
+sed -i "s| \*.po| $langs|" cmake/modules/TDEMacros.cmake
+#
 ## set up doc/CMakeLists.txt as per other apps
 ## to make compatible with the following docs routine
 echo "tde_auto_add_subdirectories( )" > doc/CMakeLists.txt
-
-## always build 'en' docs ...
-ldocs="en tdeioslave man misc"
+}
+## always build en_US docs ...
+ldocs="en man misc tdeioslave"
 ## ... and find other html docs required and available ...
 for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
 ## ... and edit tde_auto_add_subdirectories GLOB:
-sed -i "s|} \* )|} $ldocs )|" cmake/modules/TDEMacros.cmake
-## .. then set ldocs for slack-desc
+[[ $TDEVERSION == 14.0.8 ]] && sed -i "s|} \* )|} $ldocs )|" cmake/modules/TDEMacros.cmake
+#
+[[ $langs != "" ]] && TRANS=ON
+## for slack-desc
+langs=$(echo $langs | sed "s|.po||g")
 ldocs=$(echo $ldocs | sed "s| man misc||")
-
+#
 ## add misc docs
 MISC_FILES=$(cd doc/misc/;ls README* pptp.txt)
 cat << EOF > doc/misc/CMakeLists.txt
@@ -63,6 +71,9 @@ INSTALL(
     COMPONENT doc
 )
 EOF
+## this will only work for cgit
+## substituting tde_auto_add_subdirectories( ) above covers the 14.0.8 case
+sed -i 's|add_subdirectory( tdeioslave )|&\nadd_subdirectory( misc )|' doc/CMakeLists.txt
 
 chown_fn
 
@@ -83,11 +94,7 @@ cmake \
 
 make_fn
 
-installdocs_fn
-for file in $(ls -1 ../doc | grep -vE "compile|Makefile|CMakeLists.txt")
-do
-cp ../doc/$file $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION/  2>/dev/null || true
-done
+#installdocs_fn # not required - docs installed with cmake
 
 mangzip_fn
 

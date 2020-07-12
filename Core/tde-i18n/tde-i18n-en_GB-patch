@@ -1,13 +1,19 @@
+## this patch needs some context to avoid unwanted patching at offsets for the git builds
 --- tde-i18n-en_GB/messages/tdebase/libkickermenu_prefmenu.po
 +++ tde-i18n-en_GB/messages/tdebase/libkickermenu_prefmenu.po
-@@ -35 +34,0 @@
+@@ -34,3 +34,2 @@
+ #: prefmenu.cpp:248
 -#, fuzzy
+ msgid "Trinity Control Center"
 --- tde-i18n-en_GB/messages/tdebase/khelpcenter.po
 +++ tde-i18n-en_GB/messages/tdebase/khelpcenter.po
-@@ -36 +35,0 @@
+@@ -35,3 +35,2 @@
+ #: application.cpp:63
 -#, fuzzy
-@@ -41 +39,0 @@
+ msgid "Trinity Help Center"
+@@ -40,5 +39,4 @@
+ #: application.cpp:65 navigator.cpp:476
 -#, fuzzy
-@@ -43 +41 @@
+ msgid "The Trinity Help Center"
 -msgstr "The TDE Control Centre"
 +msgstr "The TDE Help Centre"

@@ -33,18 +33,40 @@ getsource_fn
 
 untar_fn
 
-## set installation directory for kkbswitch.desktop file
-sed -i 's|DESTINATION ${APPS_INSTALL_DIR}/Utilities|DESTINATION ${XDG_APPS_INSTALL_DIR}|' kkbswitch/CMakeLists.txt
+## https://mirror.git.trinitydesktop.org/cgit/kkbswitch, commit d8aff77
+[[ $TDEVERSION == 14.0.8 ]] && {
+patch -N -p0 << EOF || true
+--- kkbswitch/CMakeLists.txt
++++ kkbswitch/CMakeLists.txt
+# Install the translated kkbswitch.desktop file to default XDG_APPS_INSTALL_DIR
+@@ -48,4 +48 @@
+-tde_create_translated_desktop(
+-    SOURCE \${PROJECT_NAME}.desktop
+-    DESTINATION \${AUTOSTART_INSTALL_DIR}
+-)
++tde_create_translated_desktop( \${PROJECT_NAME}.desktop )
+# Install the translated kkbswitch.desktop file to AUTOSTART_INSTALL_DIR
+@@ -54,2 +51,2 @@
+-    FILES \${PROJECT_NAME}.desktop
+-    DESTINATION \${APPS_INSTALL_DIR}/Utilities
++    FILES \${CMAKE_CURRENT_BINARY_DIR}/\${PROJECT_NAME}.desktop
++    DESTINATION \${AUTOSTART_INSTALL_DIR}
+EOF
+}
 
 ## edit man page
 sed -i "s|/usr/share/doc/.*/HTML/en/kkbswitch/|$INSTALL_TDE/share/doc/tde/HTML/en/kkbswitch/|" doc/man/kkbswitch.1
 
-# set support for additional language(s) as per I18N variable
+# for 14.0.8, set support for additional language(s) as per I18N variable
 # but only for languages available with this package
+## for later versions, use the env variable LINGUAS=$I18N - set in BUILD-TDE.sh
+#
 langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang.po";done
-sed -i "s|\${po_files}|$langs|" translations/messages/CMakeLists.txt
-[[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs | sed "s|.po||g")
+[[ $TDEVERSION == 14.0.8 ]] && sed -i "s|\${po_files}|$langs|" translations/messages/CMakeLists.txt
+[[ $langs != "" ]] && TRANS=ON
 [[ $langs == *ru* || $langs == *uk* ]] && RU_UA=ON
+## for slack-desc
+langs=$(echo $langs | sed "s|.po||g")
 
 listdocs_fn
 

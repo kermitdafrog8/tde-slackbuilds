@@ -58,7 +58,7 @@ ldocs="$ldocs $Lang"
 done
 #
 ## this GLOB overrides "LANG auto" in po/CMakeLists.txt:
-sed -i "s|\*.po|$lpos|" cmake/modules/TDEMacros.cmake
+sed -i "s| \*.po| $lpos|" cmake/modules/TDEMacros.cmake
 [[ $lpos != "" ]] && TRANS=ON
 
 listdocs_fn

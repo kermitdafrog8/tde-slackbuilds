@@ -37,7 +37,7 @@ untar_fn
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
 ## this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
-sed -i "s|\*.po|$langs|" cmake/modules/TDEMacros.cmake
+sed -i "s| \*.po| $langs|" cmake/modules/TDEMacros.cmake
 [[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs | sed "s|.po||g")
 
 listdocs_fn
@@ -76,7 +76,7 @@ make_fn
 
 installdocs_fn
 
-[[ $TDEVERSION != 14.0.7 ]] && mangzip_fn
+mangzip_fn
 
 strip_fn
 

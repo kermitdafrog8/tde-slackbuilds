@@ -33,11 +33,19 @@ getsource_fn
 
 untar_fn
 
-# set support for additional language(s) as per I18N variable
+# for 14.0.8, set support for additional language(s) as per I18N variable
 # but only for languages available with this package
+#
+[[ $TDEVERSION == 14.0.8 ]] && {
 langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang/$PRGNAM.po";done
 sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
+## for slack-desc
 langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
+} || {
+## for later versions, use the env variable LINGUAS=$I18N - set in BUILD-TDE.sh
+## langs= for slack-desc only - translations are generated via LINGUAS variable
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+}
 [[ $langs != "" ]] && TRANS=ON
 
 listdocs_fn

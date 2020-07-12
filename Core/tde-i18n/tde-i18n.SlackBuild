@@ -35,27 +35,22 @@ getsource_fn
 ## extract, build, and remove source for each language package one at a time
 
 cd $TMP_BUILD/tmp-$PRGNAM
-[[ $TDEVERSION == *14.0.? ]] && {
-[[ $TDEVERSION == r14.0.? ]] && SNAPSHOT=-$TDEVERSION || SNAPSHOT=-trinity-$TDEVERSION
+[[ $TDEVERSION == 14.0.8 ]] && {
 # extract the cmake source once only
 echo -e "\033[39;1m"
-echo "Extracting the cmake source from the $(basename $SOURCE) archive ..."
+echo "Extracting the cmake source from $(basename $SOURCE) ..."
 echo -e "\033[0m"
-tar xf $SOURCE $PRGNAM${SNAPSHOT:-}/cmake
-[[ $TDEVERSION == r14.0.? ]] && {
-## copy cmake contents to cmake directory
-tar xf $SRCDIR/../../src/cmake-$TDEVERSION.$ARCHIVE_TYPE --strip-components=1 -C $PRGNAM${SNAPSHOT:-}/cmake
-}
+tar xf $SOURCE $PRGNAM-trinity-$TDEVERSION/cmake
 }
 
 for lang in $I18N
 do
-[[ $TDEVERSION == *14.0.? ]] && {
+[[ $TDEVERSION == 14.0.8 ]] && {
 # extract the source for one language at a time for each iteration of the loop
 echo -e "\033[39;1m"
-echo "Extracting the $PRGNAM-$lang source from the $(basename $SOURCE) archive ..."
+echo "Extracting the $PRGNAM-$lang source from $(basename $SOURCE) ..."
 echo -e "\033[0m"
-tar -xf $SOURCE $PRGNAM${SNAPSHOT:-}/$PRGNAM-$lang
+tar -xf $SOURCE $PRGNAM-trinity-$TDEVERSION/$PRGNAM-$lang
 cd $PRGNAM*
 
 true # don't go to cgit if extracting fails
@@ -70,7 +65,7 @@ cp -a --parents {admin,cmake}/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/tde-i18n-$lang/)
 }
 
 ## language specific patches
-patch -p0 < $SRCDIR/tde-i18n-$lang-patch || true # continue if patch file doesn't exist
+patch -N -p0 < $SRCDIR/tde-i18n-$lang-patch || true # continue if patch file doesn't exist
 
 chown_fn
 
