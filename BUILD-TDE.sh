@@ -548,6 +548,23 @@ sed -i 's|Apps/koffice|Misc/libpng &|' $TMPVARS/TDEbuilds
 }
 
 
+## only run this if kvkbd has been selected
+rm -f $TMPVARS/WinLock
+[[ $(grep -o kvkbd $TMPVARS/TDEbuilds) ]] && {
+dialog --cr-wrap --no-shadow --yes-label "No Lock" --no-label "Lock" --colors --defaultno --title " Kvkbd Win Keys " --yesno \
+"
+The \Zb\Z6LWin\Zn and \Zb\Z6RWin\Zn keys on the \Zb\Z6Kvkbd\Zn keyboard are set to 'lock' for the next key click.
+
+If they're to be used as control keys to map a number of characters or functions, then they need to be set to \Zr\Z4\ZbLock\Zn while the next key is clicked - this is to simulate holding down the key on a physical keyboard.
+
+If they will only be used as alternately mapped keys using xmodmap, then they will need to be set to generate a keycode on a single click - \Z1N\Zb\Z0o Lock\Zn.
+" \
+17 75
+[[ $? == 0 ]] && 2> $TMPVARS/WinLock
+[[ $? == 1 ]] && echo 1 > $TMPVARS/WinLock
+}
+
+
 ## option to prefix some package names
 ## get a list of packages that have SlackBuilds set up to use the prefix 'tde'
 grep TDEPFX [ACDL]???/*/*SlackBuild | grep PKGNAM | cut -d/ -f2 > $TMPVARS/TDEPFX_packages
@@ -700,6 +717,7 @@ export KEEP_BUILD=$(cat $TMPVARS/KEEP_BUILD)
 export RUNLEVEL=$(cat $TMPVARS/RUNLEVEL)
 export PRE_DOWNLOAD=$(cat $TMPVARS/PRE_DOWNLOAD)
 export TDEPFX=$(cat $TMPVARS/TDEPFX)
+export WinLock=$(cat $TMPVARS/WinLock)
 
 ## Set installation directory for tqt
 TQTDIR=$INSTALL_TDE

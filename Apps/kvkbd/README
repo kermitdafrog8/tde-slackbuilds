@@ -1,0 +1,9 @@
+Known issues with Kvkbd are:
+
+Where the shift character is not the upper case of the lower alpha character, the upper case character will be shown on the key.
+For example, on the French azerty keyboard, Shift eacute should show as 2, but shows as Eacute.
+
+Where the KeyPad '.' character on the Del key is mapped as a comma for a particular locale, it stills shows on the key as a period.
+
+These are only problems with the characters displayed on the keys - the correct characters are printed.
+ 

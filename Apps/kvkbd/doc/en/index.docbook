@@ -1,0 +1,325 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.2-Based Variant V1.1//EN" "dtd/kdex.dtd" [
+  <!ENTITY kvkbd "<application>Kvkbd</application>">
+  <!ENTITY xmmp "<application>xmodmap</application>">
+  <!ENTITY AltGr "<keycap>Alt Gr</keycap>">
+                     <!-- Alt Gr uses U+00a0 for nbsp -->
+  <!ENTITY kappname "&kvkbd;">
+  <!ENTITY package "kde-module">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % English "INCLUDE">
+]>
+
+<book lang="&language;">
+
+<bookinfo>
+<title>The &kvkbd; Handbook</title>
+
+<authorgroup>
+<author>
+<personname><firstname>Todor</firstname><surname>Gyumyushev</surname></personname><email>yodor1@gmail.com</email>
+</author>
+<author>
+<personname><firstname>Guillaume</firstname><surname>Martres</surname></personname><email>smarter@ubuntu.com</email>
+</author>
+<!-- TRANS:ROLES_OF_TRANSLATORS -->
+</authorgroup>
+
+<copyright>
+<year>2007-2014</year>
+<holder>Todor Gyumyushev</holder>
+</copyright>
+<copyright>
+<year>2008</year>
+<holder>Guillaume Martres</holder>
+</copyright>
+
+<legalnotice>&FDLNotice;</legalnotice>
+
+<date>2020</date>
+<releaseinfo>0.4.8 &tde;</releaseinfo>
+
+<abstract>
+&kvkbd; is a virtual keyboard for &tde;
+</abstract>
+
+<keywordset>
+<keyword>TDE</keyword>
+<keyword>Kvkbd</keyword>
+<keyword>keyboard</keyword>
+<keyword>virtual</keyword>
+<keyword>accessibility</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title>Introduction</title>
+
+&kvkbd; is a simple virtual keyboard for &tde;.
+<sbr/>It can be used instead of a physical keyboard or for devices with a touch screen but no keyboard.
+<sbr/>It is also useful to quickly test a keyboard mapping to locate some keys.
+</chapter>
+
+
+<chapter id="using-kvkbd">
+<title>Using &kvkbd;</title>
+
+<sect1 id="kvkbd-interface">
+<title>&kvkbd; interface</title>
+
+When first launched, &kvkbd; will appear in the bottom-right corner of the screen.
+<sbr/>It can be moved by clicking and dragging on any part of the background area.
+<sbr/><sbr/>Resize it by clicking and dragging on the stripes at the bottom right.
+<sbr/>The <guiicon><inlinegraphic fileref="exit-btn.png"/></guiicon> button on the top right is used to hide the keyboard - to show it again, just click on the tray icon.
+<sbr/><sbr/>
+
+<emphasis role="bold">French keyboard:</emphasis>
+<sbr/>The AD11 key, ringed, is a <link linkend='dead-keys'>dead key</link>.
+<mediaobject><imageobject>
+    <imagedata fileref="kvkbd.png" format="PNG"/>
+</imageobject></mediaobject>
+
+To use the numeric keypad, click the double arrow <guiicon><inlinegraphic fileref="num-pad-btn.png"/></guiicon> on the right.
+<sbr/>The Num pad display can be toggled by clicking on the Num Lock key <keycap>&#x02116;</keycap>.
+<mediaobject><imageobject>
+    <imagedata fileref="num-pad.png" format="PNG"/>
+</imageobject></mediaobject>
+
+To display and select the shift characters, use both &Shift; keys:
+<sbr/>&nbsp;&#x02022; Click either &Shift; key, which will 'lock', and then the other &Shift; key and the shift characters will be displayed.
+<sbr/>&nbsp;&#x02022; Then click on the character to print it.
+<sbr/><sbr/>Otherwise, if you know which key the shift character is on, then the expected behaviour applies, and &Shift;&nbsp;<keycap>'key'</keycap> will print it.
+<sbr/><sbr/>
+
+<emphasis role="bold">Spanish keyboard shift characters:</emphasis>
+<mediaobject><imageobject>
+    <imagedata fileref="kvkbds.png" format="PNG"/>
+</imageobject></mediaobject>
+</sect1>
+
+<sect1 id="config-menu">
+<title>The configuration menu</title>
+
+The &kvkbd; configuration menu is accessible by clicking on the configuration button <guiicon><inlinegraphic fileref="config-btn.png"/></guiicon> or by right clicking on the tray icon.
+<sbr/><sbr/>Select "<emphasis role="bold">Font ...</emphasis>" to choose the font used to display the characters on the keys.
+<sbr/><sbr/>Check "<emphasis role="bold">Auto Resize Font</emphasis>" to resize the font when &kvkbd; is resized.
+<sbr/><sbr/>Check "<emphasis role="bold">Dock Widget</emphasis>" to display a small dock which can be placed anywhere on screen.
+<sbr/>Click on it to hide or show the virtual keyboard.
+<mediaobject><imageobject>
+    <imagedata fileref="config-menu.png" format="PNG" />
+</imageobject></mediaobject>
+
+</sect1>
+
+<sect1 id="keys">
+<title>Keys</title>
+
+The &kvkbd; keyboard is based on the US layout with an extra key to the right of Left &Shift; for non-US keyboards - the extra key duplicates <emphasis role="bold">&lt;</emphasis> and <emphasis role="bold">></emphasis> characters on the US keyboard.
+<sbr/><sbr/>
+For non-US keyboards, the key which is normally lower left of the &Enter; key is placed above the &Enter; key.
+<sbr/><sbr/>
+Where set up in the keyboard mapping file, &AltGr; will enable selection of the character mapped to the lower right of any key, and &AltGr;&nbsp;&Shift; for any upper right character.
+<sbr/><sbr/>
+The &Shift;, &Ctrl;, <keycap>Alt*</keycap> buttons 'lock' when clicked to simulate holding down a key on a physical keyboard.
+<sbr/>
+Whether the <keycap>*Win</keycap> buttons 'lock' will depend on the build time option chosen.
+<sbr/><sbr/>
+
+<sect2 id="dead-keys">
+<title>Dead Keys</title>
+
+Using &Shift; and/or &AltGr; which need press and hold on a physical keyboard will need click only for &kvkbd;.
+<sbr/><sbr/>For example, using the AD11 key [ ˆ ] on the oss variant of the French[fr]/azerty keyboard:
+<sbr/><sbr/><command>setxkbmap fr -variant oss</command>
+<informaltable>
+  <tr>
+    <td>Character:</td><td></td>
+    <td>dead_circumflex</td><td>&nbsp;</td>
+    <td>dead_diaeresis</td><td></td>
+    <td>dead_tilde</td><td></td>
+    <td>dead_abovering</td>
+  </tr>
+  <tr>
+    <td>K/B press:</td><td></td>
+    <td><keycap>ˆ</keycap>&nbsp;<keycap>o</keycap></td><td></td>
+    <td>&Shift;+<keycap>ˆ</keycap>&nbsp;<keycap>u</keycap></td><td></td>
+    <td>&AltGr;+<keycap>ˆ</keycap>&nbsp;<keycap>e</keycap></td><td></td>
+    <td>&AltGr;+&Shift;+<keycap>ˆ</keycap>&nbsp;<keycap>a</keycap></td>
+  </tr>
+  <tr>
+    <td>&kvkbd;&nbsp;click:</td><td>&nbsp;</td>
+    <td><keycap>ˆ</keycap>&nbsp;<keycap>o</keycap></td><td></td>
+    <td>&Shift;&nbsp;<keycap>ˆ</keycap>&nbsp;<keycap>u</keycap></td><td>&nbsp;</td>
+    <td>&AltGr;&nbsp;<keycap>ˆ</keycap>&nbsp;<keycap>e</keycap></td><td>&nbsp;</td>
+    <td>&AltGr;&nbsp;&Shift;&nbsp;<keycap>ˆ</keycap>&nbsp;<keycap>a</keycap></td>
+  </tr>
+  <tr>
+    <td>Printed:</td><td></td>
+    <td><emphasis role="bold">ô</emphasis></td><td></td>
+    <td><emphasis role="bold">ü</emphasis></td><td></td>
+    <td><emphasis role="bold">ẽ</emphasis></td><td></td>
+    <td><emphasis role="bold">å</emphasis></td>
+  </tr>
+</informaltable>
+<sbr/>
+<emphasis>Note</emphasis> that &kvkbd; is compiled for keycodes defined by evdev&nbsp;&#x000bb;&nbsp;<filename>/etc/X11/xkb/keycodes/evdev.</filename>
+<sbr/>&kvkbd; will have reduced functionality in systems using another keycode definitions file which can be checked by:
+<literallayout>  &#x02022; running <command>xev</command> in a konsole
+  &#x02022; pressing or clicking <keycap>Menu</keycap>
+  &#x02022; looking for <code><emphasis>keycode 135</emphasis></code> among the output
+</literallayout>
+
+</sect2>
+
+</sect1>
+
+
+<sect1 id="loginhelper-mode">
+<title>Using &kvkbd; with &tdm;</title>
+
+&kvkbd; doesn't work with &tdm;.
+<sbr/>Use with other Display Managers by editing /etc/.../Xsetup.
+<sbr/><sbr/>Add this:
+<programlisting>HOME=/root kvkbd --loginhelper</programlisting>
+There is no configuration button in the loginhelper mode.
+<sbr/>To change the default config, launch &kvkbd; as root:
+<literallayout><command>tdesu kvkbd</command>
+</literallayout>
+and make the changes there from the configuration menu.
+<sbr/><sbr/>&kvkbd; is run without the --loginhelper option when run from a konsole.
+
+</sect1>
+
+<sect1 id="autostart">
+<title>Autostart</title>
+
+Add <filename>kvkbd.desktop</filename> to the &tde; Autostart directory for &kvkbd; to run when &tde; starts.
+<sbr/><sbr/>
+<emphasis>For a specific keyboard layout:</emphasis>
+<sbr/><sbr/>
+&nbsp;Exec=<command>setxkbmap &lt;xx>;kvkbd</command>
+
+<sbr/><sbr/>
+<emphasis>Or, with &xmmp;:</emphasis> [as in the <link linkend='assign-keycodes'>example</link>]
+<sbr/><sbr/>
+&nbsp;Exec=<command>setxkbmap &lt;xx>;&xmmp; -e 'keycode 133=quotedbl';&xmmp; -e 'keycode 134=asterisk';kvkbd</command>
+
+<sbr/><sbr/>
+<emphasis>Or, including the setxkbmap <link linkend='compose-option'>compose</link> option:</emphasis> 
+<sbr/><sbr/>
+&nbsp;Exec=<command>setxkbmap -option compose:menu &lt;xx>;xmodmap -e 'keycode 133=quotedbl';xmodmap -e 'keycode 134=asterisk';kvkbd</command>
+
+<sbr/><sbr/>
+
+
+</sect1>
+
+
+<sect1 id="layout-switching">
+<title>Layout switching</title>
+
+&kvkbd; will dynamically switch keyboard layouts as they are changed, either through the command line or using the &tde; Keyboard Tool.
+
+<sbr/><sbr/>
+Refer to the <ulink url='help:/kxkb/index.html'>Keyboard Layouts Handbook</ulink> for details on how to set up different and switchable keyboard layouts.
+<sbr/><sbr/>
+
+</sect1>
+
+</chapter>
+
+
+<chapter id="customizing-kvkbd">
+<title>Customizing &kvkbd;</title>
+
+<sect1 id="key-mapping">
+<title>Key mapping</title>
+
+Using the compose option for <command id="compose-option">setxkbmap</command>, it could be useful for example to set the <keycap>Menu</keycap> key as the compose key to set up user specified characters or character strings.
+
+<formalpara>
+<title>Examples</title>
+</formalpara>
+
+<literallayout><emphasis role="bold">Add the Euro symbol for a US keyboard</emphasis> <link linkend='one'>[¹]</link>
+  &#x02022; Add <quote> &lt;Multi_key> &lt;e> &lt;r> : U20AC # "€" EuroSign </quote> to ~/.XCompose <link linkend='two'>[²]</link>
+  &#x02022; Run <command>setxkbmap -option compose:menu us</command>
+  &#x02022; Start new konsole or editor
+  &#x02022; Click <keycap>Menu</keycap> <keycap>e</keycap> <keycap>r</keycap>
+     .. and <emphasis role="bold">€</emphasis> should be displayed
+</literallayout>
+
+<literallayout><emphasis role="bold">Add a shortcut for a frequently used text string</emphasis>
+  &#x02022; Add <quote> &lt;Multi_key> &lt;t> &lt;r> : "&tde; rocks" </quote> to ~/.XCompose
+  &#x02022; Run <command>setxkbmap -option compose:menu &lt;xx></command>
+  &#x02022; Start new konsole or editor
+  &#x02022; Click <keycap>Menu</keycap> <keycap>t</keycap> <keycap>r</keycap>
+     .. and <emphasis role="bold">&tde; rocks</emphasis> should be displayed
+</literallayout>
+
+<emphasis role="bold" id="assign-keycodes">Assign keycodes</emphasis>
+<sbr/>&xmmp; can be used to assign keycodes to any key.
+<sbr/><sbr/>If &kvkbd; has been built for the <keycap>Win</keycap> keys to function as non-control keys, they can conveniently be used for frequently used characters which might otherwise be more cumbersome to generate.
+<sbr/><sbr/>For example, the <emphasis role="bold">"</emphasis> and <emphasis role="bold">*</emphasis> characters on a gb keyboard are &Shift;+<keycap>2</keycap> and &Shift;+<keycap>8</keycap>, and they could be assigned to the Win keys:
+<literallayout><command>&xmmp; -e 'keycode 133=quotedbl'</command>
+<command>&xmmp; -e 'keycode 134=asterisk'</command>
+</literallayout>
+Then <keycap>LWin</keycap> would print <emphasis role="bold">"</emphasis> and <keycap>RWin</keycap> would print <emphasis role="bold">*</emphasis>
+<sbr/><sbr/>
+<mediaobject></mediaobject>
+[¹] <emphasis id="one">To emulate a keyboard where the Euro sign is engraved on the <keycap>5</keycap> key,  <command>setxkbmap us -variant euro</command> and &AltGr; <keycap>5</keycap> would be more appropriate.
+</emphasis><!-- setxkbmap us -variant euro uses nbsp U+00a0 to avoid line wrapping -->
+<sbr/>[²]
+<emphasis id="two">This is an easier combination to enter than the other Euro options in /usr/share/X11/locale/&lt;LOCALE>/Compose, which doesn't include this combination.
+<sbr/>    However, if ~/.XCompose 'includes' /usr/share/X11/locale/&lt;LOCALE>/Compose, any duplicated compose sequences in ~/.XCompose will have priority.</emphasis><!-- >    However, uses nbsp U+00a0 for indentation -->
+</sect1>
+
+<sect1 id="comp-chars">
+<title>Composite Characters</title>
+
+Create a character that doesn't have a direct unicode mapping, but is composed of unicode characters in the font being used.
+<sbr/><sbr/>
+As an example -- a-ogonek [U<emphasis role="bold">0105</emphasis>] + combining acute [U<emphasis role="bold">0301</emphasis>] -- <emphasis role="bold">ą́</emphasis>́
+<sbr/><sbr/>
+
+Add the character and chosen key combination to the ~/.XCompose file:
+<sbr/>
+  &#x02022; <command>echo</command> "&lt;Multi_key> &lt;space> &lt;a> : \"$(printf '\u<emphasis role="bold">0105</emphasis>\u<emphasis role="bold">0301</emphasis>')\" # aogonek + combining acute" >> ~/.XCompose
+<sbr/><sbr/>
+Test:
+<sbr/>
+  &#x02022; Start new editor
+<sbr/>
+  &#x02022; Print the character:   <keycap>Menu</keycap> <keycap>space</keycap> <keycap>a</keycap>
+<sbr/><sbr/>
+</sect1>
+
+</chapter>
+
+
+<appendix id="credits">
+<title>Credits and License</title>
+
+&kvkbd;
+<sbr/><sbr/>Program Copyright &copy; 2007-2014 Todor Gyumyushev <email>yodor1@gmail.com</email>
+<sbr/><sbr/>Program and Documentation Copyright &copy; 2008 Guillaume Martres <email>smarter@ubuntu.com</email>
+
+<!-- TRANS:CREDIT_FOR_TRANSLATORS -->
+&underFDL;               <!-- FDL: do not remove -->
+
+<!-- Determine which license your application is licensed under,
+     and delete all the remaining licenses below:
+     (NOTE:  All documentation are licensed under the FDL,
+     regardless of what license the application uses) -->
+&underGPL;
+</appendix>
+
+<appendix id="installation">
+<title>Installation</title>
+For your own build of &kvkbd;, see the INSTALL file.
+</appendix>
+
+&documentation.index;
+</book>
+

@@ -33,6 +33,385 @@ getsource_fn
 
 untar_fn
 
+## copy the helpfile docs to the build tree
+cp -a $SRCDIR/doc .
+## not in this version - introduced for the later qt4 build
+sed -i '/CSS Color themes/d' README
+## remove meinproc check - there are a number of validity errors relating to the use of <sbr/> etc.,
+## which I feel provides a better presentation. The help file displays as intended.
+sed -i 's|--check --cache index.cache.bz2|--cache index.cache.bz2|' cmake/modules/TDEMacros.cmake
+
+## These patches are applied in chunks to identify the changes being made and allow any particular change to be easily identified and removed if required
+
+## Add a key, LSGT, between 'left shift' and 'z' for non-US keyboards.  
+## This duplicates '<' and '>' characters for US keyboards, but otherwise leaves the US keyboard fully functional.
+## The key which is normally lower left of Enter on non-US keyboards is above the Enter key.
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+#
+## add a key[code] to row 4
+@@ -46 +46 @@
+-#define R4LEN 7
++#define R4LEN 8
+#
+## add keycode 94 key between l-shift and z key
+## gb=\|  fr=<>  de=<>|  [us=<>]  etc
+@@ -72,3 +72,3 @@
+-	//TQString k4="zxcvbnm"; //,./";
+-	//TQString k4s="ZXCVBNM";
+-	unsigned int kc4[R4LEN] = {52,53,54,55,56,57,58};//59,60,61};
++	//TQString k4="<zxcvbnm"; //,./";
++	//TQString k4s=">ZXCVBNM";
++	unsigned int kc4[R4LEN] = {94,52,53,54,55,56,57,58};//59,60,61};
+#
+## reduce width of left shift key
+@@ -249 +249 @@
+-	lshft->resize ( 80,30 );
++	lshft->resize ( 45,30 );
+#
+## remove one key space after left shift
+## and fix spacing
+@@ -262 +262 @@
+-		v->move ( stx+35+16+35+ ( 35*a ),sty+ ( 4*35 ) );
++		v->move ( stx+35+15+ ( 35*a ),sty+ ( 4*35 ) );
+EOF
+
+## Replace text on Num pad keys for a better fit
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -402 +402 @@
+-	TQString txt[9] = { "Ho\nme", TQString::fromUtf8("▲"), "Pg\nUp",
++	TQString txt[9] = { TQString::fromUtf8("H\u2190"), TQString::fromUtf8("▲"), TQString::fromUtf8("P\u2191"),
+@@ -404 +404 @@
+-		"End", TQString::fromUtf8("▼"), "Pg\nDn" };
++		TQString::fromUtf8("E\u2192"), TQString::fromUtf8("▼"), TQString::fromUtf8("P\u2193") };
+@@ -448 +448 @@
+-	numl->setText("Num\nLock");
++	numl->setText(TQString::fromUtf8("\u2116"));
+#+	numl->setText("N#");
+EOF
+
+## Set a more realistic initial font size
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -676 +676 @@
+-		double rp = (8.0/600.0)*width();
++		double rp = (10.0/600.0)*width();
+EOF
+
+## Fix keycodes for evdev mapping:
+## Right shift, LWin, AltGr, Menu, Right Ctrl, Num pad divide, Num pad Enter
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -296 +296 @@
+-	rshft->setKeyCode ( 50 );
++	rshft->setKeyCode ( 62 );
+@@ -321 +321 @@
+-	win->setKeyCode ( 115 );
++	win->setKeyCode ( 133 );
+@@ -349 +349 @@
+-	ralt->setKeyCode ( 113 );
++	ralt->setKeyCode ( 108 );
+@@ -359 +359 @@
+-	mnu->setKeyCode ( 117 );
++	mnu->setKeyCode ( 135 );
+@@ -370 +370 @@
+-	rctrl->setKeyCode ( 37 );
++	rctrl->setKeyCode ( 105 );
+@@ -459 +459 @@
+-	div->setKeyCode(112);
++	div->setKeyCode(106);
+@@ -476 +476 @@
+-	ent->setKeyCode(36);
++	ent->setKeyCode(104);
+EOF
+
+## dead_* characters don't display on keys, so add single click printable character equivalents
+## to display on keys - the printed character remains as dead_<whatever>
+## Only need for levels 0 and 1 - higher levels don't show on keys
+## NoSymbol shows as an outline square on keys - replace with space=blank
+## Re: MainWidget.cpp "* therefore keysymtab[] must remain SORTED by keysym value."
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -999,2 +1021,3 @@
+ } keysymtab[] = {
++  { 0x0000, 0x0020 }, /*                  NoSymbol -> <- space */
+   { 0x01a1, 0x0104 }, /*                     Aogonek Ą LATIN CAPITAL LETTER A WITH OGONEK */
+@@ -1772,2 +1795,18 @@
+   { 0x20ac, 0x20ac }, /*                    EuroSign € EURO SIGN */
++  { 0xfe50, 0x0060 }, /*                  dead_grave \` */
++  { 0xfe51, 0x00b4 }, /*                  dead_acute ´ */
++  { 0xfe52, 0x02c6 }, /*             dead_circumflex ˆ */
++  { 0xfe53, 0x02dc }, /*                  dead_tilde ˜ small tilde */
++  { 0xfe54, 0x00af }, /*                 dead_macron ¯ */
++  { 0xfe55, 0x02d8 }, /*                  dead_breve ˘ */
++  { 0xfe56, 0x02d9 }, /*               dead_abovedot ˙ */
++  { 0xfe57, 0x00a8 }, /*              dead_diaeresis ¨ */
++  { 0xfe58, 0x02da }, /*              dead_abovering ° */
++  { 0xfe59, 0x02dd }, /*            dead_doubleacute ˝ */
++  { 0xfe5a, 0x02c7 }, /*                  dead_caron ˇ */
++  { 0xfe5b, 0x00b8 }, /*                dead_cedilla ¸ */
++  { 0xfe5c, 0x02db }, /*                 dead_ogonek ˛ */
++  { 0xfe5d, 0x0269 }, /*                   dead_iota ɩ Latin small iota */
++  { 0xfe64, 0x1fbf }, /*             dead_abovecomma ᾽ Greek Psili */
++  { 0xfe65, 0x1ffe }, /*     dead_abovereversedcomma ῾ Greek Dasia */
+ };
+EOF
+
+## add a tooltip for the panel icon
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -1825,3 +1825,3 @@
+ {
+-
++	TQToolTip::add ( this, "Virtual keyboard" );
+ }
+EOF
+
+## Fix Num pad numbers where 0-9 aren't the non-shift characters on the keyboard  
+## E.g. for fr, the num pad '1' [KP_1 keycode 87] appears as '&' [keycode 10] when Num Lock is on
+## And fix Del keycode so that KP_Separator prints correctly, eg for gr = comma
+## This is a quick-and-dirty fix because it effectively means that this routine is redundant.
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -407 +407 @@
+-	int nval[9] = {16,17,18,13,14,15,10,11,12};
++	int nval[9] = {79,80,81,83,84,85,87,88,89};
+@@ -427 +427 @@
+-	ins->setKeyCode(19,90);
++	ins->setKeyCode(90,90);
+@@ -439 +439 @@
+-	del->setKeyCode(60,91);
++	del->setKeyCode(91,91);
+EOF
+
+## Cosmetic changes:
+## Set F4-F5 spacing as per F8-F9
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -97 +97 @@
+-		f->move ( stx+esc->width() + ( 35*a ) +20,sty );
++		f->move ( stx+esc->width() +3 + ( 35*a ) +25,sty );
+@@ -107 +107 @@
+-		f->move ( stx+esc->width() + ( 35*a ) +40+ ( 4*35 ),sty );
++		f->move ( stx+esc->width() +3 + ( 35*a ) +40+ ( 4*35 ),sty );
+@@ -118 +118 @@
+-		f->move ( stx+esc->width() + ( 35*a ) +45+ ( 8*35 ) +10,sty );
++		f->move ( stx+esc->width() +3 + ( 35*a ) +45+ ( 8*35 ) +10,sty );
+#
+## resize keys for alignment on right side of keyboard
+@@ -139 +139 @@
+-	bksp->resize ( 46,30 );
++	bksp->resize ( 48,30 );
+@@ -149 +149 @@
+-	tab->resize ( 47,30 );
++	tab->resize ( 48,30 );
+EOF
+
+## use icons for quit and num pad show/hide buttons
+## these are the 16x16/actions icons used for the system selected icon set
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+#
+## num pad show button
+@@ -388 +388 @@
+-	extent->setText(">>");
++	extent->setPixmap(TQIconSet(SmallIcon("media-seek-forward")).pixmap());
+@@ -689 +689 @@
+-		extent->setText(">>");
++		extent->setPixmap(TQIconSet(SmallIcon("media-seek-forward")).pixmap());
+#
+## num pad hide button
+@@ -693 +693 @@
+-		extent->setText("<<");
++		extent->setPixmap(TQIconSet(SmallIcon("media-seek-backward")).pixmap());
+#
+## quit button
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -380 +380 @@
+-	quit->setPaletteBackgroundColor ( TQt::red );
++	quit->setPixmap(TQIconSet(SmallIcon("application-exit")).pixmap());
+EOF
+
+## Display '&' where it is the lower key character on the key
+## E.g. fr be azerty keyboards
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -886,5 +897,9 @@
+ 	TQString btn_text(TQChar((uint)ret));
+ 	
+-	v.setText(btn_text);
++		TQChar c((uint)ret);
++		if (c=='&')
++			v.setText("&&");
++		else
++			v.setText(btn_text);
+ 
+ 	TQString btn_upper(btn_text.upper());
+EOF
+
+## Add RWin button
+patch -N -p0 << EOF || true
+## new button added
+--- src/MainWidget.h
++++ src/MainWidget.h
+@@ -96,2 +96,3 @@
+	VButton *win;
++	VButton *rwin;
+	VButton *mnu;
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+#
+## differentiate between Win keys for documentation
+@@ -320 +320 @@
+-	win->setText ( "Win" );
++	win->setText ( "LWin" );
+#
+## reduce the width of the space bar by 45=RWin width and 5=space between keys
+@@ -339 +339 @@
+-	space->resize ( 5*35+28,30 );
++	space->resize ( 5*35+28-45-5,30 );
+#
+## RWin 'locks' with mouse click
+@@ -353,2 +354,11 @@
+ 
++	rwin = new VButton ( this,"" );
++	rwin->resize ( 45,30 );
++	rwin->move ( 5+ralt->x() +ralt->width(), sty+ ( 5*35 ) );
++	rwin->setText ( "RWin" );
++	rwin->setKeyCode ( 134 );
++	rwin->setToggleButton ( true );
++	mod_keys.append( rwin );
++	rwin->res();
++
+ 
+#
+## Menu now follows RWin not Alt Gr
+@@ -357 +367 @@
+-	mnu->move ( 5+ralt->x() +ralt->width(), sty+ ( 5*35 ) );
++	mnu->move ( 5+rwin->x() +rwin->width(), sty+ ( 5*35 ) );
+EOF
+
+## resize quit, num pad show/hide, configure buttons to see the icons better at reduced size of keyboard
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -387,2 +387,2 @@
+-	quit->resize ( 15,30 );
+-	quit->move ( 525,15 );
++	quit->resize ( 20,30 );
++	quit->move ( 526,15 );
+@@ -395,2 +395,2 @@
+-	extent->resize( 15,65 );
+-	extent->move(525, 85 );
++	extent->resize ( 20,65 );
++	extent->move(526, 85 );
+@@ -551,2 +551,2 @@
+-		popup_menu->resize ( 15,30 );
+-		popup_menu->move ( 525,15+35 );
++		popup_menu->resize ( 20,30 );
++		popup_menu->move ( 526,15+35 );
+#
+## move numpad after resizing buttons
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -410 +410 @@
+-	int padx= 550;
++	int padx= 552;
+#
+## move and resize keyboard
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -76 +76 @@
+-	int stx=15;
++	int stx=17;
+@@ -593 +593 @@
+-	int d_width=550;
++	int d_width=552;
+@@ -639,2 +639,2 @@
+-		sdxs = width() - (width() * (150.0/700.0));
+-		VButton::pw=700.0;
++		sdxs = width() - (width() * (150.0/702.0));
++		VButton::pw=702.0;
+@@ -642 +642 @@
+-		setMinimumSize(700/3,235/3);
++		setMinimumSize(702/3,235/3);
+@@ -646,2 +646,2 @@
+-		sdxb = width() + (width() * (150.0/550.0));
+-		VButton::pw=550.0;
++		sdxb = width() + (width() * (150.0/552.0));
++		VButton::pw=552.0;
+@@ -649 +649 @@
+-		setMinimumSize(550/3,235/3);
++		setMinimumSize(552/3,235/3);
+--- src/VButton.cpp
+--- src/VButton.cpp
+@@ -5 +5 @@
+-double VButton::pw=550.0;
++double VButton::pw=552.0;
+EOF
+
+## missing characters in keysymtab[] - for AC12 -> AD13 key on ua keyboard
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -1251,2 +1251,3 @@
+   { 0x06ac, 0x045c }, /*               Macedonia_kje ќ CYRILLIC SMALL LETTER KJE */
++  { 0x06ad, 0x0491 }, /*   Ukrainian_ghe_with_upturn ґ CYRILLIC SMALL LETTER GHE WITH UPTURN */
+   { 0x06ae, 0x045e }, /*         Byelorussian_shortu ў CYRILLIC SMALL LETTER SHORT U */
+@@ -1266,2 +1267,3 @@
+   { 0x06bc, 0x040c }, /*               Macedonia_KJE Ќ CYRILLIC CAPITAL LETTER KJE */
++  { 0x06bd, 0x0490 }, /*   Ukrainian_GHE_WITH_UPTURN Ґ CYRILLIC CAPITAL LETTER GHE WITH UPTURN */
+   { 0x06be, 0x040e }, /*         Byelorussian_SHORTU Ў CYRILLIC CAPITAL LETTER SHORT U */
+EOF
+
+## generate keycode for Win keys with single click so that they can be used for xmodmap
+## User option, set in ./BUILD-TDE.sh
+[[ $WinLock != 1 ]] && {
+echo -e "\033[36;1m"'patching for Win keys no-lock ..'"\033[0m"
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+#
+## don't lock the LWin button
+@@ -322 +322 @@
+-	win->setToggleButton ( true );
++	win->setToggleButton ( false );
+## don't lock the RWin button
+@@ -359 +359 @@
+-	rwin->setToggleButton ( true );
++	rwin->setToggleButton ( false );
+#
+## generate keycode on click rather than wait for next key-click for keycode
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+#
+## for LWin
+@@ -323 +323,2 @@
+-	mod_keys.append ( win );
++	connect ( win, TQT_SIGNAL ( keyClick ( unsigned int ) ), this, TQT_SLOT ( keyPress ( unsigned int ) ) );
++	other_keys.append( win );
+#
+## for RWin
+@@ -360 +361,2 @@
+-	mod_keys.append( rwin );
++	connect ( rwin, TQT_SIGNAL ( keyClick ( unsigned int ) ), this, TQT_SLOT ( keyPress ( unsigned int ) ) );
++	other_keys.append( rwin );
+EOF
+}
+
+
 # for 14.0.8, set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 ## for later versions, use the env variable LINGUAS=$I18N - set in BUILD-TDE.sh
@@ -86,14 +465,14 @@ echo "
        |-----handy-ruler------------------------------------------------------|
 $PRGNAM: A virtual keyboard for TDE
 $PRGNAM:
-$PRGNAM: Re: kvkbd --help
-$PRGNAM: loginhelper   Stand alone version for use with TDM or XDM.
-$PRGNAM:               You should Add : HOME=/root kvkbd --loginhelper &
-$PRGNAM:               to Xsetup to run in xdm/tdm
 $PRGNAM:
 $PRGNAM:
 $PRGNAM: With language support for:
 $PRGNAM: en $langs
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc
 
