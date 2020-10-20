@@ -35,6 +35,7 @@ untar_fn
 
 ## copy the helpfile docs to the build tree
 cp -a $SRCDIR/doc .
+cp $SRCDIR/dock.png src/
 ## not in this version - introduced for the later qt4 build
 sed -i '/CSS Color themes/d' README
 ## remove meinproc check - there are a number of validity errors relating to the use of <sbr/> etc.,
@@ -133,7 +134,7 @@ EOF
 ## dead_* characters don't display on keys, so add single click printable character equivalents
 ## to display on keys - the printed character remains as dead_<whatever>
 ## Only need for levels 0 and 1 - higher levels don't show on keys
-## NoSymbol shows as an outline square on keys - replace with space=blank
+## NoSymbol shows as an outline square [.notdef] on keys - replace with space=blank
 ## Re: MainWidget.cpp "* therefore keysymtab[] must remain SORTED by keysym value."
 patch -N -p0 << EOF || true
 --- src/MainWidget.cpp
@@ -214,6 +215,23 @@ patch -N -p0 << EOF || true
 @@ -149 +149 @@
 -	tab->resize ( 47,30 );
 +	tab->resize ( 48,30 );
+## reduce size of Dock image
+@@ -929 +929 @@
+-	resize ( 96,47 );
++	resize ( 64,31 );
+EOF
+
+## set keyboard background colour
+## User option, set in ./BUILD-TDE.sh
+BGCOLR=$(cat $TMPVARS/kvkbd-bg)
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -397,2 +397,2 @@
+-	setPaletteBackgroundColor ( TQt::black );
+	setFocusPolicy ( TQ_NoFocus );
++	setPaletteBackgroundColor ( TQColor($BGCOLR) );
+	setFocusPolicy ( TQ_NoFocus );
 EOF
 
 ## use icons for quit and num pad show/hide buttons

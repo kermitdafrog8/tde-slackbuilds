@@ -550,6 +550,7 @@ sed -i 's|Apps/koffice|Misc/libpng &|' $TMPVARS/TDEbuilds
 
 ## only run this if kvkbd has been selected
 rm -f $TMPVARS/WinLock
+rm -f $TMPVARS/kvkbd-bg
 [[ $(grep -o kvkbd $TMPVARS/TDEbuilds) ]] && {
 dialog --cr-wrap --no-shadow --yes-label "No Lock" --no-label "Lock" --colors --defaultno --title " Kvkbd Win Keys " --yesno \
 "
@@ -557,11 +558,26 @@ The \Zb\Z6LWin\Zn and \Zb\Z6RWin\Zn keys on the \Zb\Z6Kvkbd\Zn keyboard are set 
 
 If they're to be used as control keys to map a number of characters or functions, then they need to be set to \Zr\Z4\ZbLock\Zn while the next key is clicked - this is to simulate holding down the key on a physical keyboard.
 
-If they will only be used as alternately mapped keys using xmodmap, then they will need to be set to generate a keycode on a single click - \Z1N\Zb\Z0o Lock\Zn.
+If they will only be used as alternatively mapped keys using xmodmap, then they will need to be set to generate a keycode on a single click - \Z1N\Zb\Z0o Lock\Zn.
 " \
 17 75
 [[ $? == 0 ]] && 2> $TMPVARS/WinLock
 [[ $? == 1 ]] && echo 1 > $TMPVARS/WinLock
+
+dialog --cr-wrap --no-collapse --nocancel --no-shadow --colors --title " Kvkbd background colour " --inputbox \
+"
+The default background colour for the keyboard is black.
+
+To change it, enter the colour you want in any of these forms, including the double quotes where shown.
+These examples are all the same colour:
+
+Named: \Zb\Z6\"antiquewhite3\"\Zn
+Hex:      \Zb\Z6\"#cdc0b0\"\Zn
+RGB:    \Zb\Z6 205,192,176\Zn
+ 
+" \
+19 75 "\"black\"" \
+2> $TMPVARS/kvkbd-bg
 }
 
 
