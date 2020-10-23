@@ -121,7 +121,7 @@ Includes:
 
 [3] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.
 
-[4] The README for a native build for Raspberry Pi3 [[README-Raspberry-Pi3.md](./README-Raspberry-Pi3.md)] is now rather dated and cross compiling is preferred.
+[4] The README for a native build for Raspberry Pi3 [[README-Raspberry-Pi3.md](./README-Raspberry-Pi3.md)] is now rather dated and cross compiling is a better option.
 
 [5] Building the kalzium equation solver needs ocaml and facile installed. They will be built, packaged, and installed during the tdeedu build if the source archives are pre-downloaded to the 'src' directory.  
 https://github.com/ocaml/ocaml/archive/4.05.0.tar.gz  

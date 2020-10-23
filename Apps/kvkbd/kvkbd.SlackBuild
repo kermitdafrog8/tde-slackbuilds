@@ -429,6 +429,96 @@ patch -N -p0 << EOF || true
 EOF
 }
 
+## add 'Lock on screen' feature from v0.5
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -529,4 +529,8 @@
+ 		m->setItemChecked(mnu_dock, show_dock);
+ 		
++		mnu_lock = m->insertItem("Lock on screen", this, TQT_SLOT(toggleLock()));
++		bool is_locked = cfg->readBoolEntry("locked",false);
++		m->setItemChecked(mnu_lock,is_locked);
++		
+ 		//m->insertItem("Configure", this, TQT_SLOT(config()));
+ 		m->insertSeparator();
+@@ -742,2 +746,14 @@
+ }
++void MainWidget::toggleLock()
++{
++	bool c = isLocked();
++
++	tray->contextMenu()->setItemChecked ( mnu_lock, !c );
++	setLocked(!c);
++
++	TDEConfig *cfg = TDEApplication::kApplication()->config();
++	cfg->writeEntry ("locked", !c);
++	cfg->sync();
++
++}
+ void MainWidget::showDock()
+#
+##
+--- src/MainWidget.h
++++ src/MainWidget.h
+@@ -69,2 +69,3 @@
+  	void saveState();
++	void toggleLock();
+ 
+@@ -131,2 +131,3 @@
+ 	int mnu_autores;
++	int mnu_lock;
+ 
+#
+##
+--- src/DragWidget.cpp
++++ src/DragWidget.cpp
+@@ -6,3 +6,3 @@
+ 	drag=false;
+-
++	locked=false;
+ }
+@@ -17,2 +17,3 @@
+ 	gpress=e->globalPos();
++	if (locked)return;
+ 	drag=true;
+@@ -34,2 +35,12 @@
+ }
++
++void DragWidget::setLocked(bool mode)
++{
++	locked=mode;
++}
++
++const bool DragWidget::isLocked() const
++{
++	return locked;
++}
+ 
+#
+##
+--- src/DragWidget.h
++++ src/DragWidget.h
+@@ -14,2 +14,5 @@
+ 
++	void setLocked(bool mode);
++	const bool isLocked() const;
++
+ private:
+@@ -24,2 +27,3 @@
+ 	TQPoint gpress;
++	bool locked;
+ 
+#
+##
+--- src/resizabledragwidget.cpp
++++ src/resizabledragwidget.cpp
+@@ -38,2 +38,3 @@
+ {
++	if (locked)return;
+ 	
+EOF
+
 
 # for 14.0.8, set support for additional language(s) as per I18N variable
 # but only for languages available with this package

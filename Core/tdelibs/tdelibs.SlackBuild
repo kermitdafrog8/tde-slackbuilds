@@ -71,6 +71,49 @@ sed -i "s|trinity|$PLUGIN_INSTALL_DIR|g" $file || true
 done
 sed -i "s|\"trinity\"|\"$PLUGIN_INSTALL_DIR\"|"  tdecore/tdeapplication.cpp || true
 
+## Patching for preferred formatting of help files
+patch -N -p0 << EOF || true
+--- doc/common/tde-docs.css
++++ doc/common/tde-docs.css
+#
+## tone down menu items highlighting
+@@ -176,6 +176,6 @@
+ .guilabel, .interface, .guibutton {
+-    background-color: rgb(220, 220, 220);
++    background-color: #f0f0f0;
+     color: black;
+     border: 1px solid rgb(190, 190, 190);
+-
++    padding:0px 1px;
+     -khtml-border-radius: 3px;
+#
+## for the <keycap> tags
+@@ -199 +199 @@
+-    background-color: #DFDFFF;
++    background-color: #efefef;
+@@ -201 +201,6 @@
+-
++    padding-left: 1px;
++    padding-right: 1px;
++    border-style: solid;
++    border-width: 0px 1px;
++    border-color: lightgray;
++    color:gray;
+@@ -209 +214 @@
+-    border 2px solid gray;
++    border: 2px solid gray;
+#
+## left justify text in the <para> tags in index.docbook
+--- doc/common/tde-default.css
++++ doc/common/tde-default.css
+@@ -211 +211 @@
+-  text-align: justify; 
++  text-align: left; 
+@@ -319 +319 @@
+-  text-align: justify; 
++  text-align: left;
+EOF
+
 listdocs_fn
 
 chown_fn
@@ -82,6 +125,9 @@ cd_builddir_fn
 ## dnssd/responder.cpp:28:10: fatal error: avahi-tqt/qt-watch.h: No such file or directory
 sed -i 's|TQT_INCLUDE_DIRS}|&\n  ${AVAHI_TQT_INCLUDE_DIRS}|' ../dnssd/CMakeLists.txt
 }
+
+## comment out if setting ASPELL, HSPELL, or ISPELL 'ON'
+sed -i 's|^.*Spell checker selected as default.*$|message( STATUS " ## no spell checker selected ##" )|' ../CMakeLists.txt
 
 cmake \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -110,6 +156,7 @@ cmake \
     -DWITH_HAL="OFF" \
     -DWITH_HSPELL="OFF" \
     -DWITH_INOTIFY="ON" \
+    -DWITH_ISPELL="OFF" \
     -DWITH_JASPER="OFF" \
     -DWITH_KDE4_MENU_SUFFIX="ON" \
     -DWITH_LIBART="ON" \

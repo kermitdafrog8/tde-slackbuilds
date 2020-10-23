@@ -105,7 +105,8 @@ The &kvkbd; configuration menu is accessible by clicking on the configuration bu
 <sbr/><sbr/>Select "<emphasis role="bold">Font ...</emphasis>" to choose the font used to display the characters on the keys.
 <sbr/><sbr/>Check "<emphasis role="bold">Auto Resize Font</emphasis>" to resize the font when &kvkbd; is resized.
 <sbr/><sbr/>Check "<emphasis role="bold">Dock Widget</emphasis>" to display a small dock which can be placed anywhere on screen.
-<sbr/>Click on it to hide or show the virtual keyboard.
+<sbr/>Click on the dock to hide or show the virtual keyboard.
+<sbr/><sbr/>Check "<emphasis role="bold">Lock on screen</emphasis>" to fix the position and size of the keyboard on the screen.
 <mediaobject><imageobject>
     <imagedata fileref="config-menu.png" format="PNG" />
 </imageobject></mediaobject>

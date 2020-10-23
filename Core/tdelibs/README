@@ -1,0 +1,6 @@
+Some formatting for help pages has been changed by a patch in the SlackBuild - if it's not wanted, just remove or comment out the patch.
+
+* text in paragraphs left aligned
+* border and colour for keyboard key highlighting
+* lightened menu items highlighting
+ 

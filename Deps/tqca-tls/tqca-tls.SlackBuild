@@ -37,14 +37,14 @@ listdocs_fn
 
 chown_fn
 
+[[ $TDEVERSION == 14.0.8 ]] && {
+
 #cd_builddir_fn - don't use
 
 ## add TQt headers directory to configure search list
 sed -i "s|/usr/include/tqt|$TQTDIR/include/tqt|" configure
 
-## QTDIR is needed for 14.0.? because configure can't find tqmake
-## from its algorithm - ignored for 14.1.0 which needs TQTDIR
-## which has been set as a shell variable in BUILD-TDE.sh
+## QTDIR is needed for 14.0.8 because configure can't find tqmake from its algorithm
 QTDIR=$TQTDIR \
 CXXFLAGS="$SLKRCFLAGS" \
 ./configure
@@ -56,8 +56,28 @@ sed -i "s|-march=.*-mtune=[a-z,0-9,-]*||;s|fvisibility-inlines-hidden|& $SET_mar
 ## set RPATH to ensure tqt libs are prioritized
 sed -i "s|LFLAGS .*$|& -Wl,-rpath,'$INST_RPATH'|" Makefile
 
+} || {
+
+cd_builddir_fn
+
+cmake \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -Wno-dev \
+    ..
+
+}
+
 make ${NUMJOBS:-} || exit 1
-make INSTALL_ROOT=$PKG install || exit 1
+## INSTALL_ROOT is DESTDIR for builds beyond 14.0.8
+[[ $TDEVERSION == 14.0.8 ]] && INSTALL_ROOT=INSTALL_ROOT
+make ${INSTALL_ROOT:-DESTDIR}=$PKG install || exit 1
 
 installdocs_fn
 

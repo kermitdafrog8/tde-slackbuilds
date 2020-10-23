@@ -17,3 +17,94 @@
  msgid "The Trinity Help Center"
 -msgstr "The TDE Control Centre"
 +msgstr "The TDE Help Centre"
+
+## In the Configure Panel|Taskbar window, the Alt-c shortcut is assigned
+## to the Cancel button, which takes priority over 'custom colors'
+## which becomes "Us&e custom colours", so force &Use ..
+--- tde-i18n-en_GB/messages/tdebase/kcmtaskbar.po
++++ tde-i18n-en_GB/messages/tdebase/kcmtaskbar.po
+@@ -378,3 +378,3 @@
+ msgid "Use &custom colors"
+-msgstr ""
++msgstr "&Use custom colours"
+ 
+@@ -383,3 +383,3 @@
+ msgid "Inacti&ve task text color:"
+-msgstr ""
++msgstr "Inacti&ve task text colour:"
+ 
+@@ -388,3 +388,3 @@
+ msgid "Active task te&xt color:"
+-msgstr ""
++msgstr "Active task te&xt colour:"
+ 
+@@ -393,3 +393,3 @@
+ msgid "&Background color:"
+-msgstr ""
++msgstr "&Background colour:"
+ 
+@@ -413,3 +413,3 @@
+ msgid "Right b&utton:"
+-msgstr "Right b&utton:"
++msgstr "&Right button:"
+ 
+
+--- tde-i18n-en_GB/messages/tdebase/tderandr.po
++++ tde-i18n-en_GB/messages/tdebase/tderandr.po
+@@ -188,3 +188,3 @@
+ msgid "Color Profile"
+-msgstr ""
++msgstr "Colour Profile"
+ 
+
+## re-assign shortcut key for System Admin|Monitor & Display|Global Settings|Enable ...
+## otherwise the option toggles with S&earch and
+## the space bar is needed to enable it
+--- /dev/null
++++ tde-i18n-en_GB/messages/tdebase/kcmdisplayconfig.po
+@@ -0,0 +1,5 @@
++msgid "Color Profiles"
++msgstr "Colour Profiles"
++
++msgid "&Enable global display control"
++msgstr "E&nable global display control"
+
+## Control Centre|Peripherals|Colour Profile, Alt-e is assigned to Search,
+## so use Alt-n for "E&nable global colour profile support"
+## and use Alt-u for "Enable &user colour profile support"
+--- /dev/null
++++ tde-i18n-en_GB/messages/tdebase/kcmiccconfig.po
+@@ -0,0 +1,33 @@
++msgid "TDE Color Profile Control Module"
++msgstr "TDE Colour Profile Control Module"
++
++msgid "<b>The global color profile is a system wide setting, and requires "
++"administrator access</b><br>To alter the system's global profile, click on "
++"the \"Administrator Mode\" button below."
++msgstr "<b>The global colour profile is a system wide setting, and requires "
++"administrator access</b><br>To alter the system's global profile, click on "
++"the \"Administrator Mode\" button below."
++
++msgid "Color Profile Configuration"
++msgstr "Colour Profile Configuration"
++
++msgid "<h1>Color Profile Configuration</h1> This module allows you to configure TDE "
++"support for ICC color profiles. This allows you to easily color correct your "
++"monitor for a more lifelike and vibrant image."
++msgstr "<h1>Colour Profile Configuration</h1> This module allows you to configure TDE "
++"support for ICC colour profiles. This allows you to easily colour correct your "
++"monitor for a more lifelike and vibrant image."
++
++msgid "&Enable global color profile support"
++msgstr "E&nable global colour profile support"
++
++msgid "*.icc|ICC Standard Color Profiles (*.icc)\n"
++"*.icm|Windows(R) Color Profiles (*.icm)"
++msgstr "*.icc|ICC Standard Colour Profiles (*.icc)\n"
++"*.icm|Windows(R) Colour Profiles (*.icm)"
++
++msgid "Color Profile"
++msgstr "Colour Profile"
++
++msgid "&Enable user color profile support"
++msgstr "Enable &user colour profile support"

@@ -108,6 +108,28 @@ sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" tdm/kfrontend/gentdmconf.c || true
 sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" kcontrol/hwmanager/devicepropsdlg.cpp || true
 sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" tdeioslave/trash/testtrash.cpp || true
 
+[[ $TDEVERSION != 14.0.8 ]] && {
+patch -N -p0 << EOF || true
+--- translations/desktop_files/kcontrol-desktops/en_GB.po
++++ translations/desktop_files/kcontrol-desktops/en_GB.po
+@@ -1355,3 +1355,3 @@
+ msgid "Configure display ICC color profile"
+-msgstr ""
++msgstr "Configure display ICC colour profile"
+ 
+@@ -1360,3 +1360,3 @@
+ msgid "ICC;display;color;profile;"
+-msgstr ""
++msgstr "ICC;display;colour;profile;"
+ 
+@@ -1365,3 +1365,3 @@
+ msgid "Color Profile"
+-msgstr ""
++msgstr "Colour Profile"
+ 
+EOF
+}
+
 listdocs_fn
 
 chown_fn
