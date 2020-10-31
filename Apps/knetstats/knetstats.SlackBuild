@@ -33,20 +33,8 @@ getsource_fn
 
 untar_fn
 
-# for 14.0.8, set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-#
-langs="";for Lang in $I18N;do [[ -d translations/$Lang ]] && langs="$langs $Lang/messages/$PRGNAM.po";done
-sed -i "s|\${po_files}|$langs|" translations/CMakeLists.txt
 ## for slack-desc
-langs=$(echo $langs|sed "s|/messages/$PRGNAM.po||g")
-#
-## for later versions, use the env variable LINGUAS=$I18N - set in BUILD-TDE.sh
-## for slack-desc
-[[ $TDEVERSION != 14.0.8 ]] && {
-langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$Lang $langs";done
-}
-[[ $langs != "" ]] && TRANS=ON
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$Lang $langs";done
 
 listdocs_fn
 
@@ -63,7 +51,9 @@ cmake \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
     ..
 
@@ -91,7 +81,7 @@ $PRGNAM: knetstats is a simple TDE network monitor that shows rx/tx LEDs for
 $PRGNAM: any network interface on a system tray icon.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en $langs
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

@@ -9,9 +9,9 @@
        imagesTabs->setCurrentPage(1);
        setCursor(ArrowCursor);
        return;
---- po/potracegui.pot	2015-09-23 06:31:02.000000000 +0100
-+++ po/potracegui.pot	2016-06-20 20:46:04.586821425 +0100
-@@ -234,7 +234,7 @@
+--- translations/messages/potracegui.pot	2015-09-23 06:31:02.000000000 +0100
++++ translations/messages/potracegui.pot	2016-06-20 20:46:04.586821425 +0100
+@@ -236,7 +236,7 @@
 -"Sorry, but the image format which you are working with\n"
 -"is not recognized by TDE.\n"
 +"Sorry, but the image format which you are working\n"
@@ -25,8 +25,8 @@
 +"format (EPS and PGM should work well) and only\n"
 +"when you are satisfied with the result revert to\n"
 +"the format of your choice and save the result."
---- po/de.po	2015-09-23 06:31:02.000000000 +0100
-+++ po/de.po	2016-06-20 20:46:13.183713949 +0100
+--- translations/messages/de.po	2015-09-23 06:31:02.000000000 +0100
++++ translations/messages/de.po	2016-06-20 20:46:13.183713949 +0100
 @@ -239,7 +239,7 @@
 -"Sorry, but the image format which you are working with\n"
 -"is not recognized by TDE.\n"

@@ -70,8 +70,10 @@
 
 When first launched, &kvkbd; will appear in the bottom-right corner of the screen.
 <sbr/>It can be moved by clicking and dragging on any part of the background area.
-<sbr/><sbr/>Resize it by clicking and dragging on the stripes at the bottom right.
-<sbr/>The <guiicon><inlinegraphic fileref="exit-btn.png"/></guiicon> button on the top right is used to hide the keyboard - to show it again, just click on the tray icon.
+<sbr/>Resize it by clicking and dragging on the stripes at the bottom right.
+<sbr/><sbr/>The style will be the system default which can be overridden whether launched from the command line or via the .desktop file with any &tde; or &TQt; style installed on the system.
+<sbr/>Example: <command>kvkbd --style plastik</command>, as shown here.
+<sbr/><sbr/>The <guiicon><inlinegraphic fileref="exit-btn.png"/></guiicon> button on the top right is used to hide the keyboard - to show it again, just click on the tray icon.
 <sbr/><sbr/>
 
 <emphasis role="bold">French keyboard:</emphasis>

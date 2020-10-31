@@ -33,24 +33,13 @@ getsource_fn
 
 untar_fn
 
-# for 14.0.8, set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-## for later versions, use the env variable LINGUAS=$I18N - set in BUILD-TDE.sh
-#
-[[ $TDEVERSION != 14.0.8 ]] && PO_PATH=translations/messages
-#
 # there is a Spanish language file in the source, but it has no translations in it ..
 # the included es.po file is a Google translation - if you don't want to use it,
 # then comment out the following line:
 cp $SRCDIR/es.po ${PO_PATH:-po}
-#
-langs="";for Lang in $I18N;do [[ -s ${PO_PATH:-po}/$Lang.po ]] && langs="$langs $Lang.po";done
-#
-## for 14.0.8, this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
-[[ $TDEVERSION == 14.0.8 ]] && sed -i "s| \*.po| $langs|" cmake/modules/TDEMacros.cmake
-[[ $langs != "" ]] && TRANS=ON
-## for slack-desc
-langs=$(echo $langs | sed "s|.po||g")
+
+# for slack-desc
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 
@@ -66,8 +55,9 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DWITH_GCC_VISIBILITY="OFF" \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
     ..
 
@@ -99,7 +89,7 @@ $PRGNAM:
 $PRGNAM: Needs separate chess engines, for example gnuchess, stockfish, komodo.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en $langs
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc

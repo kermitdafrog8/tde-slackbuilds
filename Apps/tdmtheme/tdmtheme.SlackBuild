@@ -33,19 +33,8 @@ getsource_fn
 
 untar_fn
 
-# for 14.0.8, set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-## for later versions, use the env variable LINGUAS=$I18N - set in BUILD-TDE.sh
-#
-[[ $TDEVERSION != 14.0.8 ]] && PO_PATH=translations/messages
-#
-langs="";for Lang in $I18N;do [[ -s ${PO_PATH:-po}/$Lang.po ]] && langs="$langs $Lang.po";done
-#
-## for 14.0.8, this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
-[[ $TDEVERSION == 14.0.8 ]] && sed -i "s| \*.po| $langs|" cmake/modules/TDEMacros.cmake
-[[ $langs != "" ]] && TRANS=ON
 ## for slack-desc
-langs=$(echo $langs | sed "s|.po||g")
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 
@@ -53,7 +42,6 @@ chown_fn
 
 cd_builddir_fn 
 
-## all locales and html docs built by default, actually only en_US
 cmake \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
@@ -65,7 +53,7 @@ cmake \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DWITH_GCC_VISIBILITY="OFF" \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
     ..
 
@@ -89,11 +77,11 @@ echo "
        |-----handy-ruler------------------------------------------------------|
 $PRGNAM: TDM theme module
 $PRGNAM:
-$PRGNAM: Currently this module is installed in TDE Components found in the
+$PRGNAM: This module is installed in TDE Components found in the
 $PRGNAM: Trinity Control Center, under System Administration.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en $langs
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

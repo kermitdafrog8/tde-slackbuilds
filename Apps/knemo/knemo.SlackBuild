@@ -41,16 +41,8 @@ sed -i 's|<tr><td>|<tr><td width=70%>|g' src/knemod/interfacetooltip.cpp
 # patch
 sed -i 's|Default Gateway" ), LINK_QUALITY|Default Gateway" ), GATEWAY|' src/knemod/interfacetooltip.cpp
 
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -d translations/$Lang ]] && langs="$langs $Lang/messages/kcm_knemo.po";done
-## convoluted method to work around cmake 'add_custom_target' seeing duplicate files
-langs2="" && \
-for Lang in $I18N;do [[ -d translations/$Lang ]] && langs2="$langs2 $Lang/messages/knemod.po";done && \
-langs="$langs $langs2" && \
-sed -i "s|\${po_files}|$langs|" translations/CMakeLists.txt && \
-langs=$(echo $langs2|sed "s|/messages/knemod.po||g")
-[[ $langs != "" ]] && TRANS=ON
+## for slack-desc
+langs="en";for Lang in $I18N;do [[ -s translations/messages/knemod/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 
@@ -70,7 +62,7 @@ cmake \
     -DWITH_GCC_VISIBILITY="OFF" \
     -DWITH_LIBIW="OFF" \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
     ..
 
@@ -99,7 +91,7 @@ $PRGNAM: outgoing traffic. For every network interface it displays an icon in
 $PRGNAM: the Panel.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en $langs
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM: IMPORTANT: KNemo has to be started using
 $PRGNAM: Trinity Control Center|Internet & Network|Network Monitor.

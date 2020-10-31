@@ -108,7 +108,6 @@ sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" tdm/kfrontend/gentdmconf.c || true
 sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" kcontrol/hwmanager/devicepropsdlg.cpp || true
 sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" tdeioslave/trash/testtrash.cpp || true
 
-[[ $TDEVERSION != 14.0.8 ]] && {
 patch -N -p0 << EOF || true
 --- translations/desktop_files/kcontrol-desktops/en_GB.po
 +++ translations/desktop_files/kcontrol-desktops/en_GB.po
@@ -128,7 +127,6 @@ patch -N -p0 << EOF || true
 +msgstr "Colour Profile"
  
 EOF
-}
 
 listdocs_fn
 

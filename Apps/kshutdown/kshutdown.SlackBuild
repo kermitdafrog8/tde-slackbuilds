@@ -33,33 +33,9 @@ getsource_fn
 
 untar_fn
 
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-#
-[[ $TDEVERSION == 14.0.8 ]] && {
-langs="";for Lang in $I18N;do [[ -e po/$Lang.po ]] && langs="$langs $Lang.po";done
-## this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
-sed -i "s| \*.po| $langs|" cmake/modules/TDEMacros.cmake
-#
-## always build 'en' [==kshutdown] docs ...
-ldocs="kshutdown man"
-} || {
-## for later versions, use the env variable LINGUAS=$I18N - set in BUILD-TDE.sh
-## langs= for slack-desc only ..
-langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
-ldocs="en man"
-}
-#
-## ... and find other html docs required and available ...
-for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
-## ... and edit tde_auto_add_subdirectories GLOB:
-[[ $TDEVERSION == 14.0.8 ]] && sed -i "s|} \* )|} $ldocs )|" cmake/modules/TDEMacros.cmake
-#
-[[ $langs != "" ]] && TRANS=ON
-#
 ## for slack-desc
-langs=$(echo $langs | sed "s|.po||g")
-ldocs=$(echo $ldocs | sed "s|kshutdown|en|;s| man||")
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+ldocs="en";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
 
 listdocs_fn
 
@@ -77,8 +53,10 @@ cmake \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+    -DWITH_GCC_VISIBILITY="OFF" \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DBUILD_TRANSLATIONS="ON" \
+    -DBUILD_EXTRAS="ON" \
     -Wno-dev \
     ..
 
@@ -105,7 +83,7 @@ echo "
 $PRGNAM: KShutDown is an advanced shut down utility for TDE
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en $langs
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM: and help documentation for:
 $PRGNAM: $ldocs

@@ -346,7 +346,7 @@ patch -N -p0 << EOF || true
 +++ src/MainWidget.cpp
 @@ -410 +410 @@
 -	int padx= 550;
-+	int padx= 552;
++	int padx= 553;
 #
 ## move and resize keyboard
 --- src/MainWidget.cpp
@@ -356,28 +356,28 @@ patch -N -p0 << EOF || true
 +	int stx=17;
 @@ -593 +593 @@
 -	int d_width=550;
-+	int d_width=552;
++	int d_width=553;
 @@ -639,2 +639,2 @@
 -		sdxs = width() - (width() * (150.0/700.0));
 -		VButton::pw=700.0;
-+		sdxs = width() - (width() * (150.0/702.0));
-+		VButton::pw=702.0;
++		sdxs = width() - (width() * (150.0/704.0));
++		VButton::pw=704.0;
 @@ -642 +642 @@
 -		setMinimumSize(700/3,235/3);
-+		setMinimumSize(702/3,235/3);
++		setMinimumSize(704/3,235/3);
 @@ -646,2 +646,2 @@
 -		sdxb = width() + (width() * (150.0/550.0));
 -		VButton::pw=550.0;
-+		sdxb = width() + (width() * (150.0/552.0));
-+		VButton::pw=552.0;
++		sdxb = width() + (width() * (150.0/553.0));
++		VButton::pw=553.0;
 @@ -649 +649 @@
 -		setMinimumSize(550/3,235/3);
-+		setMinimumSize(552/3,235/3);
++		setMinimumSize(553/3,235/3);
 --- src/VButton.cpp
---- src/VButton.cpp
++++ src/VButton.cpp
 @@ -5 +5 @@
 -double VButton::pw=550.0;
-+double VButton::pw=552.0;
++double VButton::pw=553.0;
 EOF
 
 ## missing characters in keysymtab[] - for AC12 -> AD13 key on ua keyboard
@@ -519,20 +519,231 @@ patch -N -p0 << EOF || true
  	
 EOF
 
+## fix azerty keyboards shift keys showing caps
+## simplify the algorithm and use s for shift characters, leave u for upper case
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -905,30 +905,22 @@
+ 	KeyCode keycode=v.getKeyCode();
+-
++// first level character keysym
+ 	KeySym keysym_l = XkbKeycodeToKeysym(display, keycode, 0, 0);
++// second level, ie shift, character keysym
++	KeySym keysym_s = XkbKeycodeToKeysym(display, keycode, 0, 1);
+ 
+-	KeySym keysym_u = XkbKeycodeToKeysym(display, keycode, 0, 1);
+-
+-	long ret = keysym2ucs(keysym_l);
+-
+-	TQString btn_text(TQChar((uint)ret));
++	long retl = keysym2ucs(keysym_l);
+ 	
+-		TQChar c((uint)ret);
+-		if (c=='&')
++		TQChar l((uint)retl);
++		if (l=='&')
+ 			v.setText("&&");
+ 		else
+-			v.setText(btn_text);
++			v.setText(l);
+ 
+-	TQString btn_upper(btn_text.upper());
++	long rets = keysym2ucs(keysym_s);
+ 
+-	if (btn_upper==btn_text) {
+-		ret = keysym2ucs(keysym_u);
+-		TQChar c((uint)ret);
+-		if (c=='&')
++		TQChar s((uint)rets);
++		if (s=='&')
+ 			v.setShiftText("&&");
+ 		else
+-			v.setShiftText(c);
+-	}
+-	else {
+-		v.setShiftText(btn_upper);
+-	}
++			v.setShiftText(s);
+ }
+EOF
+#
+patch -N -p0 << EOF || true
+--- src/VButton.cpp
++++ src/VButton.cpp
+@@ -22,16 +22,6 @@
+ {
+-	if (press==true){	
+-		TQString tu=l.upper();
+-		if (tu.compare(l)==0){
+-			//TQPushButton::setText(tu);
+-			TQPushButton::setText(u);
+-		}
+-		else{
+-			TQPushButton::setText(tu);
+-		}
+-
+-	}
+-	else{
++	if (press==true)
++		TQPushButton::setText(s);
++	else
+ 		TQPushButton::setText(l);
+-	}
+ }
+@@ -39,14 +29,7 @@
+ {
+-	if (press==true){	
++	if (press==true) {
+ 		TQString tu=l.upper();
+-		if (tu.compare(l)==0){
+-			TQPushButton::setText(tu);
+-		}
+-		else{
+-			TQPushButton::setText(u);
+-		}
+-	}
+-	else{
++		TQPushButton::setText(tu); }
++	else
+ 		TQPushButton::setText(l);
+-	}
+ }
+@@ -60,3 +43,3 @@
+ {
+-	u=text;
++	s=text;
+ }
+EOF
+#
+patch -N -p0 << EOF || true
+--- src/VButton.h
++++ src/VButton.h
+@@ -31,3 +31,3 @@
+ 	unsigned int keycode;
+-	TQString u;
++	TQString s;
+ 	TQString l;
+EOF
+#
+patch -N -p0 << EOF || true
+--- src/numpadvbutton.cpp
++++ src/numpadvbutton.cpp
+@@ -35,3 +35,3 @@
+ 	if (press==true){
+-		TQPushButton::setText(u);
++		TQPushButton::setText(s);
+ 		VButton::setKeyCode(numlock_code);
+EOF
 
-# for 14.0.8, set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-## for later versions, use the env variable LINGUAS=$I18N - set in BUILD-TDE.sh
-#
-[[ $TDEVERSION != 14.0.8 ]] && PO_PATH=translations/messages
-#
-langs="";for Lang in $I18N;do [[ -s ${PO_PATH:-po}/$Lang.po ]] && langs="$langs $Lang.po";done
-#
-## for 14.0.8, this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
-[[ $TDEVERSION == 14.0.8 ]] && sed -i "s| \*.po| $langs|" cmake/modules/TDEMacros.cmake
-[[ $langs != "" ]] && TRANS=ON
+## set button background colour which otherwise defaults to system colour
+## User option, set in ./BUILD-TDE.sh
+## Note: this bleeds through on the corners when using the plastik style which has rounded corners
+## and keramik which is even more shaped.
+KEYCOLR=$(cat $TMPVARS/kvkbd-keycolr)
+[[ $KEYCOLR ]] && {
+patch -N -p0 << EOF || true
+--- src/VButton.cpp
++++ src/VButton.cpp
+@@ -11,2 +11,3 @@
+ 	//connect(this,TQT_SIGNAL(clicked()),this,TQT_SLOT(sendKey()));
++	setPaletteBackgroundColor ( TQColor($KEYCOLR) );
+ 	setFocusPolicy(TQ_NoFocus);
+EOF
+}
+
+## This is a work-in-progress, so these patches are in part revisions of previous patches
+## Revise positions of keys and reformat code to represent the calculations left-to-right
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -75,3 +75,3 @@
+ 
+-	int stx=17;
++	int stx=16;
+ 	int sty=15;
+@@ -96,3 +96,3 @@
+ 		f->setText ( "F"+TQString ( "%1" ).arg ( a+1 ) );
+-		f->move ( stx+esc->width() +3 + ( 35*a ) +25,sty );
++		f->move ( stx+esc->width() +30 + ( 35*a ),sty );
+ 		f->res();
+@@ -106,3 +106,3 @@
+ 		f->setText ( "F"+TQString ( "%1" ).arg ( a+5 ) );
+-		f->move ( stx+esc->width() +3 + ( 35*a ) +40+ ( 4*35 ),sty );
++		f->move ( stx+esc->width() +30 + ( 4*35 ) +14 + ( 35*a ),sty );
+ 		f->res();
+@@ -117,3 +117,3 @@
+ 		f->setText ( "F"+TQString ( "%1" ).arg ( a+9 ) );
+-		f->move ( stx+esc->width() +3 + ( 35*a ) +45+ ( 8*35 ) +10,sty );
++		f->move ( stx+esc->width() +30 + ( 8*35 ) +28 + ( 35*a ),sty );
+ 		f->res();
+@@ -261,3 +261,3 @@
+ 		//v->setShiftText ( k4s.mid ( a,1 ) );
+-		v->move ( stx+35+15+ ( 35*a ),sty+ ( 4*35 ) );
++		v->move ( stx+lshft->width() +5+ ( 35*a ),sty+ ( 4*35 ) );
+ 		btns.append ( v );
+@@ -269,3 +269,3 @@
+ 	sm->setKeyCode ( 59 );
+-	sm->move ( stx+ ( R4LEN *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
++	sm->move ( stx+lshft->width() +5+ ( R4LEN *35 ) ,sty+ ( 4*35 ) );
+ 	//sm->setText ( "," );
+@@ -278,3 +278,3 @@
+ 	gr->setKeyCode ( 60 );
+-	gr->move ( stx+ ( ( R4LEN +1 ) *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
++	gr->move ( stx+lshft->width() +5+ ( ( R4LEN +1 ) *35 ) ,sty+ ( 4*35 ) );
+ 	//gr->setText ( "." );
+@@ -287,3 +287,3 @@
+ 	sl->setKeyCode ( 61 );
+-	sl->move ( stx+ ( ( R4LEN +2 ) *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
++	sl->move ( stx+lshft->width() +5+ ( ( R4LEN +2 ) *35 ) ,sty+ ( 4*35 ) );
+ 	//sl->setText ( "/" );
+@@ -296,3 +296,3 @@
+ 	rshft->setKeyCode ( 62 );
+-	rshft->move ( stx+ ( ( R4LEN +3 ) *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
++	rshft->move ( stx+lshft->width() +5+ ( ( R4LEN +3 ) *35 ) ,sty+ ( 4*35 ) );
+ 	rshft->resize ( 68,30 );
+@@ -318,3 +318,3 @@
+ 	win->resize ( 45,30 );
+-	win->move ( 5+lctrl->x() +lctrl->width(), sty+ ( 5*35 ) );
++	win->move ( lctrl->x() +lctrl->width() +5, sty+ ( 5*35 ) );
+ 	win->setText ( "LWin" );
+@@ -329,3 +329,3 @@
+ 	lalt->resize ( 45,30 );
+-	lalt->move ( 5+win->x() +win->width(), sty+ ( 5*35 ) );
++	lalt->move ( win->x() +win->width() +5, sty+ ( 5*35 ) );
+ 	lalt->setText ( "Alt" );
+@@ -339,4 +339,4 @@
+ 	space->setKeyCode ( 65 );
+-	space->resize ( 5*35+28-45-5,30 );
+-	space->move ( 5+lalt->x() +lalt->width(),sty+ ( 5*35 ) );
++	space->resize ( 153,30 );
++	space->move ( lalt->x() +lalt->width() +5, sty+ ( 5*35 ) );
+ 	connect ( space, TQT_SIGNAL ( keyClick ( unsigned int ) ), this, TQT_SLOT ( keyPress ( unsigned int ) ) );
+@@ -347,3 +347,3 @@
+ 	ralt->resize ( 45,30 );
+-	ralt->move ( 5+space->x() +space->width(), sty+ ( 5*35 ) );
++	ralt->move ( space->x() +space->width() +5, sty+ ( 5*35 ) );
+ 	ralt->setText ( "AltGr" );
+@@ -356,3 +356,3 @@
+ 	rwin->resize ( 45,30 );
+-	rwin->move ( 5+ralt->x() +ralt->width(), sty+ ( 5*35 ) );
++	rwin->move ( ralt->x() +ralt->width() +5, sty+ ( 5*35 ) );
+ 	rwin->setText ( "RWin" );
+@@ -367,3 +367,3 @@
+ 	mnu->resize ( 45,30 );
+-	mnu->move ( 5+rwin->x() +rwin->width(), sty+ ( 5*35 ) );
++	mnu->move ( rwin->x() +rwin->width() +5, sty+ ( 5*35 ) );
+ 	mnu->setText ( "Menu" );
+@@ -378,3 +378,3 @@
+ 	rctrl->resize ( 45,30 );
+-	rctrl->move ( 5+mnu->x() +mnu->width(), sty+ ( 5*35 ) );
++	rctrl->move ( mnu->x() +mnu->width() +5, sty+ ( 5*35 ) );
+ 	rctrl->setText ( "Ctrl" );
+EOF
+
+
 ## for slack-desc
-langs=$(echo $langs | sed "s|.po||g")
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 
@@ -549,7 +760,7 @@ cmake \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DWITH_GCC_VISIBILITY="OFF" \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
     ..
 
@@ -576,7 +787,7 @@ $PRGNAM:
 $PRGNAM:
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en $langs
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

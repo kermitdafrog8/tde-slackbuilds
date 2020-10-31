@@ -126,7 +126,9 @@ cd_builddir_fn
 sed -i 's|TQT_INCLUDE_DIRS}|&\n  ${AVAHI_TQT_INCLUDE_DIRS}|' ../dnssd/CMakeLists.txt
 }
 
-## comment out if setting ASPELL, HSPELL, or ISPELL 'ON'
+[[ $(grep Aspell $TMPVARS/SPELL) ]] && ASPELL=ON || {
+[[ $(grep Hspell $TMPVARS/SPELL) ]] && HSPELL=ON ; } || {
+[[ $(grep Ispell $TMPVARS/SPELL) ]] && ISPELL=ON ; } || \
 sed -i 's|^.*Spell checker selected as default.*$|message( STATUS " ## no spell checker selected ##" )|' ../CMakeLists.txt
 
 cmake \
@@ -144,7 +146,7 @@ cmake \
     -DTDE_MALLOC_FULL="OFF" \
     -DWITH_ALSA="ON" \
     -DWITH_ARTS="ON" \
-    -DWITH_ASPELL="OFF" \
+    -DWITH_ASPELL=${ASPELL:-"OFF"} \
     -DWITH_AVAHI=${AVAHI:-"OFF"} \
     -DWITH_CONSOLEKIT="OFF" \
     -DWITH_CRYPTSETUP="ON" \
@@ -154,9 +156,9 @@ cmake \
     -DWITH_GAMIN="OFF" \
     -DWITH_GCC_VISIBILITY="OFF" \
     -DWITH_HAL="OFF" \
-    -DWITH_HSPELL="OFF" \
+    -DWITH_HSPELL=${HSPELL:-"OFF"} \
     -DWITH_INOTIFY="ON" \
-    -DWITH_ISPELL="OFF" \
+    -DWITH_ISPELL=${ISPELL:-"OFF"} \
     -DWITH_JASPER="OFF" \
     -DWITH_KDE4_MENU_SUFFIX="ON" \
     -DWITH_LIBART="ON" \

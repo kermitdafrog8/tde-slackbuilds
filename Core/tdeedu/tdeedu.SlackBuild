@@ -43,7 +43,7 @@ patch -N -p0 << EOF || true
 +      Py_XINCREF((objectvect.begin() +i)->ptr());
 EOF
 
-## for 14.0.8, already done in cgit
+## for 14.0.9, already done in cgit
 sed -i 's|Nome del file di input|Input filename|' kig/pykig/pykig.py
 
 ## add some files to html docs

@@ -6,7 +6,7 @@
 .. for Slackware 14.2 or current on i586+ and x86_64.  
 .. see 'Cross compiling for RPi3' for building for armv7/aarch64.
 
-Build the release version 14.0.8 from tar archives; or the development versions 14.0.9, 14.1.0 from trinitydesktop cgit.  
+Build the release version 14.0.9 from tar archives; or the development versions 14.0.10, 14.1.0 from trinitydesktop cgit.  
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input.  
 
 [<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png)
@@ -19,7 +19,7 @@ This is a global option so can't be used where the build list includes packages 
 Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.  
 Information about dependencies for some packages has been added at the bottom of the dialog screen.
 
-14.0.8 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.9/14.1.0] cloned or updated from cgit.  
+14.0.9 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.10/14.1.0] cloned or updated from cgit.  
 Downloading can be done pre-build [useful for an off-line build], or during the build.
 
 If you're curious about what this might involve, [take a look at a sample build set up](https://ray-v.github.io/A_typical_TDE_SlackBuild.html).
@@ -27,7 +27,7 @@ If you're curious about what this might involve, [take a look at a sample build 
 ---
 
 ***Other command line options*** that can be used to set some build parameters:
-* TDE_MIRROR= - override the trinitydesktop.org geoIP redirector to use https - example, *https://mirrorservice.org/sites/trinitydesktop.org/trinity*. URLs @ https://www.trinitydesktop.org/mirrorstatus.php
+* TDE_MIRROR= - override the trinitydesktop.org geoIP redirector to use https - example, *https://trinitydesktop.mirrorservice.org/trinity*. URLs @ https://www.trinitydesktop.org/mirrorstatus.php
 * BUILD= - sets the package build identifier, overriding the SlackBuild default of 1
 * USE_CMAKE_MM=yes - to build tdemultimedia with cmake - see Core/tdemultimedia/README.
 * VERBOSE=1 - show command lines during cmake builds

@@ -67,8 +67,8 @@ rm -rf $OUTPUT/{checkout,configure,make,install,error,makepkg,patch}-$PRGNAM.log
 # Where do we look for sources?
 SRCDIR=$(cd $(dirname $0); pwd)
 
-## if 14.0.8 or misc, download archive:
-[[ $TDEVERSION == 14.0.8 || $TDEMIR_SUBDIR == misc ]] && {
+## if 14.0.9 or misc, download archive:
+[[ $TDEVERSION == 14.0.9 || $TDEMIR_SUBDIR == misc ]] && {
 ## check for and remove any zero byte archive files
 [[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} ]] && \
 rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} 2>/dev/null || true
@@ -112,7 +112,7 @@ if [ "$P1" == "--download" ]; then
 fi
 } || \
 {
-## otherwise, not R14.0.8 or misc, and we are creating/updating git,
+## otherwise, not R14.0.9 or misc, and we are creating/updating git,
 ## so [1] start with admin/cmake:
 [[ $(cat $TMPVARS/DL_CGIT) == yes ]] && {
 cd $BUILD_TDE_ROOT/src/cgit
@@ -241,7 +241,7 @@ cd $TMP_BUILD/tmp-$PRGNAM
 ##
 ## [1] firstly test for R14 or misc ..
 ##
-[[ $TDEVERSION == 14.0.8 || $TDEMIR_SUBDIR == misc ]] && {
+[[ $TDEVERSION == 14.0.9 || $TDEMIR_SUBDIR == misc ]] && {
 
 ## unpack R14 or misc
 echo -e "\n unpacking $(basename $SOURCE) ... \n"
@@ -251,7 +251,7 @@ tar -xf $SOURCE
 
 } || {
 
-## [2] not 14.0.8 nor misc, so must be git ..
+## [2] not 14.0.9 nor misc, so must be git ..
 ## but is it [2a] 14.0.x ..
 [[ $TDEVERSION == 14.0.x ]] && {
 

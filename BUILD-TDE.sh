@@ -97,9 +97,9 @@ dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Version " --menu 
 Set the version of TDE to be built.
  
 " \
-12 75 3 \
-"14.0.8" "the R14.0.8 release - source from archives" \
-"14.0.x" "r14.0.9 preview/wip - source from Trinity git" \
+13 75 3 \
+"14.0.9" "the R14.0.9 release - source from archives" \
+"14.0.x" "r14.0.10 preview/wip - source from Trinity git" \
 "cgit" "R14.1.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
 
@@ -485,6 +485,26 @@ ${DLG_BOX:-0 0}
 }
 
 
+## only run this if tdelibs has been selected
+rm -f $TMPVARS/SPELL
+[[ $(grep -o tdelibs $TMPVARS/TDEbuilds) ]] && {
+dialog --cr-wrap --nocancel --no-shadow --colors --title " Spell checker " --menu \
+"
+Choose a Spell checker.
+If you chose a spell checker it must be installed, or the build will exit.
+
+This won't affect any Spell checker being installed later, it's just a work-around for a mandatory selection being forced in the source.
+ 
+" \
+19 75 4 \
+" Aspell" "" \
+" Hspell" "" \
+" Ispell" "" \
+" None" "Don't have one installed" \
+2> $TMPVARS/SPELL
+}
+
+
 ## only run this if tdebase has been selected
 rm -f $TMPVARS/RUNLEVEL
 [[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && {
@@ -551,6 +571,7 @@ sed -i 's|Apps/koffice|Misc/libpng &|' $TMPVARS/TDEbuilds
 ## only run this if kvkbd has been selected
 rm -f $TMPVARS/WinLock
 rm -f $TMPVARS/kvkbd-bg
+rm -f $TMPVARS/kvkbd-keycolr
 [[ $(grep -o kvkbd $TMPVARS/TDEbuilds) ]] && {
 dialog --cr-wrap --no-shadow --yes-label "No Lock" --no-label "Lock" --colors --defaultno --title " Kvkbd Win Keys " --yesno \
 "
@@ -578,6 +599,23 @@ RGB:    \Zb\Z6 205,192,176\Zn
 " \
 19 75 "\"black\"" \
 2> $TMPVARS/kvkbd-bg
+
+dialog --cr-wrap --no-collapse --nocancel --no-shadow --colors --title " Kvkbd keys/buttons colour " --inputbox \
+"
+The default colour for the keys and buttons is the system button colour.
+
+To change it, enter the colour you want in any of these forms, including the double quotes where shown.
+These examples are all the same colour:
+
+Named:   \Zb\Z6\"gray94\"\Zn
+Hex:    \Zb\Z6\"#f0f0f0\"\Zn
+RGB:  \Zb\Z6 240,240,240\Zn
+
+Choosing a colour for the keys doesn't work for styles like plastik and keramik which have an outline within the 30x30 key background footprint, but is OK for cde and others.
+ 
+" \
+24 75 \
+2> $TMPVARS/kvkbd-keycolr
 }
 
 
@@ -662,9 +700,9 @@ Create and/or update the git repositories local copies.
 
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
-[[ $(cat $TMPVARS/TDEVERSION) == 14.0.8 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
+[[ $(cat $TMPVARS/TDEVERSION) == 14.0.9 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
 [[ $(cat $TMPVARS/TDEVERSION) == cgit || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'." && LINES=18
-## testing for cgit!=no will allow =yes or null, which is the 14.0.8 build case
+## testing for cgit!=no will allow =yes or null, which is the 14.0.9 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "
@@ -724,9 +762,7 @@ export ARCH=$(cat $TMPVARS/ARCH)	# set again for the 'continue' option
 export TDE_MIRROR=${TDE_MIRROR:-https://mirror.ppa.trinitydesktop.org/trinity}
 export NUMJOBS=$(cat $TMPVARS/NUMJOBS)
 export I18N=$(cat $TMPVARS/I18N)
-## for later versions, use the env variable LINGUAS to determine the supported locales -
-## any of I18N not included in translations/... will be ignored -
-[[ $TDEVERSION != 14.0.8 ]] && export LINGUAS=$I18N
+export LINGUAS=$I18N
 export TQT_OPTS=$(cat $TMPVARS/TQT_OPTS)
 export EXIT_FAIL=$(cat $TMPVARS/EXIT_FAIL)
 export KEEP_BUILD=$(cat $TMPVARS/KEEP_BUILD)
