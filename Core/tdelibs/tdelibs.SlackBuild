@@ -126,10 +126,13 @@ cd_builddir_fn
 sed -i 's|TQT_INCLUDE_DIRS}|&\n  ${AVAHI_TQT_INCLUDE_DIRS}|' ../dnssd/CMakeLists.txt
 }
 
-[[ $(grep Aspell $TMPVARS/SPELL) ]] && ASPELL=ON || {
-[[ $(grep Hspell $TMPVARS/SPELL) ]] && HSPELL=ON ; } || {
-[[ $(grep Ispell $TMPVARS/SPELL) ]] && ISPELL=ON ; } || \
-sed -i 's|^.*Spell checker selected as default.*$|message( STATUS " ## no spell checker selected ##" )|' ../CMakeLists.txt
+## Slackware doesn't include Hspell
+## Prioritise Aspell according to its slack-desc:
+# GNU Aspell is a spell checker designed to eventually replace Ispell.
+[[ -d /usr/lib$LIBDIRSUFFIX/ispell ]] && ISPELL=ON && DEF_SP_CHKR=ISPELL
+[[ -d /usr/lib$LIBDIRSUFFIX/aspell ]] && ASPELL=ON && DEF_SP_CHKR=ASPELL # override ISPELL if both installed
+## just show message without failing if no spell checker is installed
+sed -i 's|tde_message_fatal( "Spell checker|message( "Spell checker|' ../CMakeLists.txt
 
 cmake \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -141,6 +144,7 @@ cmake \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+    -DDEFAULT_SPELL_CHECKER=${DEF_SP_CHKR:-"ASPELL"} \
     -DTDE_MALLOC="OFF" \
     -DTDE_MALLOC_DEBUG="OFF" \
     -DTDE_MALLOC_FULL="OFF" \
@@ -156,7 +160,7 @@ cmake \
     -DWITH_GAMIN="OFF" \
     -DWITH_GCC_VISIBILITY="OFF" \
     -DWITH_HAL="OFF" \
-    -DWITH_HSPELL=${HSPELL:-"OFF"} \
+    -DWITH_HSPELL="OFF" \
     -DWITH_INOTIFY="ON" \
     -DWITH_ISPELL=${ISPELL:-"OFF"} \
     -DWITH_JASPER="OFF" \

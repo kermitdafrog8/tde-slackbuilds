@@ -451,9 +451,9 @@ mkspecs is only required for linux-g++
 " \
 25 75 6 \
 " minimal" "Minimal packaging" off "\Zb\Z6 Exclude libs and binaries not required for TDE \Zn" \
-" pim_ksq" " ├─ Keep lib for tdepim and/or ksquirrel" off "\Zb\Z6 Only required if minimal build selected \Zn" \
-" tdevel" " ├─ Keep libs for tdevelop" off "\Zb\Z6 Only required if minimal build selected \Zn" \
-" ktorrent" " └─ Keep designer libs for ktorrent" off "\Zb\Z6 Only required if minimal build selected \Zn" \
+" pim_ksq" " ├─ Keep lib for tdepim and/or ksquirrel" off "\Zb\Z6 Only required if minimal packaging selected \Zn" \
+" tdevel" " ├─ Keep libs for tdevelop" off "\Zb\Z6 Only required if minimal packaging selected \Zn" \
+" ktorrent" " └─ Keep designer libs for ktorrent" off "\Zb\Z6 Only required if minimal packaging selected \Zn" \
 " nodocs" "Exclude html documentation" on "\Zb\Z6  \Zn" \
 " mkspecs" "linux-g++ only" on "\Zb\Z6 Uncheck for the complete set \Zn" \
 2> $TMPVARS/TQT_OPTS
@@ -483,27 +483,6 @@ ${DLG_BOX:-0 0}
 [[ $? == 0 ]] && echo set > $TMPVARS/PKG_CONFIG_PATH_MOD
 [[ $? == 1 ]] && echo leave >  $TMPVARS/PKG_CONFIG_PATH_MOD
 }
-
-
-## only run this if tdelibs has been selected
-rm -f $TMPVARS/SPELL
-[[ $(grep -o tdelibs $TMPVARS/TDEbuilds) ]] && {
-dialog --cr-wrap --nocancel --no-shadow --colors --title " Spell checker " --menu \
-"
-Choose a Spell checker.
-If you chose a spell checker it must be installed, or the build will exit.
-
-This won't affect any Spell checker being installed later, it's just a work-around for a mandatory selection being forced in the source.
- 
-" \
-19 75 4 \
-" Aspell" "" \
-" Hspell" "" \
-" Ispell" "" \
-" None" "Don't have one installed" \
-2> $TMPVARS/SPELL
-}
-
 
 ## only run this if tdebase has been selected
 rm -f $TMPVARS/RUNLEVEL
@@ -848,7 +827,7 @@ Compiler                                \Zb\Z6$COMPILER\Zn
 gcc cpu optimization                    \Zb\Z6$SET_march\Zn
 Number of parallel jobs                 \Zb\Z6$(echo $NUMJOBS|sed 's|-j||')\Zn
 Additional languages                    \Zb\Z6${I18N:-none}\Zn
-Minimal tqt build                       \Zb\Z6${TQT_BLD:-\Z0\Zbn/a}\Zn
+Minimal tqt packaging                   \Zb\Z6${TQT_BLD:-\Z0\Zbn/a}\Zn
 Include tqt html docs                   \Zb\Z6${TQT_DOCS:-\Z0\Zbn/a}\Zn
 Action on failure                       \Zb\Z6${AOF:-continue}\Zn
 Keep the temporary build files          \Zb\Z6$KEEP_BUILD\Zn

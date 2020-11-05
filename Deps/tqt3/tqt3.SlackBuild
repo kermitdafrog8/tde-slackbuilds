@@ -140,7 +140,7 @@ echo "yes" | \
 make -i $NUMJOBS symlinks src-qmake src-moc sub-src sub-tools || exit 1
 make install INSTALL_ROOT=$PKG || exit 1
 
-## for a minimal build
+## for a minimal packaging
 [[ $TQT_OPTS == *minimal* ]] && {
 (cd $PKG$TQTDIR/
 rm lib$LIBDIRSUFFIX/libtqt[de]*
@@ -149,8 +149,8 @@ rm lib$LIBDIRSUFFIX/libtqt[de]*
 }
 rm bin/???????*
 rm bin/tqm2ts
-[[ $TQT_OPTS != *ktorrent* ]] && rm -rf plugins/designer
-)}
+[[ $TQT_OPTS != *ktorrent* ]] && rm -rf lib$LIBDIRSUFFIX/tqt/plugins/designer
+)} || true # otherwise will exit 1 if [[ $TQT_OPTS == *ktorrent* ]]
 
 installdocs_fn
 
