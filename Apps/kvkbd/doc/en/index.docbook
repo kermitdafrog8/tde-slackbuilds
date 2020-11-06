@@ -71,7 +71,7 @@
 When first launched, &kvkbd; will appear in the bottom-right corner of the screen.
 <sbr/>It can be moved by clicking and dragging on any part of the background area.
 <sbr/>Resize it by clicking and dragging on the stripes at the bottom right.
-<sbr/><sbr/>The style will be the system default which can be overridden whether launched from the command line or via the .desktop file with any &tde; or &TQt; style installed on the system.
+<sbr/><sbr/>The default style will be the system style which can be overridden whether launched from the command line or via the .desktop file with any &tde; or &TQt; style installed on the system.
 <sbr/>Example: <command>kvkbd --style plastik</command>, as shown here.
 <sbr/><sbr/>The <guiicon><inlinegraphic fileref="exit-btn.png"/></guiicon> button on the top right is used to hide the keyboard - to show it again, just click on the tray icon.
 <sbr/><sbr/>
@@ -124,9 +124,9 @@ For non-US keyboards, the key which is normally lower left of the &Enter; key is
 <sbr/><sbr/>
 Where set up in the keyboard mapping file, &AltGr; will enable selection of the character mapped to the lower right of any key, and &AltGr;&nbsp;&Shift; for any upper right character.
 <sbr/><sbr/>
-The &Shift;, &Ctrl;, <keycap>Alt*</keycap> buttons 'lock' when clicked to simulate holding down a key on a physical keyboard.
+The &Shift;, &Ctrl;, <keycap>Alt*</keycap> keys 'lock' when clicked to simulate holding down a key on a physical keyboard.
 <sbr/>
-Whether the <keycap>*Win</keycap> buttons 'lock' will depend on the build time option chosen.
+Whether the <keycap>*Win</keycap> keys 'lock' will depend on the build time option chosen.
 <sbr/><sbr/>
 
 <sect2 id="dead-keys">
@@ -225,7 +225,7 @@ Add <filename>kvkbd.desktop</filename> to the &tde; Autostart directory for &kvk
 &kvkbd; will dynamically switch keyboard layouts as they are changed, either through the command line or using the &tde; Keyboard Tool.
 
 <sbr/><sbr/>
-Refer to the <ulink url='help:/kxkb/index.html'>Keyboard Layouts Handbook</ulink> for details on how to set up different and switchable keyboard layouts.
+Refer to the <ulink url='help:/kxkb/index.html'>&kxkb; Handbook</ulink> for details on keyboard layout switching.
 <sbr/><sbr/>
 
 </sect1>
@@ -287,10 +287,12 @@ As an example -- a-ogonek [U<emphasis role="bold">0105</emphasis>] + combining a
 <sbr/><sbr/>
 
 Add the character and chosen key combination to the ~/.XCompose file:
-<sbr/>
+<sbr/><sbr/>
   &#x02022; <command>echo</command> "&lt;Multi_key> &lt;space> &lt;a> : \"$(printf '\u<emphasis role="bold">0105</emphasis>\u<emphasis role="bold">0301</emphasis>')\" # aogonek + combining acute" >> ~/.XCompose
 <sbr/><sbr/>
 Test:
+<sbr/>
+  &#x02022; Run <command>setxkbmap -option compose:menu &lt;xx></command>
 <sbr/>
   &#x02022; Start new editor
 <sbr/>

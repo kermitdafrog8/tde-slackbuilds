@@ -75,32 +75,43 @@ patch -N -p0 << EOF || true
 ## and fix spacing
 @@ -262 +262 @@
 -		v->move ( stx+35+16+35+ ( 35*a ),sty+ ( 4*35 ) );
-+		v->move ( stx+35+15+ ( 35*a ),sty+ ( 4*35 ) );
++		v->move ( stx+lshft->width() +5+ ( 35*a ),sty+ ( 4*35 ) );
 EOF
 
-## Replace text on Num pad keys for a better fit
+## Add RWin button
 patch -N -p0 << EOF || true
+## new button added
+--- src/MainWidget.h
++++ src/MainWidget.h
+@@ -96,2 +96,3 @@
+	VButton *win;
++	VButton *rwin;
+	VButton *mnu;
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
-@@ -402 +402 @@
--	TQString txt[9] = { "Ho\nme", TQString::fromUtf8("▲"), "Pg\nUp",
-+	TQString txt[9] = { TQString::fromUtf8("H\u2190"), TQString::fromUtf8("▲"), TQString::fromUtf8("P\u2191"),
-@@ -404 +404 @@
--		"End", TQString::fromUtf8("▼"), "Pg\nDn" };
-+		TQString::fromUtf8("E\u2192"), TQString::fromUtf8("▼"), TQString::fromUtf8("P\u2193") };
-@@ -448 +448 @@
--	numl->setText("Num\nLock");
-+	numl->setText(TQString::fromUtf8("\u2116"));
-#+	numl->setText("N#");
-EOF
-
-## Set a more realistic initial font size
-patch -N -p0 << EOF || true
---- src/MainWidget.cpp
-+++ src/MainWidget.cpp
-@@ -676 +676 @@
--		double rp = (8.0/600.0)*width();
-+		double rp = (10.0/600.0)*width();
+#
+## RWin 'locks' with mouse click
+@@ -353,2 +354,11 @@
+ 
++	rwin = new VButton ( this,"" );
++	rwin->resize ( 50,30 );
++	rwin->move ( ralt->x() +ralt->width() +5, sty+ ( 5*35 ) );
++	rwin->setText ( "RWin" );
++	rwin->setKeyCode ( 134 );
++	rwin->setToggleButton ( true );
++	mod_keys.append( rwin );
++	rwin->res();
++
+ 
+#
+## Menu now follows RWin not Alt Gr
+@@ -355,4 +364,4 @@
+ 	mnu = new VButton ( this,"" );
+-	mnu->resize ( 45,30 );
+-	mnu->move ( 5+ralt->x() +ralt->width(), sty+ ( 5*35 ) );
++	mnu->resize ( 50,30 );
++	mnu->move ( rwin->x() +rwin->width() +5, sty+ ( 5*35 ) );
+ 	mnu->setText ( "Menu" );
 EOF
 
 ## Fix keycodes for evdev mapping:
@@ -117,33 +128,161 @@ patch -N -p0 << EOF || true
 @@ -349 +349 @@
 -	ralt->setKeyCode ( 113 );
 +	ralt->setKeyCode ( 108 );
-@@ -359 +359 @@
+@@ -368 +368 @@
 -	mnu->setKeyCode ( 117 );
 +	mnu->setKeyCode ( 135 );
-@@ -370 +370 @@
+@@ -379 +379 @@
 -	rctrl->setKeyCode ( 37 );
 +	rctrl->setKeyCode ( 105 );
-@@ -459 +459 @@
+@@ -468 +468 @@
 -	div->setKeyCode(112);
 +	div->setKeyCode(106);
-@@ -476 +476 @@
+@@ -485 +485 @@
 -	ent->setKeyCode(36);
 +	ent->setKeyCode(104);
 EOF
 
+## Cosmetic changes:
+## Set F4-F5 spacing as per F8-F9
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -97 +97 @@
+-		f->move ( stx+esc->width() + ( 35*a ) +20,sty );
++		f->move ( stx+esc->width() +30 + ( 35*a ),sty );
+@@ -107 +107 @@
+-		f->move ( stx+esc->width() + ( 35*a ) +40+ ( 4*35 ),sty );
++		f->move ( stx+esc->width() +30 + ( 4*35 ) +14 + ( 35*a ),sty );
+@@ -118 +118 @@
+-		f->move ( stx+esc->width() + ( 35*a ) +45+ ( 8*35 ) +10,sty );
++		f->move ( stx+esc->width() +30 + ( 8*35 ) +28 + ( 35*a ),sty );
+#
+## resize keys for alignment on right side of keyboard
+@@ -139 +139 @@
+-	bksp->resize ( 46,30 );
++	bksp->resize ( 48,30 );
+@@ -149 +149 @@
+-	tab->resize ( 47,30 );
++	tab->resize ( 48,30 );
+## reduce size of Dock image
+@@ -938 +938 @@
+-	resize ( 96,47 );
++	resize ( 64,31 );
+EOF
+
+## Revise positions of keys and reformat code to represent the calculations left-to-right
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -75,3 +75,3 @@
+ 
+-	int stx=15;
++	int stx=16;
+ 	int sty=15;
+@@ -219,3 +219,3 @@
+ 	smcl->setKeyCode ( 47 );
+-	smcl->move ( stx+ ( R3LEN *35 ) +caps->width() +5,sty+ ( 3*35 ) );
++	smcl->move ( stx+caps->width() +5+ ( R3LEN *35 ) ,sty+ ( 3*35 ) );
+ 	//smcl->setText ( ";" );
+@@ -228,3 +228,3 @@
+ 	sngq->setKeyCode ( 48 );
+-	sngq->move ( stx+ ( ( R3LEN +1 ) *35 ) +caps->width() +5,sty+ ( 3*35 ) );
++	sngq->move ( stx+caps->width() +5+ ( ( R3LEN +1 ) *35 ) ,sty+ ( 3*35 ) );
+ 	//sngq->setText ( "'" );
+@@ -237,3 +237,3 @@
+ 	enter->setKeyCode ( 36 );
+-	enter->move ( stx+ ( ( R3LEN +2 ) *35 ) +caps->width() +5,sty+ ( 3*35 ) );
++	enter->move ( stx+caps->width() +5+ ( ( R3LEN +2 ) *35 ) ,sty+ ( 3*35 ) );
+ 	enter->resize ( 50,30 );
+@@ -269,3 +269,3 @@
+ 	sm->setKeyCode ( 59 );
+-	sm->move ( stx+ ( R4LEN *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
++	sm->move ( stx+lshft->width() +5+ ( R4LEN *35 ) ,sty+ ( 4*35 ) );
+ 	//sm->setText ( "," );
+@@ -278,3 +278,3 @@
+ 	gr->setKeyCode ( 60 );
+-	gr->move ( stx+ ( ( R4LEN +1 ) *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
++	gr->move ( stx+lshft->width() +5+ ( ( R4LEN +1 ) *35 ) ,sty+ ( 4*35 ) );
+ 	//gr->setText ( "." );
+@@ -287,3 +287,3 @@
+ 	sl->setKeyCode ( 61 );
+-	sl->move ( stx+ ( ( R4LEN +2 ) *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
++	sl->move ( stx+lshft->width() +5+ ( ( R4LEN +2 ) *35 ) ,sty+ ( 4*35 ) );
+ 	//sl->setText ( "/" );
+@@ -296,3 +296,3 @@
+ 	rshft->setKeyCode ( 62 );
+-	rshft->move ( stx+ ( ( R4LEN +3 ) *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
++	rshft->move ( stx+lshft->width() +5+ ( ( R4LEN +3 ) *35 ) ,sty+ ( 4*35 ) );
+ 	rshft->resize ( 68,30 );
+@@ -305,3 +305,3 @@
+ 	
+-
++	//ROW 5
+ 	lctrl = new VButton ( this,"" );
+@@ -317,5 +317,5 @@
+ 	win = new VButton ( this,"" );
+-	win->resize ( 45,30 );
+-	win->move ( 5+lctrl->x() +lctrl->width(), sty+ ( 5*35 ) );
+-	win->setText ( "Win" );
++	win->resize ( 50,30 );
++	win->move ( lctrl->x() +lctrl->width() +5, sty+ ( 5*35 ) );
++	win->setText ( "LWin" );
+	win->setKeyCode ( 133 );
+@@ -328,3 +328,3 @@
+ 	lalt->resize ( 45,30 );
+-	lalt->move ( 5+win->x() +win->width(), sty+ ( 5*35 ) );
++	lalt->move ( win->x() +win->width() +5, sty+ ( 5*35 ) );
+ 	lalt->setText ( "Alt" );
+@@ -338,4 +338,4 @@
+ 	space->setKeyCode ( 65 );
+-	space->resize ( 5*35+28,30 );
+-	space->move ( 5+lalt->x() +lalt->width(),sty+ ( 5*35 ) );
++	space->resize ( 133,30 );
++	space->move ( lalt->x() +lalt->width() +5, sty+ ( 5*35 ) );
+ 	connect ( space, TQT_SIGNAL ( keyClick ( unsigned int ) ), this, TQT_SLOT ( keyPress ( unsigned int ) ) );
+@@ -345,4 +345,4 @@
+ 	ralt = new VButton ( this,"" );
+-	ralt->resize ( 45,30 );
+-	ralt->move ( 5+space->x() +space->width(), sty+ ( 5*35 ) );
++	ralt->resize ( 50,30 );
++	ralt->move ( space->x() +space->width() +5, sty+ ( 5*35 ) );
+ 	ralt->setText ( "AltGr" );
+@@ -376,3 +376,3 @@
+ 	rctrl->resize ( 45,30 );
+-	rctrl->move ( 5+mnu->x() +mnu->width(), sty+ ( 5*35 ) );
++	rctrl->move ( mnu->x() +mnu->width() +5, sty+ ( 5*35 ) );
+ 	rctrl->setText ( "Ctrl" );
+EOF
+
+## Replace text on Num pad keys for a better fit
+patch -N -p0 << EOF || true
+--- src/MainWidget.cpp
++++ src/MainWidget.cpp
+@@ -411 +411 @@
+-	TQString txt[9] = { "Ho\nme", TQString::fromUtf8("▲"), "Pg\nUp",
++	TQString txt[9] = { TQString::fromUtf8("H\u2190"), TQString::fromUtf8("▲"), TQString::fromUtf8("P\u2191"),
+@@ -413 +413 @@
+-		"End", TQString::fromUtf8("▼"), "Pg\nDn" };
++		TQString::fromUtf8("E\u2192"), TQString::fromUtf8("▼"), TQString::fromUtf8("P\u2193") };
+@@ -457 +457 @@
+-	numl->setText("Num\nLock");
++	numl->setText(TQString::fromUtf8("\u2116"));
+EOF
+
+
 ## dead_* characters don't display on keys, so add single click printable character equivalents
 ## to display on keys - the printed character remains as dead_<whatever>
-## Only need for levels 0 and 1 - higher levels don't show on keys
+## Only needed for levels 0 and 1 - higher levels don't show on keys
 ## NoSymbol shows as an outline square [.notdef] on keys - replace with space=blank
 ## Re: MainWidget.cpp "* therefore keysymtab[] must remain SORTED by keysym value."
 patch -N -p0 << EOF || true
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
-@@ -999,2 +1021,3 @@
+@@ -1008,2 +1030,3 @@
  } keysymtab[] = {
 +  { 0x0000, 0x0020 }, /*                  NoSymbol -> <- space */
    { 0x01a1, 0x0104 }, /*                     Aogonek Ą LATIN CAPITAL LETTER A WITH OGONEK */
-@@ -1772,2 +1795,18 @@
+@@ -1781,2 +1782,18 @@
    { 0x20ac, 0x20ac }, /*                    EuroSign € EURO SIGN */
 +  { 0xfe50, 0x0060 }, /*                  dead_grave \` */
 +  { 0xfe51, 0x00b4 }, /*                  dead_acute ´ */
@@ -168,7 +307,7 @@ EOF
 patch -N -p0 << EOF || true
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
-@@ -1825,3 +1825,3 @@
+@@ -1834,3 +1834,3 @@
  {
 -
 +	TQToolTip::add ( this, "Virtual keyboard" );
@@ -182,57 +321,46 @@ EOF
 patch -N -p0 << EOF || true
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
-@@ -407 +407 @@
+@@ -416 +416 @@
 -	int nval[9] = {16,17,18,13,14,15,10,11,12};
 +	int nval[9] = {79,80,81,83,84,85,87,88,89};
-@@ -427 +427 @@
+@@ -436 +436 @@
 -	ins->setKeyCode(19,90);
 +	ins->setKeyCode(90,90);
-@@ -439 +439 @@
+@@ -448 +448 @@
 -	del->setKeyCode(60,91);
 +	del->setKeyCode(91,91);
 EOF
 
-## Cosmetic changes:
-## Set F4-F5 spacing as per F8-F9
-patch -N -p0 << EOF || true
---- src/MainWidget.cpp
-+++ src/MainWidget.cpp
-@@ -97 +97 @@
--		f->move ( stx+esc->width() + ( 35*a ) +20,sty );
-+		f->move ( stx+esc->width() +3 + ( 35*a ) +25,sty );
-@@ -107 +107 @@
--		f->move ( stx+esc->width() + ( 35*a ) +40+ ( 4*35 ),sty );
-+		f->move ( stx+esc->width() +3 + ( 35*a ) +40+ ( 4*35 ),sty );
-@@ -118 +118 @@
--		f->move ( stx+esc->width() + ( 35*a ) +45+ ( 8*35 ) +10,sty );
-+		f->move ( stx+esc->width() +3 + ( 35*a ) +45+ ( 8*35 ) +10,sty );
-#
-## resize keys for alignment on right side of keyboard
-@@ -139 +139 @@
--	bksp->resize ( 46,30 );
-+	bksp->resize ( 48,30 );
-@@ -149 +149 @@
--	tab->resize ( 47,30 );
-+	tab->resize ( 48,30 );
-## reduce size of Dock image
-@@ -929 +929 @@
--	resize ( 96,47 );
-+	resize ( 64,31 );
-EOF
 
+## kvkbd --background <color> doesn't work, so this is an option
 ## set keyboard background colour
 ## User option, set in ./BUILD-TDE.sh
+#
 BGCOLR=$(cat $TMPVARS/kvkbd-bg)
+#
+## for the plastik and keramik styles which have a key boundary within the key 30x30 footprint,
+## setting the button/key background colour with the KEYCOLR option will bleed through outside that boundary
+## except for the configuration button and the num pad keys, which follow these two lines.
+## Moving these settings to the beginning of MainWidget::MainWidget enables all keys to be displayed correctly.
+#
 patch -N -p0 << EOF || true
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
-@@ -397,2 +397,2 @@
--	setPaletteBackgroundColor ( TQt::black );
-	setFocusPolicy ( TQ_NoFocus );
+@@ -79,2 +79,5 @@
+ 
 +	setPaletteBackgroundColor ( TQColor($BGCOLR) );
-	setFocusPolicy ( TQ_NoFocus );
++	setFocusPolicy ( TQ_NoFocus );
++
+ // 	resize ( 550,235 );
+@@ -405,5 +408,2 @@
+ 
+-	setPaletteBackgroundColor ( TQt::black );
+-	setFocusPolicy ( TQ_NoFocus );
+-
+ 
 EOF
+
 
 ## use icons for quit and num pad show/hide buttons
 ## these are the 16x16/actions icons used for the system selected icon set
@@ -241,22 +369,22 @@ patch -N -p0 << EOF || true
 +++ src/MainWidget.cpp
 #
 ## num pad show button
-@@ -388 +388 @@
+@@ -400 +400 @@
 -	extent->setText(">>");
 +	extent->setPixmap(TQIconSet(SmallIcon("media-seek-forward")).pixmap());
-@@ -689 +689 @@
+@@ -698 +698 @@
 -		extent->setText(">>");
 +		extent->setPixmap(TQIconSet(SmallIcon("media-seek-forward")).pixmap());
 #
 ## num pad hide button
-@@ -693 +693 @@
+@@ -702 +702 @@
 -		extent->setText("<<");
 +		extent->setPixmap(TQIconSet(SmallIcon("media-seek-backward")).pixmap());
 #
 ## quit button
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
-@@ -380 +380 @@
+@@ -392 +392 @@
 -	quit->setPaletteBackgroundColor ( TQt::red );
 +	quit->setPixmap(TQIconSet(SmallIcon("application-exit")).pixmap());
 EOF
@@ -266,7 +394,7 @@ EOF
 patch -N -p0 << EOF || true
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
-@@ -886,5 +897,9 @@
+@@ -895,5 +897,9 @@
  	TQString btn_text(TQChar((uint)ret));
  	
 -	v.setText(btn_text);
@@ -279,58 +407,16 @@ patch -N -p0 << EOF || true
  	TQString btn_upper(btn_text.upper());
 EOF
 
-## Add RWin button
-patch -N -p0 << EOF || true
-## new button added
---- src/MainWidget.h
-+++ src/MainWidget.h
-@@ -96,2 +96,3 @@
-	VButton *win;
-+	VButton *rwin;
-	VButton *mnu;
---- src/MainWidget.cpp
-+++ src/MainWidget.cpp
-#
-## differentiate between Win keys for documentation
-@@ -320 +320 @@
--	win->setText ( "Win" );
-+	win->setText ( "LWin" );
-#
-## reduce the width of the space bar by 45=RWin width and 5=space between keys
-@@ -339 +339 @@
--	space->resize ( 5*35+28,30 );
-+	space->resize ( 5*35+28-45-5,30 );
-#
-## RWin 'locks' with mouse click
-@@ -353,2 +354,11 @@
- 
-+	rwin = new VButton ( this,"" );
-+	rwin->resize ( 45,30 );
-+	rwin->move ( 5+ralt->x() +ralt->width(), sty+ ( 5*35 ) );
-+	rwin->setText ( "RWin" );
-+	rwin->setKeyCode ( 134 );
-+	rwin->setToggleButton ( true );
-+	mod_keys.append( rwin );
-+	rwin->res();
-+
- 
-#
-## Menu now follows RWin not Alt Gr
-@@ -357 +367 @@
--	mnu->move ( 5+ralt->x() +ralt->width(), sty+ ( 5*35 ) );
-+	mnu->move ( 5+rwin->x() +rwin->width(), sty+ ( 5*35 ) );
-EOF
-
 ## resize quit, num pad show/hide, configure buttons to see the icons better at reduced size of keyboard
 patch -N -p0 << EOF || true
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
-@@ -387,2 +387,2 @@
+@@ -390,2 +390,2 @@
 -	quit->resize ( 15,30 );
 -	quit->move ( 525,15 );
 +	quit->resize ( 20,30 );
 +	quit->move ( 526,15 );
-@@ -395,2 +395,2 @@
+@@ -398,2 +398,2 @@
 -	extent->resize( 15,65 );
 -	extent->move(525, 85 );
 +	extent->resize ( 20,65 );
@@ -351,33 +437,30 @@ patch -N -p0 << EOF || true
 ## move and resize keyboard
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
-@@ -76 +76 @@
--	int stx=15;
-+	int stx=17;
 @@ -593 +593 @@
 -	int d_width=550;
-+	int d_width=553;
++	int d_width=552;
 @@ -639,2 +639,2 @@
 -		sdxs = width() - (width() * (150.0/700.0));
 -		VButton::pw=700.0;
-+		sdxs = width() - (width() * (150.0/704.0));
-+		VButton::pw=704.0;
++		sdxs = width() - (width() * (150.0/702.0));
++		VButton::pw=702.0;
 @@ -642 +642 @@
 -		setMinimumSize(700/3,235/3);
-+		setMinimumSize(704/3,235/3);
++		setMinimumSize(702/3,235/3);
 @@ -646,2 +646,2 @@
 -		sdxb = width() + (width() * (150.0/550.0));
 -		VButton::pw=550.0;
-+		sdxb = width() + (width() * (150.0/553.0));
-+		VButton::pw=553.0;
++		sdxb = width() + (width() * (150.0/552.0));
++		VButton::pw=552.0;
 @@ -649 +649 @@
 -		setMinimumSize(550/3,235/3);
-+		setMinimumSize(553/3,235/3);
++		setMinimumSize(552/3,235/3);
 --- src/VButton.cpp
 +++ src/VButton.cpp
 @@ -5 +5 @@
 -double VButton::pw=550.0;
-+double VButton::pw=553.0;
++double VButton::pw=552.0;
 EOF
 
 ## missing characters in keysymtab[] - for AC12 -> AD13 key on ua keyboard
@@ -403,11 +486,11 @@ patch -N -p0 << EOF || true
 +++ src/MainWidget.cpp
 #
 ## don't lock the LWin button
-@@ -322 +322 @@
+@@ -325 +325 @@
 -	win->setToggleButton ( true );
 +	win->setToggleButton ( false );
 ## don't lock the RWin button
-@@ -359 +359 @@
+@@ -362 +362 @@
 -	rwin->setToggleButton ( true );
 +	rwin->setToggleButton ( false );
 #
@@ -416,13 +499,13 @@ patch -N -p0 << EOF || true
 +++ src/MainWidget.cpp
 #
 ## for LWin
-@@ -323 +323,2 @@
+@@ -326 +326,2 @@
 -	mod_keys.append ( win );
 +	connect ( win, TQT_SIGNAL ( keyClick ( unsigned int ) ), this, TQT_SLOT ( keyPress ( unsigned int ) ) );
 +	other_keys.append( win );
 #
 ## for RWin
-@@ -360 +361,2 @@
+@@ -363 +364,2 @@
 -	mod_keys.append( rwin );
 +	connect ( rwin, TQT_SIGNAL ( keyClick ( unsigned int ) ), this, TQT_SLOT ( keyPress ( unsigned int ) ) );
 +	other_keys.append( rwin );
@@ -521,6 +604,9 @@ EOF
 
 ## fix azerty keyboards shift keys showing caps
 ## simplify the algorithm and use s for shift characters, leave u for upper case
+# * if shift is on, set text as shift character, else use lower character
+# * if caps is on, set text as l.upper(), which will be upper case for alpha characters, or lower level for non-alpha characters, else use lower character
+# * for lower level or shift characters, set ampersand as a special case
 patch -N -p0 << EOF || true
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
@@ -636,10 +722,9 @@ patch -N -p0 << EOF || true
  		VButton::setKeyCode(numlock_code);
 EOF
 
+## kvkbd --button <color> doesn't work, so this is an option
 ## set button background colour which otherwise defaults to system colour
 ## User option, set in ./BUILD-TDE.sh
-## Note: this bleeds through on the corners when using the plastik style which has rounded corners
-## and keramik which is even more shaped.
 KEYCOLR=$(cat $TMPVARS/kvkbd-keycolr)
 [[ $KEYCOLR ]] && {
 patch -N -p0 << EOF || true
@@ -652,93 +737,29 @@ patch -N -p0 << EOF || true
 EOF
 }
 
-## This is a work-in-progress, so these patches are in part revisions of previous patches
-## Revise positions of keys and reformat code to represent the calculations left-to-right
+## base auto font size on main board size otherwise when the num pad is brought into view
+## the font size immediately increases in proportion, ie by 702/552.
+## and set a more realistic initial font size
 patch -N -p0 << EOF || true
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
-@@ -75,3 +75,3 @@
- 
--	int stx=17;
-+	int stx=16;
- 	int sty=15;
-@@ -96,3 +96,3 @@
- 		f->setText ( "F"+TQString ( "%1" ).arg ( a+1 ) );
--		f->move ( stx+esc->width() +3 + ( 35*a ) +25,sty );
-+		f->move ( stx+esc->width() +30 + ( 35*a ),sty );
- 		f->res();
-@@ -106,3 +106,3 @@
- 		f->setText ( "F"+TQString ( "%1" ).arg ( a+5 ) );
--		f->move ( stx+esc->width() +3 + ( 35*a ) +40+ ( 4*35 ),sty );
-+		f->move ( stx+esc->width() +30 + ( 4*35 ) +14 + ( 35*a ),sty );
- 		f->res();
-@@ -117,3 +117,3 @@
- 		f->setText ( "F"+TQString ( "%1" ).arg ( a+9 ) );
--		f->move ( stx+esc->width() +3 + ( 35*a ) +45+ ( 8*35 ) +10,sty );
-+		f->move ( stx+esc->width() +30 + ( 8*35 ) +28 + ( 35*a ),sty );
- 		f->res();
-@@ -261,3 +261,3 @@
- 		//v->setShiftText ( k4s.mid ( a,1 ) );
--		v->move ( stx+35+15+ ( 35*a ),sty+ ( 4*35 ) );
-+		v->move ( stx+lshft->width() +5+ ( 35*a ),sty+ ( 4*35 ) );
- 		btns.append ( v );
-@@ -269,3 +269,3 @@
- 	sm->setKeyCode ( 59 );
--	sm->move ( stx+ ( R4LEN *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
-+	sm->move ( stx+lshft->width() +5+ ( R4LEN *35 ) ,sty+ ( 4*35 ) );
- 	//sm->setText ( "," );
-@@ -278,3 +278,3 @@
- 	gr->setKeyCode ( 60 );
--	gr->move ( stx+ ( ( R4LEN +1 ) *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
-+	gr->move ( stx+lshft->width() +5+ ( ( R4LEN +1 ) *35 ) ,sty+ ( 4*35 ) );
- 	//gr->setText ( "." );
-@@ -287,3 +287,3 @@
- 	sl->setKeyCode ( 61 );
--	sl->move ( stx+ ( ( R4LEN +2 ) *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
-+	sl->move ( stx+lshft->width() +5+ ( ( R4LEN +2 ) *35 ) ,sty+ ( 4*35 ) );
- 	//sl->setText ( "/" );
-@@ -296,3 +296,3 @@
- 	rshft->setKeyCode ( 62 );
--	rshft->move ( stx+ ( ( R4LEN +3 ) *35 ) +lshft->width() +5,sty+ ( 4*35 ) );
-+	rshft->move ( stx+lshft->width() +5+ ( ( R4LEN +3 ) *35 ) ,sty+ ( 4*35 ) );
- 	rshft->resize ( 68,30 );
-@@ -318,3 +318,3 @@
- 	win->resize ( 45,30 );
--	win->move ( 5+lctrl->x() +lctrl->width(), sty+ ( 5*35 ) );
-+	win->move ( lctrl->x() +lctrl->width() +5, sty+ ( 5*35 ) );
- 	win->setText ( "LWin" );
-@@ -329,3 +329,3 @@
- 	lalt->resize ( 45,30 );
--	lalt->move ( 5+win->x() +win->width(), sty+ ( 5*35 ) );
-+	lalt->move ( win->x() +win->width() +5, sty+ ( 5*35 ) );
- 	lalt->setText ( "Alt" );
-@@ -339,4 +339,4 @@
- 	space->setKeyCode ( 65 );
--	space->resize ( 5*35+28-45-5,30 );
--	space->move ( 5+lalt->x() +lalt->width(),sty+ ( 5*35 ) );
-+	space->resize ( 153,30 );
-+	space->move ( lalt->x() +lalt->width() +5, sty+ ( 5*35 ) );
- 	connect ( space, TQT_SIGNAL ( keyClick ( unsigned int ) ), this, TQT_SLOT ( keyPress ( unsigned int ) ) );
-@@ -347,3 +347,3 @@
- 	ralt->resize ( 45,30 );
--	ralt->move ( 5+space->x() +space->width(), sty+ ( 5*35 ) );
-+	ralt->move ( space->x() +space->width() +5, sty+ ( 5*35 ) );
- 	ralt->setText ( "AltGr" );
-@@ -356,3 +356,3 @@
- 	rwin->resize ( 45,30 );
--	rwin->move ( 5+ralt->x() +ralt->width(), sty+ ( 5*35 ) );
-+	rwin->move ( ralt->x() +ralt->width() +5, sty+ ( 5*35 ) );
- 	rwin->setText ( "RWin" );
-@@ -367,3 +367,3 @@
- 	mnu->resize ( 45,30 );
--	mnu->move ( 5+rwin->x() +rwin->width(), sty+ ( 5*35 ) );
-+	mnu->move ( rwin->x() +rwin->width() +5, sty+ ( 5*35 ) );
- 	mnu->setText ( "Menu" );
-@@ -378,3 +378,3 @@
- 	rctrl->resize ( 45,30 );
--	rctrl->move ( 5+mnu->x() +mnu->width(), sty+ ( 5*35 ) );
-+	rctrl->move ( mnu->x() +mnu->width() +5, sty+ ( 5*35 ) );
- 	rctrl->setText ( "Ctrl" );
+@@ -690,3 +690,6 @@
+ 		//double rs = (100.0/700.0)*width();
+-		double rp = (8.0/600.0)*width();
++	if (extent_visible) {
++		rp = (11.0/600.0)*width() * (552.0/702.0); }
++	else {
++		rp = (11.0/600.0)*width(); }
+ 		//fnt.setStretch(rs);
+EOF
+#
+patch -N -p0 << EOF || true
+--- src/MainWidget.h
++++ src/MainWidget.h
+@@ -130,2 +130,3 @@
+ 	double sdxb;
++	double rp;
+ 	int mnu_dock;
 EOF
 
 
