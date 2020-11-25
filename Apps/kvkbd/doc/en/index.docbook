@@ -104,14 +104,17 @@ To display and select the shift characters, use both &Shift; keys:
 <title>The configuration menu</title>
 
 The &kvkbd; configuration menu is accessible by clicking on the configuration button <guiicon><inlinegraphic fileref="config-btn.png"/></guiicon> or by right clicking on the tray icon.
-<sbr/><sbr/>Select "<emphasis role="bold">Font ...</emphasis>" to choose the font used to display the characters on the keys.
-<sbr/><sbr/>Check "<emphasis role="bold">Auto Resize Font</emphasis>" to resize the font when &kvkbd; is resized.
-<sbr/><sbr/>Check "<emphasis role="bold">Dock Widget</emphasis>" to display a small dock which can be placed anywhere on screen.
-<sbr/>Click on the dock to hide or show the virtual keyboard.
-<sbr/><sbr/>Check "<emphasis role="bold">Lock on screen</emphasis>" to fix the position and size of the keyboard on the screen.
 <mediaobject><imageobject>
     <imagedata fileref="config-menu.png" format="PNG" />
 </imageobject></mediaobject>
+Select "<emphasis role="bold">Font</emphasis>" to choose the font used to display the characters on the keys.
+<sbr/><sbr/>Check "<emphasis role="bold">Auto Resize Font</emphasis>" to resize the font when &kvkbd; is resized.
+<sbr/><sbr/>Select "<emphasis role="bold">Keyboard color</emphasis>" to choose a colour for the keyboard [background].
+<sbr/><sbr/>Select "<emphasis role="bold">Key color</emphasis>" to choose a colour for the keys/buttons.
+<sbr/>&kvkbd; needs to be restarted for the chosen colour to display.
+<sbr/><sbr/>Check "<emphasis role="bold">Dock Widget</emphasis>" to display a small dock which can be placed anywhere on screen.
+<sbr/>Click on the dock to hide or show the virtual keyboard.
+<sbr/><sbr/>Check "<emphasis role="bold">Lock on screen</emphasis>" to fix the position and size of the keyboard on the screen.
 
 </sect1>
 

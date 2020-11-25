@@ -563,38 +563,6 @@ If they will only be used as alternatively mapped keys using xmodmap, then they 
 17 75
 [[ $? == 0 ]] && 2> $TMPVARS/WinLock
 [[ $? == 1 ]] && echo 1 > $TMPVARS/WinLock
-
-dialog --cr-wrap --no-collapse --nocancel --no-shadow --colors --title " Kvkbd background colour " --inputbox \
-"
-The default background colour for the keyboard is black.
-
-To change it, enter the colour you want in any of these forms, including the double quotes where shown.
-These examples are all the same colour:
-
-Named: \Zb\Z6\"antiquewhite3\"\Zn
-Hex:      \Zb\Z6\"#cdc0b0\"\Zn
-RGB:    \Zb\Z6 205,192,176\Zn
- 
-" \
-19 75 "\"black\"" \
-2> $TMPVARS/kvkbd-bg
-
-dialog --cr-wrap --no-collapse --nocancel --no-shadow --colors --title " Kvkbd keys/buttons colour " --inputbox \
-"
-The default colour for the keys and buttons is the system button colour.
-
-To change it, enter the colour you want in any of these forms, including the double quotes where shown.
-These examples are all the same colour:
-
-Named:   \Zb\Z6\"gray94\"\Zn
-Hex:    \Zb\Z6\"#f0f0f0\"\Zn
-RGB:  \Zb\Z6 240,240,240\Zn
-
-Choosing a colour for the keys doesn't work for styles like plastik and keramik which have an outline within the 30x30 key background footprint, but is OK for cde and others.
- 
-" \
-24 75 \
-2> $TMPVARS/kvkbd-keycolr
 }
 
 
@@ -741,7 +709,7 @@ export ARCH=$(cat $TMPVARS/ARCH)	# set again for the 'continue' option
 export TDE_MIRROR=${TDE_MIRROR:-https://mirror.ppa.trinitydesktop.org/trinity}
 export NUMJOBS=$(cat $TMPVARS/NUMJOBS)
 export I18N=$(cat $TMPVARS/I18N)
-export LINGUAS=$I18N
+export LINGUAS="$I18N 1" ## dummy locale as LINGUAS="" builds all translations
 export TQT_OPTS=$(cat $TMPVARS/TQT_OPTS)
 export EXIT_FAIL=$(cat $TMPVARS/EXIT_FAIL)
 export KEEP_BUILD=$(cat $TMPVARS/KEEP_BUILD)

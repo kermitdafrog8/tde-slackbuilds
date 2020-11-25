@@ -45,6 +45,9 @@ sed -i "s|QMAKE_RPATH.*$|QMAKE_RPATH =|" mkspecs/linux-g++/qmake.conf
 
 ## tqt libs might be installed in $([T]QTDIR)/lib64
 sed -i "s|QTDIR)/lib|&$LIBDIRSUFFIX|" mkspecs/linux-g++/qmake.conf
+## add -headerdir as set in configure
+[[ $TDEVERSION == cgit ]] && QTDIR_PFX=T || QTDIR=$TQTDIR
+sed -i "s|QMAKE_INCDIR		=|& \$(${QTDIR_PFX:-}QTDIR)/include/tqt|" mkspecs/linux-g++/qmake.conf
 
 ## allow building with clang
 [[ ! $(grep COMPILER mkspecs/linux-g++/qmake.conf) ]] && {
@@ -155,8 +158,6 @@ rm bin/tqm2ts
 installdocs_fn
 
 mkdir -p $PKG/etc/profile.d
-#
-[[ $TDEVERSION == cgit ]] && QTDIR_PFX=T
 #
 echo '#!'"/bin/sh
 # Environment path variable for the tQt package.

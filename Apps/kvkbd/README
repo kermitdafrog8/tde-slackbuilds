@@ -1,0 +1,6 @@
+There is an option in the configuration menu to change the colours of the keyboard/background and the keys/buttons.
+
+The keyboard colour change is immediate, but a change of key colour requires a restart of Kvkbd after the new colour has been selected.
+
+If you can supply a patch to make the key colour change immediate, please open a pull request, or attach it to an issue.
+ 
