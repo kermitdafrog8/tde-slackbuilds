@@ -33,6 +33,23 @@ getsource_fn
 
 untar_fn
 
+# ### 2021-02-12
+## These changes are being merged piecemeal to git resulting in patches, and the build, failing.
+## This script will be updated when all merges have been completed, but meanwhile, to build kvkbd with these patches, revert the repo to compatible revisions
+[[ $TDEVERSION != 14.0.9 ]] && {
+(cd $BUILD_TDE_ROOT/src/cgit/$PRGNAM/
+git reset HEAD *
+rm -rf .git/worktrees/*
+[[ $TDEVERSION == cgit ]] && git checkout -f 2a5540d || git checkout -f 2882ff6
+## overwrite the files in the build area set up by untar_fn with the source now in 'detached HEAD' state ..
+echo -e "\n copying $PRGNAM git sources to build area ... \n"
+(cd $BUILD_TDE_ROOT/src/cgit
+cp -a --parents $PRGNAM/* $TMP_BUILD/tmp-$PRGNAM/
+cp -a --parents cmake/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/)
+)
+}
+# ###
+
 ## copy the helpfile docs to the build tree
 cp -a $SRCDIR/doc .
 cp $SRCDIR/dock.png src/
@@ -964,7 +981,6 @@ patch -N -p0 << EOF || true
 +		TQToolTip::add( extent, i18n( "Show num pad" ) ); }
  	extent->res();
 EOF
-
 
 ## for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done

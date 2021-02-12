@@ -14,7 +14,7 @@ For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series
 The default is to install the packages as they are built, which is necessary initially for the required packages and for some interdependencies [for example, tdesdk requires tdepim].  
 
 Run **INST=0 ./BUILD-TDE.sh** to build only.  
-This is a global option so can't be used where the build list includes packages which will be dependencies for other packages in the build list.
+This is a global option so can't be used where the build list includes packages which will need to be installed as dependencies for other packages in the build list.
 
 Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.  
 Information about dependencies for some packages has been added at the bottom of the dialog screen.
