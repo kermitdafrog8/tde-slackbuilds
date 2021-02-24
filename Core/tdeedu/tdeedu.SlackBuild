@@ -36,9 +36,10 @@ untar_fn
 ## patch for kig python scripting error:
 ## kig: /usr/include/boost/python/object_core.hpp:422: boost::python::api::object_base::~object_base(): Assertion `Py_REFCNT(m_ptr) > 0' failed.
 ## Re: https://bugs.kde.org/show_bug.cgi?id=401512#c5
+[[ $TDEVERSION == 14.0.9 ]] && EXTN=cc || EXTN=cpp
 patch -N -p0 << EOF || true
---- kig/scripting/python_scripter.cc
-+++ kig/scripting/python_scripter.cc
+--- kig/scripting/python_scripter.$EXTN
++++ kig/scripting/python_scripter.$EXTN
 @@ -493,0 +494 @@
 +      Py_XINCREF((objectvect.begin() +i)->ptr());
 EOF
@@ -57,8 +58,8 @@ cd_builddir_fn
 
 # ### Kalzium Chemical Equation Solver - start
 ## Needs OCaml and facile
-ocaml_installed_fn () { [[ -s /usr/local/lib$LIBDIRSUFFIX/libnums.a ]] && \
-[[ -s /usr/local/lib$LIBDIRSUFFIX/facile/facile.a ]] ;}
+ocaml_installed_fn () { [[ -s /usr/local/lib$LIBDIRSUFFIX/ocaml/libnums.a ]] && \
+[[ -s /usr/local/lib$LIBDIRSUFFIX/ocaml/facile/facile.a ]] ;}
 ## If they are already installed, go to OCAML="ON"
 ocaml_installed_fn || {
 ## otherwise, if the source archives are in 'src' ..
@@ -70,10 +71,11 @@ ocaml_installed_fn || {
 echo -e "\n building ocaml \n"
 
 cd /$TMP_BUILD
+rm -rf *ocaml*
 tar xf $BUILD_TDE_ROOT/src/4.05.0.tar.gz
 cd ocaml-4.05.0/
 
-./configure -cc $COMPILER -libdir /usr/local/lib$LIBDIRSUFFIX
+./configure -cc $COMPILER -libdir /usr/local/lib$LIBDIRSUFFIX/ocaml
 ## finish build with -j1 if there are race condition errors
 make ${NUMJOBS:-} world.opt || make world.opt
 DESTDIR=$TMP_BUILD/package-ocaml make install
@@ -86,13 +88,14 @@ installpkg $OUTPUT/ocaml-4.05.0-x86_64-1.txz
 echo -e "\n building facile \n"
 
 cd /$TMP_BUILD
+rm -rf *facile*
 tar xf $BUILD_TDE_ROOT/src/facile-1.1.3.tar.gz
 cd facile-1.1.3/
 
 sed -i 's|mkdir|& -p|' Makefile
 ./configure
 make
-make FACILEDIR=$TMP_BUILD/package-facile/usr/local/lib$LIBDIRSUFFIX/facile install
+make FACILEDIR=$TMP_BUILD/package-facile/usr/local/lib$LIBDIRSUFFIX/ocaml/facile install
 
 cd $TMP_BUILD/package-facile
 makepkg -l y -c n $OUTPUT/facile-1.1.3-x86_64-1.txz

@@ -295,7 +295,7 @@ echo # if this fails, SlackBuild will fail from [3]
 }
 
 ## .. or [2b] 14.1.0 ..
-[[ $TDEVERSION == cgit ]] && {
+[[ $TDEVERSION == 14.1.0 ]] && {
 ## copy git repo but don't copy .git directory:
 echo -e "\n copying $PRGNAM git sources to build area ... \n"
 (cd $BUILD_TDE_ROOT/src/cgit

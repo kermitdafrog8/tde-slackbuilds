@@ -16,7 +16,5 @@ And if akode isn't installed:
 """
 aKode was not found. Without it the aKode aRts-plugin will not be
 installed, and aRts will be unable to play many music formats.
-You can find aKode in KDE's Subversion repository under
-trunk/tdesupport/akode.
 """
  

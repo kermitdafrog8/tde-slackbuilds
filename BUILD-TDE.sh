@@ -100,7 +100,7 @@ Set the version of TDE to be built.
 13 75 3 \
 "14.0.9" "the R14.0.9 release - source from archives" \
 "14.0.x" "r14.0.10 preview/wip - source from Trinity git" \
-"cgit" "R14.1.0 development - source from Trinity git" \
+"14.1.0" "R14.1.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
 
 
@@ -319,7 +319,7 @@ The default is to remove 'tmp' & 'package' files from a previous package build a
 
 If following the build method on the previous screen, the answer here should probably be \Zr\Z4\ZbNo\Zn.
 
-Keep \ZuALL\ZU the temporary files, including for successfully built packages?" \
+\Zb\Z6Keep all\Zn the temporary files, including for successfully built packages?" \
 15 75
 [[ $? == 0 ]] && echo yes > $TMPVARS/KEEP_BUILD
 [[ $? == 1 ]] && echo no > $TMPVARS/KEEP_BUILD
@@ -347,17 +347,18 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Core/tdelibs" "\Zb\Zr\Z4R\Zn TDE libraries" off "\Zb\Z6 Will build with Avahi support if avahi/avahi-tqt are installed. \Zn" \
 "Core/tdebase" "\Zb\Zr\Z4R\Zn TDE base" off "\Zb\Z6   \Zn" \
 "Core/tde-i18n" "Additional language support for TDE" off "\Zb\Z6 Required when any \Zb\Z3Additional language support\Zb\Z6 has been selected \Zn" \
-"Core/tdeaccessibility" "Accessibility programs" off "\Zb\Z6  \Zn" \
+"Deps/akode" "A player and plugins for aRts music formats" off "\Zb\Z6 For tdemultimedia - aRts-plugin and Juk, and amarok engine \Zn" \
+"Core/tdemultimedia" "Multimedia packages for TDE" off "\Zb\Z6 Optional build-time dependency -> akode \Zn" \
+"Core/tdeaccessibility" "Accessibility programs" off "\Zb\Z6 Optional build-time dependencies -> akode + tdemultimedia \Zn" \
 "Core/tdeadmin" "System admin packages" off "\Zb\Z6  \Zn" \
 "Core/tdeartwork" "Extra artwork/themes/wallpapers for TDE" off "\Zb\Z6   \Zn" \
-"Core/tdeedu" "Educational software" off "\Zb\Z6   \Zn" \
+" Misc/graphviz" "Graph Visualization" off "\Zb\Z6 Runtime option for kscope. pdf/html docs not built by default  \Zn" \
+"Core/tdeedu" "Educational software" off "\Zb\Z6 Build-time option -> dot [graphviz] \Zn" \
 "Core/tdegames" "Games for TDE - atlantik, kasteroids, katomic, etc." off "\Zb\Z6   \Zn" \
 " Misc/imlib" "An image loading and rendering library" off "\Zb\Z6 Build-time option for tdegraphics - needed for kuickshow \Zn" \
 "Core/tdegraphics" "Misc graphics apps" off "\Zb\Z6   \Zn" \
-"Deps/akode" "A player and plugins for aRts music formats" off "\Zb\Z6 For tdemultimedia - aRts-plugin and Juk, and amarok engine \Zn" \
-"Core/tdemultimedia" "Multimedia packages for TDE" off "\Zb\Z6 Optional build-time dependency - akode \Zn" \
 " Misc/speex" "Audio compression format designed for speech" off "\Zb\Z6 Buildtime option for tdenetwork and amarok. Requires l/speexdsp  \Zn" \
-"Core/tdenetwork" "Networking applications for TDE" off "\Zb\Z6 Optional build-time dependency - speex \Zn" \
+"Core/tdenetwork" "Networking applications for TDE" off "\Zb\Z6 Optional build-time dependency -> speex \Zn" \
 "Deps/libcaldav" "Calendaring Extensions to WebDAV" off "\Zb\Z6 Optional dependency for korganizer [tdepim] \Zn" \
 "Deps/libcarddav" "Online address support" off "\Zb\Z6 Optional dependency for korganizer [tdepim] \Zn" \
 "Core/tdepim" "Personal Information Management" off "\Zb\Z6   \Zn" \
@@ -404,7 +405,6 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/koffice" "Office Suite" off "\Zb\Z6 Optional build-time dependencies - GraphicsMagick, libpng14  \Zn" \
 "Apps/koffice-i18n" "Internationalization files for koffice" off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for koffice \Zn" \
 "Apps/krusader" "File manager for TDE" off "\Zb\Z6   \Zn" \
-" Misc/graphviz" "Graph Visualization" off "\Zb\Z6 Runtime option for kscope. pdf/html docs not built by default  \Zn" \
 "Apps/kscope" "A source-editing environment for C and C-style languages." off "\Zb\Z6 Runtime options cscope [d/cscope], ctags [ap/vim], dot [graphviz] \Zn" \
 "Apps/ksensors" "A graphical interface for sensors" off "\Zb\Z6 Runtime requirement ap/lm_sensors \Zn" \
 "Apps/kshutdown" "Shutdown utility for TDE" off "\Zb\Z6   \Zn" \
@@ -621,7 +621,7 @@ $(cat $TMPVARS/READMEs)" \
 
 
 rm -f $TMPVARS/DL_CGIT  # place this here to facilitate testing for summary screen
-[[ $(cat $TMPVARS/TDEVERSION) == cgit || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && \
+[[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && \
 [[ $(grep -o [ACDLM][a-z]*/ $TMPVARS/TDEbuilds | sort | head -n1) != Misc/ ]] && {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " TDE development build " --yesno \
 "
@@ -648,7 +648,7 @@ Create and/or update the git repositories local copies.
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
 [[ $(cat $TMPVARS/TDEVERSION) == 14.0.9 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
-[[ $(cat $TMPVARS/TDEVERSION) == cgit || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'." && LINES=18
+[[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'." && LINES=18
 ## testing for cgit!=no will allow =yes or null, which is the 14.0.9 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
@@ -870,34 +870,29 @@ do
 # Re: http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
   sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$TDE_PFX$package-$(eval echo $version)-${LOG:-"${ARCH_i18n:-$ARCH}-$build-build"}-log || ${EXIT_FAIL:-"true"}
 
-checkmakepkg ()
-{
-## test whether the Slackware package has been built .. 
+
+## skip build/packaging check and installation if only downloading sources
+[[ $PRE_DOWNLOAD == yes ]] || {
+## tde-i18n package installation is handled in tde-i18n.SlackBuild because if more than one i18n package is being built, only the last one will be installed by upgradepkg here - test for last language in the I18N list to ensure they've all been built
+[[ $package == tde-i18n ]] && package=$package-$(cat $TMPVARS/LASTLANG)
+#
+## Check that the package has been created,
+## and if so, remove package name from TDEbuilds list
 [[ $(ls $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz) ]] && \
 sed -i "s|$dir ||" $TMPVARS/TDEbuilds || {
-## if unsuccessful, display error message \
+## if unsuccessful, display error message
 echo "
       Error:  $TDE_PFX$package package ${LOG:-build} failed
       Check the ${LOG:-build} log $TMP/$TDE_PFX$package-$(eval echo $version)-${LOG:-"${ARCH_i18n:-$ARCH}-$build-build"}-log
       "
 ## if koffice was building with libpng14, restore the libpng16 headers for any following builds
 [[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && source $BUILD_TDE_ROOT/get-source.sh && libpng16_fn || true
+## implement 'Action on failure'
 ${EXIT_FAIL:-":"}
 }
-}
-
-## skip build/packaging check if only downloading sources
-[[ $PRE_DOWNLOAD == yes ]] || {
-## install packages
-[[ $INST == 1 ]] && [[ $package != tde-i18n ]] && [[ $package != libpng ]] && upgradepkg --install-new --reinstall $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz && \
-checkmakepkg || ${EXIT_FAIL:-"true"}
-## tde-i18n package installation is handled in tde-i18n.SlackBuild because if more than one i18n package is being built, only the last one will be installed by upgradepkg here - test for last language in the I18N list to ensure they've all been built
-[[ $package == tde-i18n ]] && package=$package-$(cat $TMPVARS/LASTLANG) && \
-checkmakepkg
+## install packages - any 'Cannot install /tmp/....txz: file not found' error message caused by build failure deliberately not suppressed.
 ## create libpng-1.4 package only - it will be installed by the koffice.SB because it overrides libpng headers which for Sl14.2/current point to libpng16.
-## if building only, and/or libpng, just check that the package has been created
-[[ $INST == 0 ]] || [[ $package == libpng ]] && \
-checkmakepkg
+[[ $INST == 1 ]] && [[ $package != tde-i18n* ]] && [[ $package != libpng ]] && upgradepkg --install-new --reinstall $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz
 }
 
   # back to original directory

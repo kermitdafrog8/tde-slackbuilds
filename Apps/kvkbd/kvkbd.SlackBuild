@@ -40,12 +40,19 @@ untar_fn
 (cd $BUILD_TDE_ROOT/src/cgit/$PRGNAM/
 git reset HEAD *
 rm -rf .git/worktrees/*
-[[ $TDEVERSION == cgit ]] && git checkout -f 2a5540d || git checkout -f 2882ff6
+## don't need info about 'detached HEAD' state - only using the repo as a build source
+git config advice.detachedHead false
+[[ $TDEVERSION == 14.1.0 ]] && git checkout -f 2a5540d  || git checkout -f 2882ff6
 ## overwrite the files in the build area set up by untar_fn with the source now in 'detached HEAD' state ..
-echo -e "\n copying $PRGNAM git sources to build area ... \n"
+echo -e "\n copying $PRGNAM 'detached HEAD' state sources to build area ... \n"
 (cd $BUILD_TDE_ROOT/src/cgit
 cp -a --parents $PRGNAM/* $TMP_BUILD/tmp-$PRGNAM/
 cp -a --parents cmake/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/)
+
+## and then switch back to master branch ready for the next pull ..
+echo -e "\n ### Switching cgit source to master branch ### \n"
+git checkout master
+echo
 )
 }
 # ###

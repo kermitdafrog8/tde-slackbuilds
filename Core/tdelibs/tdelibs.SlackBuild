@@ -64,6 +64,7 @@ tdeio/tests/kurifiltertest.cpp \
 tdeio/tests/kmimetypetest.sh.cmake \
 tdeio/tests/jobtest.cpp \
 tdeio/kssl/kopenssl.cc \
+tdeio/kssl/kopenssl.cpp \
 tdeinit/tdestartupconfig.cpp \
 tdecore/tdeconfig_compiler/tests/test9main.cpp
 do

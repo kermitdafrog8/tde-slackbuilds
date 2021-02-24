@@ -39,7 +39,7 @@ chown_fn
 
 cd_builddir_fn
 
-[[ $TDEVERSION == cgit ]] && QTINC_PFX=T
+[[ $TDEVERSION == 14.1.0 ]] && QTINC_PFX=T
 cmake \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \

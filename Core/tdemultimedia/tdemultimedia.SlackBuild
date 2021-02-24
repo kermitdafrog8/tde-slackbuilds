@@ -41,7 +41,7 @@ USE_CMAKE_MM=${USE_CMAKE_MM:-no}
 [[ $USE_CMAKE_MM == no ]] && {
 
 ## /usr/bin/ld: cannot find -ltqt-mt/-ltqt - for gentable build
-[[ $TDEVERSION == cgit ]] && \
+[[ $TDEVERSION == 14.1.0 ]] && \
 sed -i 's|(QT_LDFLAGS|(TQT_LDFLAGS|' noatun/library/Makefile.am
 
 ltoolupdate_fn

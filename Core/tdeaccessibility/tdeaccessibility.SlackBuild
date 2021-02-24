@@ -35,11 +35,13 @@ untar_fn
 
 listdocs_fn
 
-ltoolupdate_fn
+[[ $TDEVERSION == 14.0.9 ]] && ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
+
+[[ $TDEVERSION == 14.0.9 ]] && {
 
 CFLAGS="$SLKRCFLAGS" \
 CXXFLAGS="$SLKRCFLAGS" \
@@ -49,6 +51,48 @@ CXX=$COMPILER_CXX \
    --prefix=$INSTALL_TDE \
    --disable-rpath \
    --enable-closure
+
+} || {
+
+## 
+AKODE=OFF && [[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && AKODE=ON
+FREEVERB=OFF && [[ -s $INSTALL_TDE/include/arts/artsmodules.h ]] && FREEVERB=ON
+
+cmake \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+    -DWITH_ARTS="ON" \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_AKODE="$AKODE" \
+    -DWITH_ALSA="ON" \
+    -DWITH_GSTREAMER="OFF" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_KBSTATEAPPLET="ON" \
+    -DBUILD_KMAG="ON" \
+    -DBUILD_KMOUSETOOL="ON" \
+    -DBUILD_KMOUTH="ON" \
+    -DBUILD_KSAYIT="ON" \
+    -DBUILD_KSAYIT_FREEVERB="$FREEVERB" \
+    -DBUILD_KTTSD="ON" \
+    -DBUILD_KTTSD_COMMAND="ON" \
+    -DBUILD_KTTSD_EPOS="ON" \
+    -DBUILD_KTTSD_FESTIVAL="ON" \
+    -DBUILD_KTTSD_FLITE="ON" \
+    -DBUILD_KTTSD_FREETTS="ON" \
+    -DBUILD_KTTSD_HADIFIX="ON" \
+    -DBUILD_KTTSD_KATE="ON" \
+    -DBUILD_ICONTHEMES="ON" \
+    -Wno-dev \
+    ..
+
+}
 
 make_fn
 
@@ -71,13 +115,13 @@ echo "
 $PRGNAM: Accessibility programs
 $PRGNAM:
 $PRGNAM: * kmag: a screen magnifier.
-$PRGNAM: * kmousetool: clicks the mouse whenever the mouse cursor
-$PRGNAM:               pauses briefly
+$PRGNAM: * kmousetool:
+$PRGNAM:         clicks the mouse whenever the mouse cursor pauses briefly
 $PRGNAM: * kmouth: lets the computer speak.
-$PRGNAM:           Requires a speech synthesizer installed.
+$PRGNAM:         Requires a speech synthesizer installed.
 $PRGNAM: * ksayit: a text to speech frontend
 $PRGNAM: * kttsd: Text-to-Speech system. A plugin based service to allow any
-$PRGNAM:          application to speak using the dcop interface
+$PRGNAM:         application to speak using the dcop interface
 $PRGNAM:
 " > $PKG/install/slack-desc
 
