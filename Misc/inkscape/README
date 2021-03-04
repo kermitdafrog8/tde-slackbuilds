@@ -1,0 +1,6 @@
+inkscape v1.0.2 requires non-Slackware packages gdl and double-conversion.
+
+The sources will need to be pre-downloaded and placed in the 'src' directory and will then be built, packaged, and installed during the inkscape build.
+
+The URLs will be displayed when running the SlackBuild if the installations or sources aren't found.
+ 

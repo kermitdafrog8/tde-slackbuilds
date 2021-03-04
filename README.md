@@ -30,7 +30,7 @@ If you're curious about what this might involve, [take a look at a sample build 
 * TDE_MIRROR= - override the trinitydesktop.org geoIP redirector to use https - example, *https://trinitydesktop.mirrorservice.org/trinity*. URLs @ https://www.trinitydesktop.org/mirrorstatus.php
 * BUILD= - sets the package build identifier, overriding the SlackBuild default of 1
 * USE_CMAKE_MM=yes - to build tdemultimedia with cmake - see Core/tdemultimedia/README.
-* VERBOSE=1 - show command lines during cmake builds
+* VERBOSE=1 - show command lines during cmake builds; and error messages
 
 ---
 

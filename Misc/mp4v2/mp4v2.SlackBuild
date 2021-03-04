@@ -39,6 +39,41 @@ untar_fn
 ## patch for gcc7 ../src/rtphint.cpp:342:35: error: ISO C++ forbids comparison between pointer and integer [-fpermissive]
 sed -i "s|(pSlash != '|(*pSlash != '|" src/rtphint.cpp
 
+## patch for gcc10 - error: narrowing conversion of ‘mp4v2::util::SubtitleUtility::LC_LIST’ from ‘unsigned int’ to ‘int’, etc..
+## thanks to https://bugs.gentoo.org/723098
+patch -N -p0 << EOF || true
+--- libutil/Utility.cpp
++++ libutil/Utility.cpp
+@@ -496,1 +496,1 @@
+-        switch( code ) {
++        switch( static_cast<unsigned int>( code ) ) {
+--- util/mp4art.cpp
++++ util/mp4art.cpp
+@@ -379,1 +379,1 @@
+-    switch( code ) {
++    switch( static_cast<unsigned int> ( code ) ) {
+--- util/mp4chaps.cpp
++++ util/mp4chaps.cpp
+@@ -635,1 +635,1 @@
+-    switch( code ) {
++    switch( static_cast<unsigned int> ( code ) ) {
+--- util/mp4file.cpp
++++ util/mp4file.cpp
+@@ -192,1 +192,1 @@
+-    switch( code ) {
++    switch( static_cast<unsigned int>( code ) ) {
+--- util/mp4subtitle.cpp
++++ util/mp4subtitle.cpp
+@@ -167,1 +167,1 @@
+-    switch( code ) {
++    switch( static_cast<unsigned int>( code ) ) {
+--- util/mp4track.cpp
++++ util/mp4track.cpp
+@@ -791,1 +791,1 @@
+-    switch( code ) {
++    switch( static_cast<unsigned int>( code ) ) {
+EOF
+
 listdocs_fn
 
 chown_fn

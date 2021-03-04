@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ## suppress error messages
-exec 2>/dev/null
+[[ $VERBOSE != 1 ]] && exec 2>/dev/null
 
 export TMPVARS=/tmp/build/vars
 [[ ! -d $TMPVARS ]] && mkdir -p $TMPVARS
@@ -83,6 +83,11 @@ TMP=${TMP:-/tmp}
 export LIBPNG_TMP=$TMP
 export BUILD_TDE_ROOT=$(pwd)
 
+# Place to build (TMP_BUILD), package (PKG), and output (OUTPUT) the program:
+## ### moved from get-source.sh to export variables for ocaml, facile, gdl, and double-conversion builds
+export TMP_BUILD=$TMP/build
+#export PKG=$TMP_BUILD/package-$PRGNAM
+export OUTPUT=$TMP
 
 ###################################################
 
@@ -413,7 +418,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/kvkbd" "A virtual keyboard for TDE" off "\Zb\Z6   \Zn" \
 "Apps/kvpnc" "TDE frontend for various vpn clients" off "\Zb\Z6 Miscellaneous documentation will be in $(cat $TMPVARS/INSTALL_TDE)/doc/kvpnc-$(cat $TMPVARS/TDEVERSION)  \Zn" \
 "Apps/piklab" "IDE for PIC microcontrollers" off "\Zb\Z6   \Zn" \
-" Misc/potrace" "For tracing bitmaps to a vector graphics format" off "\Zb\Z6 Required for potracegui, optional for inkscape \Zn" \
+" Misc/potrace" "For tracing bitmaps to a vector graphics format" off "\Zb\Z6 Required for potracegui, and inkscape \Zn" \
 "Apps/potracegui" "A GUI for potrace" off "\Zb\Z6 Requires potrace \Zn" \
 "Apps/rosegarden" "Audio sequencer and musical notation editor" off "\Zb\Z6 Requires jack-audio-connection-kit liblo and dssi for proper functionality \Zn" \
 "Apps/soundkonverter" "Frontend to various audio converters" off "\Zb\Z6   \Zn" \
@@ -426,7 +431,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/twin-style-crystal" "Twin theme" off "\Zb\Z6   \Zn" \
 "Apps/yakuake" "Quake-style terminal emulator" off "\Zb\Z6   \Zn" \
 " Misc/lxml" "Python bindings for libxml2 and libxslt" off "\Zb\Z6 Required to use Inkscape online help \Zn" \
-" Misc/inkscape" "SVG editor - an alternative to potrace, potracegui [and GraphicsMagick]." off "\Zb\Z6 Requires lxml if online help facility is required, potrace is a build-time option. \Zn" \
+" Misc/inkscape" "SVG editor - an alternative to potracegui [and GraphicsMagick]." off "\Zb\Z6 Requires lxml if online help facility is required; potrace is a build-time dependency. \Zn" \
 2> $TMPVARS/TDEbuilds
 # successful builds are removed from the TDEbuilds list by '$dir ' so add a space to the last entry
 # and the " needs to be removed because the Misc entries are double-quoted
@@ -855,8 +860,8 @@ do
   echo -e "\033[39;1m
 
  Starting $package.SlackBuild
- $(printf '%0.s\"' $(seq 1 $[${#package}+20]))
-  \033[0m"
+ $(printf '%0.s\"' $(seq 1 $[${#package}+20]))  \033[0m"
+
 ## set 'noarch' for i18n packages
   ARCH_i18n="" && [[ $package == *i18n* ]] && ARCH_i18n=noarch
 ## TDEPFX could be set '' from null [n/a], in which case set TDE_PFX="", or

@@ -28,34 +28,6 @@ VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
-source ../../get-source.sh
-getsource_fn
-
-untar_fn
-
-## patch for kig python scripting error:
-## kig: /usr/include/boost/python/object_core.hpp:422: boost::python::api::object_base::~object_base(): Assertion `Py_REFCNT(m_ptr) > 0' failed.
-## Re: https://bugs.kde.org/show_bug.cgi?id=401512#c5
-[[ $TDEVERSION == 14.0.9 ]] && EXTN=cc || EXTN=cpp
-patch -N -p0 << EOF || true
---- kig/scripting/python_scripter.$EXTN
-+++ kig/scripting/python_scripter.$EXTN
-@@ -493,0 +494 @@
-+      Py_XINCREF((objectvect.begin() +i)->ptr());
-EOF
-
-## for 14.0.9, already done in cgit
-sed -i 's|Nome del file di input|Input filename|' kig/pykig/pykig.py
-
-## add some files to html docs
-sed -i 's|*.png|& *.svgz README|' cmake/modules/TDEMacros.cmake
-
-listdocs_fn
-
-chown_fn
-
-cd_builddir_fn
-
 # ### Kalzium Chemical Equation Solver - start
 ## Needs OCaml and facile
 ocaml_installed_fn () { [[ -s /usr/local/lib$LIBDIRSUFFIX/ocaml/libnums.a ]] && \
@@ -75,7 +47,8 @@ rm -rf *ocaml*
 tar xf $BUILD_TDE_ROOT/src/4.05.0.tar.gz
 cd ocaml-4.05.0/
 
-./configure -cc $COMPILER -libdir /usr/local/lib$LIBDIRSUFFIX/ocaml
+## force "gcc -fcommon" for gcc10 build - see https://github.com/ocaml/ocaml/issues/9622
+./configure -cc "gcc -fcommon" -libdir /usr/local/lib$LIBDIRSUFFIX/ocaml
 ## finish build with -j1 if there are race condition errors
 make ${NUMJOBS:-} world.opt || make world.opt
 DESTDIR=$TMP_BUILD/package-ocaml make install
@@ -107,6 +80,34 @@ ocaml_installed_fn || { echo -e " installation of ocaml/facile failed \n" ; exit
 } && \
 OCAML="ON"
 # ### Kalzium Chemical Equation Solver - end
+
+source ../../get-source.sh
+getsource_fn
+
+untar_fn
+
+## patch for kig python scripting error:
+## kig: /usr/include/boost/python/object_core.hpp:422: boost::python::api::object_base::~object_base(): Assertion `Py_REFCNT(m_ptr) > 0' failed.
+## Re: https://bugs.kde.org/show_bug.cgi?id=401512#c5
+[[ $TDEVERSION == 14.0.9 ]] && EXTN=cc || EXTN=cpp
+patch -N -p0 << EOF || true
+--- kig/scripting/python_scripter.$EXTN
++++ kig/scripting/python_scripter.$EXTN
+@@ -493,0 +494 @@
++      Py_XINCREF((objectvect.begin() +i)->ptr());
+EOF
+
+## for 14.0.9, already done in cgit
+sed -i 's|Nome del file di input|Input filename|' kig/pykig/pykig.py
+
+## add some files to html docs
+sed -i 's|*.png|& *.svgz README|' cmake/modules/TDEMacros.cmake
+
+listdocs_fn
+
+chown_fn
+
+cd_builddir_fn
 
 ## kig python scripting support
 [[ $(ls -1 /usr/lib$LIBDIRSUFFIX/libboost_python*.so) ]] && KIG_PS="ON"

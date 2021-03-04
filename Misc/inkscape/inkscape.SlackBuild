@@ -24,11 +24,80 @@
 #   SUCH DAMAGE.
 
 PRGNAM=inkscape
-VERSION=0.92.4
+## store version for later use to set $version for package name -
+## too late for log file name, but sort that out when Sl current is released as Sl 15
+## and this script updated for v1.x.x only
+echo 0.92.4 > $TMPVARS/INKSC_VERS && {
+## v 1.0.2 for Slackware current
+[[ $(ls /var/log/packages/poppler-*) == *-2[1-9].* ]] && echo 1.0.2 > $TMPVARS/INKSC_VERS ; }
+VERSION=$(cat $TMPVARS/INKSC_VERS)
 BUILD=${BUILD:-1}
 
-SRCURL="https://media.inkscape.org/dl/resources/file/inkscape-$VERSION.tar.bz2"
-ARCHIVE_TYPE="tar.bz2"
+ARCHIVE_TYPE="tar.bz2" && [[ $VERSION == 1.0.2 ]] && ARCHIVE_TYPE="tar.xz"
+SRCURL="https://media.inkscape.org/dl/resources/file/$PRGNAM-$VERSION.$ARCHIVE_TYPE"
+
+## inkscape v1.0.2 for Slackware current needs gdl and double-conversion
+# ### gdl and double-conversion  - start
+[[ $(ls /var/log/packages/poppler-*) == *-2[1-9].* ]] && {
+## If they are already installed, go to end
+[[ -s /usr/local/lib$LIBDIRSUFFIX/libgdl-3.so ]] && \
+[[ -s /usr/local/lib$LIBDIRSUFFIX/libdouble-conversion.so ]] || {
+## otherwise, if the source archives are in 'src' ..
+[[ -s $BUILD_TDE_ROOT/src/gdl-3.34.0.tar.xz ]] && \
+[[ -s $BUILD_TDE_ROOT/src/double-conversion-3.1.5.tar.gz ]] && {
+## .. build, package, and install them
+(
+## gdl:
+echo -e "\n building gdl \n"
+
+cd /$TMP_BUILD
+rm -rf *gdl*
+tar xf $BUILD_TDE_ROOT/src/gdl-3.34.0.tar.xz
+cd gdl-3.34.0
+
+LOCALES=$(cat po/LINGUAS)
+rm po/LINGUAS
+for locale in $I18N
+ do
+ [[ $LOCALES == *$locale* ]] && echo $locale >> po/LINGUAS
+ done
+
+./configure --libdir=/usr/local/lib$LIBDIRSUFFIX
+make $NUMJOBS
+DESTDIR=$TMP_BUILD/package-gdl make install
+
+cd $TMP_BUILD/package-gdl
+makepkg -l y -c n $OUTPUT/gdl-3.34.0-$ARCH-$BUILD.txz
+installpkg $OUTPUT/gdl-3.34.0-$ARCH-$BUILD.txz
+
+## double-conversion:
+echo -e "\n building double-conversion \n"
+
+cd /$TMP_BUILD
+rm -rf *double-conversion*
+tar xf $BUILD_TDE_ROOT/src/double-conversion-3.1.5.tar.gz
+cd double-conversion-3.1.5/
+
+cd cmake/
+# LIBDIRSUFFIX not required - builds to lib$LIBDIRSUFFIX ..
+cmake ../ -DBUILD_SHARED_LIBS=ON
+make $NUMJOBS
+DESTDIR=$TMP_BUILD/package-double-conversion make install
+
+cd $TMP_BUILD/package-double-conversion
+makepkg -l y -c n $OUTPUT/double-conversion-3.1.5-$ARCH-$BUILD.txz
+installpkg $OUTPUT/double-conversion-3.1.5-$ARCH-$BUILD.txz
+)
+echo -e "\n returning to building inkscape \n"
+} || { ## .. but if the source archives aren't in 'src', display message ..
+echo -e "\n ############ \n\n\033[39;1m gdl and/or double-conversion are not installed and are required for this build \n \033[34;1m
+ Download:
+\n wget -O $BUILD_TDE_ROOT/src/gdl-3.34.0.tar.xz https://download.gnome.org/sources/gdl/3.34/gdl-3.34.0.tar.xz
+\n wget -O $BUILD_TDE_ROOT/src/double-conversion-3.1.5.tar.gz https://github.com/google/double-conversion/archive/v3.1.5.tar.gz
+\n and re-run this script .. \n\n \033[0m ############ \n" ; exit 1 ; }
+}
+}
+# ### gdl and double-conversion - end
 
 source ../../get-source.sh
 getsource_fn
@@ -49,6 +118,7 @@ sed -i 's|lib/inkscape|lib${LIB_SUFFIX}/inkscape|' CMakeScripts/HelperMacros.cma
 }
 
 ## only build for required locales
+# ### TODO tidy up when Sl 15 released and v0.92.4 no longer built
 {
 ## set up a directory to store the required locale files temporarily
 TEMP_DIR=$TMP_BUILD/tmp-$PRGNAM/loc_tmp
@@ -113,6 +183,10 @@ chown_fn
 cd_builddir_fn
 
 ## default options have been pulled from CMakeLists.txt
+## These next two determine the RPATH for the inkscape library relative to the binary:
+## INKSCAPE_INSTALL_LIBDIR is an addition for v1.0.2 and is relative to CMAKE_INSTALL_PREFIX/
+## LIB_SUFFIX is used for v0.92.4
+# ### TODO docs and man to /usr/local ..
 cmake \
     -DCMAKE_C_FLAGS="$SLKCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
@@ -120,25 +194,33 @@ cmake \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DINKSCAPE_INSTALL_LIBDIR=lib$LIBDIRSUFFIX/inkscape \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DBUILD_SHARED_LIBS="ON" \
+    -DENABLE_BINRELOC="OFF" \
     -DENABLE_LCMS="ON" \
     -DENABLE_POPPLER="ON" \
     -DENABLE_POPPLER_CAIRO="ON" \
+    -DWITH_ASAN="OFF" \
     -DWITH_DBUS="OFF" \
+    -DWITH_FUZZ="OFF" \
     -DWITH_GNOME_VFS="ON" \
-    -DWITH_SVG2="ON" \
-    -DWITH_LPETOOL="OFF" \
-    -DWITH_INKJAR="ON" \
-    -DWITH_OPENMP="ON" \
-    -DWITH_PROFILING="OFF" \
+    -DWITH_GRAPHICS_MAGICK="ON" \
+    -DWITH_GTK3_EXPERIMENTAL="OFF" \
+    -DWITH_GTKSPELL="OFF" \
     -DWITH_IMAGE_MAGICK="ON" \
+    -DWITH_INKJAR="ON" \
+    -DWITH_JEMALLOC="OFF" \
     -DWITH_LIBCDR="ON" \
     -DWITH_LIBVISIO="ON" \
     -DWITH_LIBWPG="ON" \
+    -DWITH_LPETOOL="OFF" \
+    -DLPE_ENABLE_TEST_EFFECTS="OFF" \
+    -DWITH_MANPAGE_COMPRESSION="ON" \
     -DWITH_NLS="ON" \
-    -DWITH_GTK3_EXPERIMENTAL="OFF" \
-    -DWITH_GTKSPELL="OFF" \
-    -DENABLE_BINRELOC="OFF" \
+    -DWITH_OPENMP="ON" \
+    -DWITH_PROFILING="OFF" \
+    -DWITH_SVG2="ON" \
     -Wno-dev \
     ..
 

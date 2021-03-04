@@ -48,9 +48,10 @@ getsource_fn ()
 #   SUCH DAMAGE.
 
 # Place to build (TMP_BUILD) package (PKG) and output (OUTPUT) the program:
-TMP_BUILD=/tmp/build
+## ### moved to BUILD-TDE.sh to export variables for ocaml, facile, gdl, and double-conversion builds
+# ### TMP_BUILD=/tmp/build
 PKG=$TMP_BUILD/package-$PRGNAM
-OUTPUT=/tmp
+# ### OUTPUT=/tmp
 
 # remove any previous builds if option chosen
 [[ $KEEP_BUILD != "yes" ]] && [[ $PRE_DOWNLOAD != yes ]] && echo -e "\n removing previous build data .." && rm -rf $TMP_BUILD/{tmp,package}*
@@ -223,7 +224,7 @@ SLKRCFLAGS="$SLKRCFLAGS -fPIC"
 
 # Exit the script on errors:
 set -e
-trap 'echo "$0 FAILED at line $LINENO" | tee $OUTPUT/error-$PRGNAM.log' ERR
+trap 'echo "$0 FAILED at line $LINENO"' ERR
 # Catch unitialized variables:
 set -u
 P1=${1:-1}

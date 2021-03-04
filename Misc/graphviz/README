@@ -12,5 +12,5 @@ gts is an optional dependency.
 ------------------------------
 
 pdf and html documentation is not built by default in the SlackBuild.
-To build it, comment out 'rm -rf $PKG/usr/share/$PRGNAM/doc' in the script [c. line 110].
+To build it, comment out 'rm -rf $PKG/usr/share/$PRGNAM/doc' in the script [c. line 95].
  
