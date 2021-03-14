@@ -35,9 +35,14 @@ untar_fn
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
+[[ $TDEVERSION == 14.0.9 ]] && {
 langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
 ## this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
 sed -i "s| \*.po| $langs|" cmake/modules/TDEMacros.cmake
+} || {
+## for slack-desc
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+}
 [[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs | sed "s|.po||g")
 
 listdocs_fn

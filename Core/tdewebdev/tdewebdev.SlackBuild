@@ -33,16 +33,24 @@ getsource_fn
 
 untar_fn
 
+## override hard coded trinity references - PLUGIN_INSTALL_DIR is derived from SYS_CNF_DIR,
+## and is relative to the TDE libraries directory
+sed -i "s|FileName=trinity|FileName=$PLUGIN_INSTALL_DIR|" quanta/data/config/plugins.rc
+sed -i "s|/opt/trinity|$INSTALL_TDE|" */*.tdevelop
+sed -i "s|trinity/|$PLUGIN_INSTALL_DIR/|" doc/*/*.docbook
+
 ## /usr/bin/ld: quanta.o: undefined reference to symbol '_ZNK6KParts11PartManager5partsEv'
-sed -i 's|-ltdefx|& $(LIB_TDEPARTS)|' quanta/src/Makefile.am
+[[ $TDEVERSION == 14.0.9 ]] && sed -i 's|-ltdefx|& $(LIB_TDEPARTS)|' quanta/src/Makefile.am
 
 listdocs_fn
 
-ltoolupdate_fn
+[[ $TDEVERSION == 14.0.9 ]] && ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
+
+[[ $TDEVERSION == 14.0.9 ]] && {
 
 CFLAGS="$SLKRCFLAGS" \
 CXXFLAGS="$SLKRCFLAGS" \
@@ -52,6 +60,37 @@ CXX=$COMPILER_CXX \
    --prefix=$INSTALL_TDE \
    --disable-rpath \
    --enable-closure
+
+} || {
+
+## override hard coded trinity installation directory link
+sed -i "s|/opt/trinity|$INSTALL_TDE|" ../doc/man/*/*.1
+
+## LIB_INSTALL_DIR is for ../kommander/{widget{,s},plugin}/CMakeLists.txt
+## which defaults to $INSTALL_TDE/lib
+cmake \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX \
+    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_OTHER_EDITORS="ON" \
+    -DWITH_QUANTA_CVSSERVICE="ON" \
+    -DBUILD_DOC="ON" \
+    -DBUILD_KIMAGEMAPEDITOR="ON" \
+    -DBUILD_KLINKSTATUS="ON" \
+    -DBUILD_KOMMANDER="ON" \
+    -DBUILD_KXSLDBG="ON" \
+    -DBUILD_QUANTA="ON" \
+    -Wno-dev \
+    ..
+
+}
 
 make_fn
 
