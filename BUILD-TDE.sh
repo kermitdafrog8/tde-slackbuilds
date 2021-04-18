@@ -438,6 +438,35 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 sed -i 's|$| |;s|" M|M|g;s|"||g' $TMPVARS/TDEbuilds
 
 
+## this dialog will only run if any of the selected packages has a README
+rm -f $TMPVARS/READMEs
+## generate list of READMEs ..
+RM_LIST=$(find [ACDLM][a-z]* -name "README" | grep -vE "tdebase|kvkbd")
+for package in $(cat $TMPVARS/TDEbuilds)
+do
+[[ $RM_LIST == *$package* ]] && {
+echo "\Zb\Z6\Zu$package\ZU\Zn
+
+$(cat $package/README)
+" >> $TMPVARS/READMEs
+}
+done
+## .. if there is a list, run dialog
+[[ $(cat $TMPVARS/READMEs) ]] && {
+dialog --cr-wrap --defaultno --no-shadow --colors --title " READMEs " --yesno \
+"
+Some of the selected packages have READMEs in their SlackBuilds directories.
+
+Do you want to read them?
+ " \
+10 75
+[[ $? == 0 ]] && dialog --no-collapse --cr-wrap --no-shadow --colors --ok-label "Close" --msgbox \
+"
+$(cat $TMPVARS/READMEs)" \
+30 75
+}
+
+
 ## only run this if tqt3 has been selected
 rm -f $TMPVARS/TQT_OPTS
 rm -f $TMPVARS/PKG_CONFIG_PATH_MOD
@@ -451,7 +480,7 @@ If you select minimal packaging and intend to build any of those at any time, se
 
 TQt html documentation is ~21M, and can be excluded from the package.
 
-mkspecs is only required for linux-g++
+The only mkspecs required is the one for linux-g++
  
 " \
 25 75 6 \
@@ -551,25 +580,41 @@ PNG_VERSION=$(grep VERSION:- $BUILD_TDE_ROOT/Misc/libpng/libpng.SlackBuild|cut -
 sed -i 's|Apps/koffice|Misc/libpng &|' $TMPVARS/TDEbuilds
 }
 
-
 ## only run this if kvkbd has been selected
-rm -f $TMPVARS/WinLock
-rm -f $TMPVARS/kvkbd-bg
-rm -f $TMPVARS/kvkbd-keycolr
+rm -f $TMPVARS/Kvkbd_OPTS
 [[ $(grep -o kvkbd $TMPVARS/TDEbuilds) ]] && {
-dialog --cr-wrap --no-shadow --yes-label "No Lock" --no-label "Lock" --colors --defaultno --title " Kvkbd Win Keys " --yesno \
+## the default exit status for the extra button is 3 - exit 2 from a help button is needed for Kvkbd_OPTS
+EXITVAL=3
+until [[ $EXITVAL -lt 2 ]] ; do
+dialog --cr-wrap --nocancel --no-shadow --extra-button --extra-label "README" --colors --title " Kvkbd options " --checklist \
 "
-The \Zb\Z6LWin\Zn and \Zb\Z6RWin\Zn keys on the \Zb\Z6Kvkbd\Zn keyboard are set to 'lock' for the next key click.
+See the README for further details ..
 
-If they're to be used as control keys to map a number of characters or functions, then they need to be set to \Zr\Z4\ZbLock\Zn while the next key is clicked - this is to simulate holding down the key on a physical keyboard.
+[1] Use Win keys either as modifier keys,
+                     or for characters set with xmodmap.
 
-If they will only be used as alternatively mapped keys using xmodmap, then they will need to be set to generate a keycode on a single click - \Z1N\Zb\Z0o Lock\Zn.
+[2] Alternative text on the num pad keys.
+
+[3] Show small icons on the buttons.
+
+[4] Show blank keys where AltGr doesn't produce a character.
+ 
 " \
-17 75
-[[ $? == 0 ]] && 2> $TMPVARS/WinLock
-[[ $? == 1 ]] && echo 1 > $TMPVARS/WinLock
+23 75 4 \
+" Winlock" "Win keys as modifier keys" off \
+" numpad" "replace default text" on \
+" icons" "use small icons" on \
+" blank" "blank keys" on \
+2> $TMPVARS/Kvkbd_OPTS
+EXITVAL=$?
+[[ $EXITVAL == 3 ]] && dialog --cr-wrap --no-shadow --colors --ok-label "Return" --title " Kvkbd options " --msgbox \
+"
+$(cat Apps/kvkbd/README)
+" \
+30 75
+#}
+done
 }
-
 
 ## option to prefix some package names
 ## get a list of packages that have SlackBuilds set up to use the prefix 'tde'
@@ -593,35 +638,6 @@ to avoid confusion with identical packages which might be installed for KDE.
 0 0
 [[ $? == 0 ]] && echo tde > $TMPVARS/TDEPFX
 [[ $? == 1 ]] && touch $TMPVARS/TDEPFX
-}
-
-
-## this dialog will only run if any of the selected packages has a README
-rm -f $TMPVARS/READMEs
-## generate list of READMEs ..
-RM_LIST=$(find [ACDLM][a-z]* -name "README" | grep -v tdebase)
-for package in $(cat $TMPVARS/TDEbuilds)
-do
-[[ $RM_LIST == *$package* ]] && {
-echo "\Zb\Z6\Zu$package\ZU\Zn
-
-$(cat $package/README)
-" >> $TMPVARS/READMEs
-}
-done
-## .. if there is a list, run dialog
-[[ $(cat $TMPVARS/READMEs) ]] && {
-dialog --cr-wrap --defaultno --no-shadow --colors --title " READMEs " --yesno \
-"
-Some of the selected packages have READMEs in their SlackBuilds directories.
-
-Do you want to read them?
- " \
-10 75
-[[ $? == 0 ]] && dialog --no-collapse --cr-wrap --no-shadow --colors --ok-label "Close" --msgbox \
-"
-$(cat $TMPVARS/READMEs)" \
-30 75
 }
 
 

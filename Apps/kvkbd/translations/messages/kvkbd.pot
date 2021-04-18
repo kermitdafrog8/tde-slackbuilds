@@ -61,11 +61,11 @@ msgid "Auto resize font"
 msgstr ""
 
 #: MainWidget.cpp:536
-msgid "Keyboard color"
+msgid "Background color"
 msgstr ""
 
 #: MainWidget.cpp:538
-msgid "Key color (restart if changed)"
+msgid "Key color"
 msgstr ""
 
 #: MainWidget.cpp:541

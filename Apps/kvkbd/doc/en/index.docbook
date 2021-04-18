@@ -2,6 +2,7 @@
 <!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.2-Based Variant V1.1//EN" "dtd/kdex.dtd" [
   <!ENTITY kvkbd "<application>Kvkbd</application>">
   <!ENTITY xmmp "<application>xmodmap</application>">
+  <!ENTITY Caps "<keycap>Caps</keycap>">
   <!ENTITY AltGr "<keycap>Alt Gr</keycap>">
                      <!-- Alt Gr uses U+00a0 for nbsp -->
   <!ENTITY kappname "&kvkbd;">
@@ -36,7 +37,7 @@
 
 <legalnotice>&FDLNotice;</legalnotice>
 
-<date>2020</date>
+<date>2021</date>
 <releaseinfo>0.4.8 &tde;</releaseinfo>
 
 <abstract>
@@ -57,8 +58,8 @@
 <title>Introduction</title>
 
 &kvkbd; is a simple virtual keyboard for &tde;.
-<sbr/>It can be used instead of a physical keyboard or for devices with a touch screen but no keyboard.
-<sbr/>It is also useful to quickly test a keyboard mapping to locate some keys.
+<sbr/>It can be used with, or instead of, a physical keyboard or for devices with a touch screen but no keyboard.
+<sbr/>It is also useful for displaying a keyboard mapping to identify what characters are defined.
 </chapter>
 
 
@@ -81,23 +82,31 @@ When first launched, &kvkbd; will appear in the bottom-right corner of the scree
 <mediaobject><imageobject>
     <imagedata fileref="kvkbd.png" format="PNG"/>
 </imageobject></mediaobject>
-
+<sbr/>
 To use the numeric keypad, click the double arrow <guiicon><inlinegraphic fileref="num-pad-btn.png"/></guiicon> on the right.
 <sbr/>The Num pad display can be toggled by clicking on the Num Lock key <keycap>&#x02116;</keycap>.
 <mediaobject><imageobject>
     <imagedata fileref="num-pad.png" format="PNG"/>
 </imageobject></mediaobject>
-
-To display and select the shift characters, use both &Shift; keys:
-<sbr/>&nbsp;&#x02022; Click either &Shift; key, which will 'lock', and then the other &Shift; key and the shift characters will be displayed.
+<sbr/>
+To display and select the shift characters:
+<sbr/>&nbsp;&#x02022; Click either &Shift; key, which will 'lock', and the shift characters will be displayed.
 <sbr/>&nbsp;&#x02022; Then click on the character to print it.
-<sbr/><sbr/>Otherwise, if you know which key the shift character is on, then the expected behaviour applies, and &Shift;&nbsp;<keycap>'key'</keycap> will print it.
 <sbr/><sbr/>
 
 <emphasis role="bold">Spanish keyboard shift characters:</emphasis>
 <mediaobject><imageobject>
     <imagedata fileref="kvkbds.png" format="PNG"/>
 </imageobject></mediaobject>
+<sbr/>
+3rd &amp; 4th level characters which are printed using &AltGr; &amp; &AltGr;+&Shift; as modifier keys, can be displayed and printed in a similar way.
+<sbr/><sbr/>
+There are therefore six sets of characters which can be displayed -
+<sbr/>
+<keycap>Lower</keycap>&ensp; &Shift;&ensp; &Caps;&ensp; &Caps;+&Shift;&ensp; &AltGr;&ensp; &AltGr;+&Shift;
+<sbr/><sbr/>
+&Caps; can be used with &AltGr; &amp; &AltGr;+&Shift; and mostly gives the correct display, but may not depending on how the unicode character has been defined.
+
 </sect1>
 
 <sect1 id="config-menu">
@@ -107,11 +116,11 @@ The &kvkbd; configuration menu is accessible by clicking on the configuration bu
 <mediaobject><imageobject>
     <imagedata fileref="config-menu.png" format="PNG" />
 </imageobject></mediaobject>
-Select "<emphasis role="bold">Font</emphasis>" to choose the font used to display the characters on the keys.
-<sbr/><sbr/>Check "<emphasis role="bold">Auto Resize Font</emphasis>" to resize the font when &kvkbd; is resized.
-<sbr/><sbr/>Select "<emphasis role="bold">Keyboard color</emphasis>" to choose a colour for the keyboard [background].
+Select "<emphasis role="bold">Font</emphasis>" to choose the font used to display the characters and text on the keys.
+<sbr/>Allows selection of the style and size.
+<sbr/><sbr/>Check "<emphasis role="bold">Auto Resize Font</emphasis>" for the font size to change as the keyboard  is resized.
+<sbr/><sbr/>Select "<emphasis role="bold">Background color</emphasis>" to choose a colour for the keyboard background.
 <sbr/><sbr/>Select "<emphasis role="bold">Key color</emphasis>" to choose a colour for the keys/buttons.
-<sbr/>&kvkbd; needs to be restarted for the chosen colour to display.
 <sbr/><sbr/>Check "<emphasis role="bold">Dock Widget</emphasis>" to display a small dock which can be placed anywhere on screen.
 <sbr/>Click on the dock to hide or show the virtual keyboard.
 <sbr/><sbr/>Check "<emphasis role="bold">Lock on screen</emphasis>" to fix the position and size of the keyboard on the screen.
@@ -121,11 +130,17 @@ Select "<emphasis role="bold">Font</emphasis>" to choose the font used to displa
 <sect1 id="keys">
 <title>Keys</title>
 
-The &kvkbd; keyboard is based on the US layout with an extra key to the right of Left &Shift; for non-US keyboards - the extra key duplicates <emphasis role="bold">&lt;</emphasis> and <emphasis role="bold">></emphasis> characters on the US keyboard.
+The &kvkbd; keyboard is based on the US layout with an extra key to the right of Left &Shift; for non-US keyboards - the extra key duplicates the '<emphasis role="bold">&lt;</emphasis>' and '<emphasis role="bold">></emphasis>' characters on the US keyboard.
 <sbr/><sbr/>
 For non-US keyboards, the key which is normally lower left of the &Enter; key is placed above the &Enter; key.
 <sbr/><sbr/>
-Where set up in the keyboard mapping file, &AltGr; will enable selection of the character mapped to the lower right of any key, and &AltGr;&nbsp;&Shift; for any upper right character.
+&AltGr; will enable selection of the character mapped to the lower right of any key, and &AltGr;&nbsp;&Shift; for any upper right character where they have been set up in the keyboard mapping file [<filename>&lt;path_to>/X11/xkb/symbols/</filename>].
+<sbr/>
+<emphasis role="bold">Note</emphasis> that there are two possible gotchas in displaying the &AltGr; characters:
+<sbr/>
+&nbsp;  &#x02022; they tend to be less commonly used and might not have glyphs in the font being used,
+<sbr/>
+&nbsp;  &#x02022; the keyboard mapping file needs to <emphasis role="bold">include&nbsp;"level3(ralt_switch)"</emphasis> for the variant being used.
 <sbr/><sbr/>
 The &Shift;, &Ctrl;, <keycap>Alt*</keycap> keys 'lock' when clicked to simulate holding down a key on a physical keyboard.
 <sbr/>
@@ -136,7 +151,7 @@ Whether the <keycap>*Win</keycap> keys 'lock' will depend on the build time opti
 <title>Dead Keys</title>
 
 Using &Shift; and/or &AltGr; which need press and hold on a physical keyboard will need click only for &kvkbd;.
-<sbr/><sbr/>For example, using the AD11 key [ ˆ ] on the oss variant of the French[fr]/azerty keyboard:
+<sbr/><sbr/>For example, using the AD11 key [ ˆ ] on the oss variant of the French keyboard:
 <sbr/><sbr/><command>setxkbmap fr -variant oss</command>
 <informaltable>
   <tr>
@@ -149,16 +164,16 @@ Using &Shift; and/or &AltGr; which need press and hold on a physical keyboard wi
   <tr>
     <td>K/B press:</td><td></td>
     <td><keycap>ˆ</keycap>&nbsp;<keycap>o</keycap></td><td></td>
-    <td>&Shift;+<keycap>ˆ</keycap>&nbsp;<keycap>u</keycap></td><td></td>
+    <td>&Shift;+<keycap>¨</keycap>&nbsp;<keycap>u</keycap></td><td></td>
     <td>&AltGr;+<keycap>ˆ</keycap>&nbsp;<keycap>e</keycap></td><td></td>
-    <td>&AltGr;+&Shift;+<keycap>ˆ</keycap>&nbsp;<keycap>a</keycap></td>
+    <td>&AltGr;+&Shift;+<keycap>¨</keycap>&nbsp;<keycap>a</keycap></td>
   </tr>
   <tr>
     <td>&kvkbd;&nbsp;click:</td><td>&nbsp;</td>
     <td><keycap>ˆ</keycap>&nbsp;<keycap>o</keycap></td><td></td>
-    <td>&Shift;&nbsp;<keycap>ˆ</keycap>&nbsp;<keycap>u</keycap></td><td>&nbsp;</td>
-    <td>&AltGr;&nbsp;<keycap>ˆ</keycap>&nbsp;<keycap>e</keycap></td><td>&nbsp;</td>
-    <td>&AltGr;&nbsp;&Shift;&nbsp;<keycap>ˆ</keycap>&nbsp;<keycap>a</keycap></td>
+    <td>&Shift;&nbsp;<keycap>¨</keycap>&nbsp;<keycap>u</keycap></td><td>&nbsp;</td>
+    <td>&AltGr;&nbsp;<keycap>˜</keycap>&nbsp;<keycap>e</keycap></td><td>&nbsp;</td>
+    <td>&AltGr;&nbsp;&Shift;&nbsp;<keycap>°</keycap>&nbsp;<keycap>a</keycap></td>
   </tr>
   <tr>
     <td>Printed:</td><td></td>
@@ -169,12 +184,51 @@ Using &Shift; and/or &AltGr; which need press and hold on a physical keyboard wi
   </tr>
 </informaltable>
 <sbr/>
-<emphasis>Note</emphasis> that &kvkbd; is compiled for keycodes defined by evdev&nbsp;&#x000bb;&nbsp;<filename>/etc/X11/xkb/keycodes/evdev.</filename>
+<emphasis>Note</emphasis> that &kvkbd; is compiled for keycodes defined by evdev&nbsp;&#x000bb;&nbsp;<filename>/etc/X11/xkb/keycodes/evdev</filename>.
 <sbr/>&kvkbd; will have reduced functionality in systems using another keycode definitions file which can be checked by:
 <literallayout>  &#x02022; running <command>xev</command> in a konsole
   &#x02022; pressing or clicking <keycap>Menu</keycap>
   &#x02022; looking for <code><emphasis>keycode 135</emphasis></code> among the output
 </literallayout>
+
+</sect2>
+
+<sect2 id="comb-keys">
+<title>Combining Keys for diacritics</title>
+
+A similar function to dead keys, but they follow the handwriting sequence of character+diacritic.
+<sbr/><sbr/>For example, using the AE12 key [ ´ ] on the ru-recom variant of the German keyboard:
+<sbr/><sbr/><command>setxkbmap de -variant ru-recom</command>
+<informaltable>
+  <tr>
+    <td>Character:</td><td></td>
+    <td>combining acute</td><td>&nbsp;</td>
+    <td>combining grave</td><td></td>
+    <td>combining dot below</td><td></td>
+    <td>́combining dot above</td>
+  </tr>
+  <tr>
+    <td>K/B press:</td><td></td>
+    <td><keycap>o</keycap>&nbsp;<keycap>´</keycap></td><td></td>
+    <td><keycap>u</keycap>&nbsp;&Shift;+<keycap>`</keycap></td><td></td>
+    <td><keycap>e</keycap>&nbsp;&AltGr;+<keycap>´</keycap></td><td></td>
+    <td><keycap>a</keycap>&nbsp;&AltGr;+&Shift;+<keycap>`</keycap></td>
+  </tr>
+  <tr>
+    <td>&kvkbd;&nbsp;click:</td><td>&nbsp;</td>
+    <td><keycap>о</keycap>&nbsp;<keycap>´</keycap></td><td></td>
+    <td><keycap>у</keycap>&nbsp;&Shift;&nbsp;<keycap>`</keycap></td><td>&nbsp;</td>
+    <td><keycap>е</keycap>&nbsp;&AltGr;&nbsp;<keycap>.</keycap></td><td>&nbsp;</td>
+    <td><keycap>а</keycap>&nbsp;&AltGr;&nbsp;&Shift;&nbsp;<keycap>˙</keycap></td>
+  </tr>
+  <tr>
+    <td>Printed:</td><td></td>
+    <td><emphasis role="bold">о́</emphasis></td><td></td>
+    <td><emphasis role="bold">у̀</emphasis></td><td></td>
+    <td><emphasis role="bold">е̣</emphasis></td><td></td>
+    <td><emphasis role="bold">а̇</emphasis></td>
+  </tr>
+</informaltable>
 
 </sect2>
 
@@ -202,7 +256,7 @@ and make the changes there from the configuration menu.
 
 Add <filename>kvkbd.desktop</filename> to the &tde; Autostart directory for &kvkbd; to run when &tde; starts.
 <sbr/><sbr/>
-<emphasis>For a specific keyboard layout:</emphasis>
+<emphasis>For a specific keyboard layout:</emphasis> [§]
 <sbr/><sbr/>
 &nbsp;Exec=<command>setxkbmap &lt;xx>;kvkbd</command>
 
@@ -217,7 +271,7 @@ Add <filename>kvkbd.desktop</filename> to the &tde; Autostart directory for &kvk
 &nbsp;Exec=<command>setxkbmap -option compose:menu &lt;xx>;xmodmap -e 'keycode 133=quotedbl';xmodmap -e 'keycode 134=asterisk';kvkbd</command>
 
 <sbr/><sbr/>
-
+[§] <emphasis>See /etc/X11/xkb/rules/evdev.lst for a list of layouts, variants, and options.</emphasis>
 
 </sect1>
 
@@ -225,7 +279,7 @@ Add <filename>kvkbd.desktop</filename> to the &tde; Autostart directory for &kvk
 <sect1 id="layout-switching">
 <title>Layout switching</title>
 
-&kvkbd; will dynamically switch keyboard layouts as they are changed, either through the command line or using the &tde; Keyboard Tool.
+&kvkbd; will dynamically switch keyboard layouts as they are changed, either through the command line, with <command>setxkbmap</command>, or using the &tde; Keyboard Tool.
 
 <sbr/><sbr/>
 Refer to the <ulink url='help:/kxkb/index.html'>&kxkb; Handbook</ulink> for details on keyboard layout switching.
@@ -242,7 +296,7 @@ Refer to the <ulink url='help:/kxkb/index.html'>&kxkb; Handbook</ulink> for deta
 <sect1 id="key-mapping">
 <title>Key mapping</title>
 
-Using the compose option for <command id="compose-option">setxkbmap</command>, it could be useful for example to set the <keycap>Menu</keycap> key as the compose key to set up user specified characters or character strings.
+Using the compose option for <command id="compose-option">setxkbmap</command>, it could be useful for example to set <keycap>Menu</keycap> as the compose key to set up user specified characters or character strings.
 
 <formalpara>
 <title>Examples</title>
@@ -251,7 +305,7 @@ Using the compose option for <command id="compose-option">setxkbmap</command>, i
 <literallayout><emphasis role="bold">Add the Euro symbol for a US keyboard</emphasis> <link linkend='one'>[¹]</link>
   &#x02022; Add <quote> &lt;Multi_key> &lt;e> &lt;r> : U20AC # "€" EuroSign </quote> to ~/.XCompose <link linkend='two'>[²]</link>
   &#x02022; Run <command>setxkbmap -option compose:menu us</command>
-  &#x02022; Start new konsole or editor
+  &#x02022; Start a new konsole or editor
   &#x02022; Click <keycap>Menu</keycap> <keycap>e</keycap> <keycap>r</keycap>
      .. and <emphasis role="bold">€</emphasis> should be displayed
 </literallayout>
@@ -259,14 +313,14 @@ Using the compose option for <command id="compose-option">setxkbmap</command>, i
 <literallayout><emphasis role="bold">Add a shortcut for a frequently used text string</emphasis>
   &#x02022; Add <quote> &lt;Multi_key> &lt;t> &lt;r> : "&tde; rocks" </quote> to ~/.XCompose
   &#x02022; Run <command>setxkbmap -option compose:menu &lt;xx></command>
-  &#x02022; Start new konsole or editor
+  &#x02022; Start a new konsole or editor
   &#x02022; Click <keycap>Menu</keycap> <keycap>t</keycap> <keycap>r</keycap>
      .. and <emphasis role="bold">&tde; rocks</emphasis> should be displayed
 </literallayout>
 
 <emphasis role="bold" id="assign-keycodes">Assign keycodes</emphasis>
 <sbr/>&xmmp; can be used to assign keycodes to any key.
-<sbr/><sbr/>If &kvkbd; has been built for the <keycap>Win</keycap> keys to function as non-control keys, they can conveniently be used for frequently used characters which might otherwise be more cumbersome to generate.
+<sbr/><sbr/>If &kvkbd; has been built for the <keycap>Win</keycap> keys not to function as modifier keys, they can conveniently be used for frequently used characters which might otherwise be more cumbersome to generate.
 <sbr/><sbr/>For example, the <emphasis role="bold">"</emphasis> and <emphasis role="bold">*</emphasis> characters on a gb keyboard are &Shift;+<keycap>2</keycap> and &Shift;+<keycap>8</keycap>, and they could be assigned to the Win keys:
 <literallayout><command>&xmmp; -e 'keycode 133=quotedbl'</command>
 <command>&xmmp; -e 'keycode 134=asterisk'</command>
@@ -286,7 +340,7 @@ Then <keycap>LWin</keycap> would print <emphasis role="bold">"</emphasis> and <k
 
 Create a character that doesn't have a direct unicode mapping, but is composed of unicode characters in the font being used.
 <sbr/><sbr/>
-As an example -- a-ogonek [U<emphasis role="bold">0105</emphasis>] + combining acute [U<emphasis role="bold">0301</emphasis>] -- <emphasis role="bold">ą́</emphasis>́
+As an example -- a-ogonek 'ą' [U<emphasis role="bold">0105</emphasis>] + combining acute '´' [U<emphasis role="bold">0301</emphasis>]́
 <sbr/><sbr/>
 
 Add the character and chosen key combination to the ~/.XCompose file:
@@ -299,7 +353,7 @@ Test:
 <sbr/>
   &#x02022; Start new editor
 <sbr/>
-  &#x02022; Print the character:   <keycap>Menu</keycap> <keycap>space</keycap> <keycap>a</keycap>
+  &#x02022; Print the character:   <keycap>Menu</keycap> <keycap>space</keycap> <keycap>a</keycap> → <emphasis role="bold">ą́</emphasis>
 <sbr/><sbr/>
 </sect1>
 
