@@ -44,12 +44,15 @@ Apps [applications/]
 Other directories are:  
 ```
 Misc - for non-Trinity package builds
-src - to hold all the sources, either pre-downloaded or downloaded during the build.
+src - to hold all the sources, either pre-downloaded
+      or downloaded during the build.
 ```
 Other scripts:  
 ```
 get-source.sh - a chunk of common code for the SlackBuilds
-              - used for getting the sources, setting FLAGS, creating build directories, ...
+              - used for getting the sources, setting FLAGS,
+                creating build directories, ...
+
 ```
 There is an override in the Misc SlackBuilds for non-trinity source archive URLs. Non-trinity builds have been included where a TDE package requires a dependency that is not in Slackware, or where it's an alternative to a TDE package.
 

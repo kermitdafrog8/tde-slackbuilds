@@ -68,15 +68,15 @@ rm -rf $OUTPUT/{checkout,configure,make,install,error,makepkg,patch}-$PRGNAM.log
 # Where do we look for sources?
 SRCDIR=$(cd $(dirname $0); pwd)
 
-## if 14.0.9 or misc, download archive:
-[[ $TDEVERSION == 14.0.9 || $TDEMIR_SUBDIR == misc ]] && {
+## if 14.0.10 or misc, download archive:
+[[ $TDEVERSION == 14.0.10 || $TDEMIR_SUBDIR == misc ]] && {
 ## check for and remove any zero byte archive files
 [[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} ]] && \
 rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} 2>/dev/null || true
 ## R14.0.6+ archive names include -trinity.
 ## To maintain compatibility with the previous naming convention,
 ## sym-link any pre-downloaded R14.0.6+ archives
-[[ $TDEVERSION == 14.0.[6-9] ]] && [[ -s $SRCDIR/../../src/$PRGNAM-trinity-$VERSION.tar.xz ]] && \
+[[ $TDEVERSION == 14.0.10 ]] && [[ -s $SRCDIR/../../src/$PRGNAM-trinity-$VERSION.tar.xz ]] && \
 (cd $SRCDIR/../../src/
 ln -sf $PRGNAM-trinity-$VERSION.tar.xz $PRGNAM-$VERSION.tar.xz)
 
@@ -113,7 +113,7 @@ if [ "$P1" == "--download" ]; then
 fi
 } || \
 {
-## otherwise, not R14.0.9 or misc, and we are creating/updating git,
+## otherwise, not R14.0.10 or misc, and we are creating/updating git,
 ## so [1] start with admin/cmake:
 [[ $(cat $TMPVARS/DL_CGIT) == yes ]] && {
 cd $BUILD_TDE_ROOT/src/cgit
@@ -170,7 +170,7 @@ git fetch origin r14.0.x:r14.0.x)
 git clone https://mirror.git.trinitydesktop.org/cgit/libltdl
 }
 
-## if tdenetwork, need libtdevnc, but not yet for 14.0.x==14.0.9 which uses krfb/libvncserver
+## if tdenetwork, need libtdevnc, but not yet for 14.0.x==14.0.11[?] which uses krfb/libvncserver
 [[ " tdenetwork " == *$PRGNAM* ]] && {
 [[ -d libtdevnc ]] && \
 (echo "Updating libtdevnc ..."
@@ -242,7 +242,7 @@ cd $TMP_BUILD/tmp-$PRGNAM
 ##
 ## [1] firstly test for R14 or misc ..
 ##
-[[ $TDEVERSION == 14.0.9 || $TDEMIR_SUBDIR == misc ]] && {
+[[ $TDEVERSION == 14.0.10 || $TDEMIR_SUBDIR == misc ]] && {
 
 ## unpack R14 or misc
 echo -e "\n unpacking $(basename $SOURCE) ... \n"
@@ -252,7 +252,7 @@ tar -xf $SOURCE
 
 } || {
 
-## [2] not 14.0.9 nor misc, so must be git ..
+## [2] not 14.0.10 nor misc, so must be git ..
 ## but is it [2a] 14.0.x ..
 [[ $TDEVERSION == 14.0.x ]] && {
 

@@ -35,17 +35,27 @@ getsource_fn
 ## extract, build, and remove source for each language package one at a time
 
 cd $TMP_BUILD/tmp-$PRGNAM
-[[ $TDEVERSION == 14.0.9 ]] && {
+[[ $TDEVERSION == 14.0.10 ]] && {
 # extract the cmake source once only
 echo -e "\033[39;1m"
 echo "Extracting the cmake source from $(basename $SOURCE) ..."
 echo -e "\033[0m"
 tar xf $SOURCE $PRGNAM-trinity-$TDEVERSION/cmake
+# extract the template source once only
+echo -e "\033[39;1m"
+echo "Extracting the template source from $(basename $SOURCE) ..."
+echo -e "\033[0m"
+tar xf $SOURCE $PRGNAM-trinity-$TDEVERSION/template
+# extract the translations source once only
+echo -e "\033[39;1m"
+echo "Extracting the translations source from $(basename $SOURCE) ..."
+echo -e "\033[0m"
+tar xf $SOURCE $PRGNAM-trinity-$TDEVERSION/translations
 }
 
 for lang in $I18N
 do
-[[ $TDEVERSION == 14.0.9 ]] && {
+[[ $TDEVERSION == 14.0.10 ]] && {
 # extract the source for one language at a time for each iteration of the loop
 echo -e "\033[39;1m"
 echo "Extracting the $PRGNAM-$lang source from $(basename $SOURCE) ..."

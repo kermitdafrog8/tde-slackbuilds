@@ -33,12 +33,9 @@ getsource_fn
 
 untar_fn
 
-## this lang variable is for slack-desc & setting TRANS
+## for slack-desc
 langs="en"
-for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang.po";done
-[[ $langs != "" ]] && TRANS=ON
-langs=$(echo $langs | sed "s|.po||g")
-## this ldocs variable is only used for slack-desc
+for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 ldocs="en tdeioslave"
 for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
 
@@ -66,7 +63,7 @@ cmake \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
     ..
 

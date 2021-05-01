@@ -33,17 +33,8 @@ getsource_fn
 
 untar_fn
 
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-[[ $TDEVERSION == 14.0.9 ]] && {
-langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang.po";done
-## this GLOB overrides 'LANG auto' in po/CMakeLists.txt:
-sed -i "s| \*.po| $langs|" cmake/modules/TDEMacros.cmake
-} || {
 ## for slack-desc
-langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
-}
-[[ $langs != "" ]] && TRANS=ON && langs=$(echo $langs | sed "s|.po||g")
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 
@@ -62,7 +53,7 @@ cmake \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DBUILD_TRANSLATIONS="ON" \
     -DWITH_GCC_VISIBILITY="OFF" \
     -DWITH_DPMS="ON" \
     -DWITH_XTEST="ON" \
@@ -100,7 +91,7 @@ echo "
 $PRGNAM: kaffeine - a Media Player for TDE
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en $langs
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

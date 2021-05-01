@@ -103,8 +103,8 @@ Set the version of TDE to be built.
  
 " \
 13 75 3 \
-"14.0.9" "the R14.0.9 release - source from archives" \
-"14.0.x" "r14.0.10 preview/wip - source from Trinity git" \
+"14.0.10" "the R14.0.10 release - source from archives" \
+"14.0.x" "next release preview - source from Trinity git" \
 "14.1.0" "R14.1.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
 
@@ -855,7 +855,7 @@ for dir in $(cat $TMPVARS/TDEbuilds)
 do
 [[ ! -e $TMPVARS/download-failure ]] && {
    { [[ $dir == Deps* ]] && export TDEMIR_SUBDIR="/dependencies"; } \
-|| { [[ $dir == Core* ]] && export TDEMIR_SUBDIR=""; } \
+|| { [[ $dir == Core* ]] && export TDEMIR_SUBDIR="/core"; } \
 || { [[ $dir == Libs* ]] && export TDEMIR_SUBDIR="/libraries"; } \
 || { [[ $dir == Apps* ]] && export TDEMIR_SUBDIR="/applications"; } \
 || { [[ $dir == *Misc* ]] && export TDEMIR_SUBDIR="misc"; } # used for untar_fn - leading slash deliberately omitted

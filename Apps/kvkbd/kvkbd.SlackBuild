@@ -33,10 +33,9 @@ getsource_fn
 
 untar_fn
 
-# ### 2021-04-16
 ## These patches could be broken by ongoing development.
 ## To build kvkbd with these patches, revert the repo to revisions known to work
-[[ $TDEVERSION != 14.0.9 ]] && {
+[[ $TDEVERSION != 14.0.10 ]] && {
 (cd $BUILD_TDE_ROOT/src/cgit/$PRGNAM/
 git reset HEAD *
 rm -rf .git/worktrees/*
@@ -62,18 +61,10 @@ cp -a $SRCDIR/doc .
 cp $SRCDIR/dock.png src/
 ## copy translations
 cp $SRCDIR/translations/messages/* translations/messages/
-## not in this version - introduced for the later qt4 build
-sed -i '/CSS Color themes/d' README
 ## remove meinproc check - there are a number of validity errors relating to the use of <sbr/> etc.,
 ## which I feel provides a better presentation. The help file displays as intended.
 sed -i 's|--check --cache index.cache.bz2|--cache index.cache.bz2|' cmake/modules/TDEMacros.cmake
 
-## Update 14.0.9 to development known working revision
-[[ $TDEVERSION == 14.0.9 ]] && {
-patch -p0 < $SRCDIR/backport.patch
-}
-
-## development build changes ..
 ## change num-pad keys text
 [[ $(cat $TMPVARS/Kvkbd_OPTS) == *numpad* ]] && {
 echo -e "\033[36;1m"'patching for num-pad text ..'"\033[0m"
