@@ -6,7 +6,7 @@
 .. for Slackware 14.2 or current on i586+ and x86_64.  
 .. see 'Cross compiling for RPi3' for building for armv7/aarch64.
 
-Build the release version 14.0.9 from tar archives; or the development versions 14.0.10, 14.1.0 from trinitydesktop cgit.  
+Build the release version 14.0.10 from tar archives; or the development versions 14.0.x, 14.1.0 from trinitydesktop cgit.  
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input.  
 
 [<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png)
@@ -19,7 +19,7 @@ This is a global option so can't be used where the build list includes packages 
 Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.  
 Information about dependencies for some packages has been added at the bottom of the dialog screen.
 
-14.0.9 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.10/14.1.0] cloned or updated from cgit.  
+14.0.10 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.x/14.1.0] cloned or updated from cgit.  
 Downloading can be done pre-build [useful for an off-line build], or during the build.
 
 If you're curious about what this might involve, [take a look at a sample build set up](https://ray-v.github.io/A_typical_TDE_SlackBuild.html).
