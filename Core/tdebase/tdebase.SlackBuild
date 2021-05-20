@@ -320,37 +320,17 @@ chmod 755 $PKG/etc/profile.d/tde.{,c}sh
 
 ##############################################################################
 
-# Add some configuration files / scripts needed by TDE.
-mkdir -p $PKG$SYS_CNF_DIR
-mv $PKG$INSTALL_TDE/share/config/tdm $PKG$SYS_CNF_DIR/tdm
-( cd $PKG$INSTALL_TDE/share/config ; ln -sf $SYS_CNF_DIR/tdm tdm )
-
-##############################################################################
-
-# Add rc.4.local to give TDM priority over rc.4 X11 session manager options
-# Assumes that rc.4.new from sysvinit-scripts still has the rc.4.local option
-
-mkdir $PKG/etc/rc.d
-echo '#!'" /bin/sh
-
-# Start TDM:
-if [ -x $INSTALL_TDE/bin/tdm ]; then
- echo 'Using TDM (Trinity Login Manager).'
- echo
-# log_cleanup '/var/log/tdm.log'
- exec $INSTALL_TDE/bin/tdm -nodaemon -error /var/log/tdm.log
-fi
-" > $PKG/etc/rc.d/rc.4.local
-chmod 755 $PKG/etc/rc.d/rc.4.local
-
-##############################################################################
-
 # Set sane permissions for the include files.
 if [ -d $PKG$INSTALL_TDE/include ]; then
    find $PKG$INSTALL_TDE/include -type f -exec chmod 0644 {} \;
 fi
 
-##############################################################################
+#################################  TDM stuff #################################
+
+# Add some configuration files / scripts needed by TDE.
+mkdir -p $PKG$SYS_CNF_DIR
+mv $PKG$INSTALL_TDE/share/config/tdm $PKG$SYS_CNF_DIR/tdm
+( cd $PKG$INSTALL_TDE/share/config ; ln -sf $SYS_CNF_DIR/tdm tdm )
 
 # Setup config files for TDM:
 $PKG$INSTALL_TDE/bin/gentdmconf --no-old --no-old-scripts --no-backup --in $PKG$SYS_CNF_DIR/tdm
@@ -456,12 +436,26 @@ esac
 exec xmessage -center -buttons OK:0 -default OK "Sorry, cannot execute $session. Check $DESKTOP_SESSION.desktop."
 ' > $PKG$SYS_CNF_DIR/tdm/Xsession
 
-##############################################################################
+# Add rc.4.local to give TDM priority over rc.4 X11 session manager options
+# Assumes that rc.4.new from sysvinit-scripts still has the rc.4.local option
+mkdir $PKG/etc/rc.d
+echo '#!'" /bin/sh
+
+# Start TDM:
+if [ -x $INSTALL_TDE/bin/tdm ]; then
+ echo 'Using TDM (Trinity Login Manager).'
+ echo
+# log_cleanup '/var/log/tdm.log'
+ exec $INSTALL_TDE/bin/tdm -nodaemon -error /var/log/tdm.log
+fi
+" > $PKG/etc/rc.d/rc.4.local.tdm
+chmod 755 $PKG/etc/rc.d/rc.4.local.tdm
 
 mv $PKG$SYS_CNF_DIR/tdm/backgroundrc $PKG$SYS_CNF_DIR/tdm/backgroundrc.new
 [[ -r $PKG$SYS_CNF_DIR/tdm/README ]] && \
 sed -i "s|$TMP_BUILD/package-tdebase$SYS_CNF_DIR/tdm|$SYS_CNF_DIR/tdm|" $PKG$SYS_CNF_DIR/tdm/README
 
+##############################################################################
 
 mkdir_install_fn
 
@@ -520,12 +514,6 @@ fi
 sed -i '\''s|source /etc/profile.d/mc.sh|#source /etc/profile.d/mc.sh|'\'' $HOME/.bashrc || true
 ' > $PKG/install/doinst.sh
 
-[[ $RUNLEVEL == 4 ]] && {
-echo "## set default runlevel to 4 for tdm
-sed -i 's|id:[1-5]|id:4|' etc/inittab
-" >> $PKG/install/doinst.sh
-}
-
 ## set TDEHOME and TDEROOTHOME variables - defaults ~/.trinity and /root/.trinity
 [[ $SYS_CNF_DIR == /etc/tde ]] && {
 echo "# upgradepkg runs installpkg twice, so firstly remove any previous TDE*HOME entries
@@ -534,6 +522,20 @@ echo 'export TDEHOME=~/.tde' >> /etc/profile
 echo 'export TDEROOTHOME=/root/.tde' >> /etc/profile
 " >> $PKG/install/doinst.sh
 }
+
+## Set up doinst.sh according to the TDM options selected
+[[ $(cat $TMPVARS/RUNLEVEL) == *rc4l* ]] && {
+echo '## login manager TDM selected
+cp etc/rc.d/rc.4.local.tdm etc/rc.d/rc.4.local
+' >> $PKG/install/doinst.sh
+}
+#
+[[ $(cat $TMPVARS/RUNLEVEL) == *rl4* ]] && {
+echo "## set default runlevel to 4 for TDM
+sed -i 's|id:[1-5]|id:4|' etc/inittab
+" >> $PKG/install/doinst.sh
+}
+
 
 doinst_sh_fn
 

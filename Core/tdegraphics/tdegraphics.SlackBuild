@@ -54,11 +54,6 @@ chown_fn
 
 cd_builddir_fn
 
-## Slackware current build with poppler v21....
-## error: cannot convert ‘XRef*’ to ‘PDFDoc*’
-## Workaround until resolved:
-[[ $(ls /var/log/packages/poppler-*) == *-2[1-9].* ]] &&  W_PDF=OFF
-
 # If imlib is installed, include Kuickshow:
 [[ -s /usr/include/Imlib.h ]] && KUICKSHOW=ON
 cmake \
@@ -74,7 +69,7 @@ cmake \
     -DWITH_PAPER="OFF" \
     -DWITH_TIFF="OFF" \
     -DWITH_OPENEXR="OFF" \
-    -DWITH_PDF=${W_PDF:-ON} \
+    -DWITH_PDF="ON" \
     -DBUILD_DOC="ON" \
     -DBUILD_TDEFILE_PLUGINS="ON" \
     -DBUILD_KUICKSHOW=${KUICKSHOW:-OFF} \

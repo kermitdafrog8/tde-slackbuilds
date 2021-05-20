@@ -1,4 +1,4 @@
-The 14.0.9 build has been updated with a backport from the development version. The many enhancements include setting key and/or background colours, and displaying level 3 & 4 characters where the xkb/symbols definitions include using the AltGr [ralt] key.
+The many enhancements include setting key and/or background colours, and displaying level 3 & 4 characters where the xkb/symbols definitions include using the AltGr [ralt] key.
 
 Build-time options to be hard-coded into the app are:
 

@@ -518,26 +518,34 @@ ${DLG_BOX:-0 0}
 [[ $? == 1 ]] && echo leave >  $TMPVARS/PKG_CONFIG_PATH_MOD
 }
 
+
 ## only run this if tdebase has been selected
 rm -f $TMPVARS/RUNLEVEL
 [[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && {
-EXITVAL=2
+## the default exit status for the extra button is 3 - exit from a help button is 2 which is needed for RUNLEVEL
+EXITVAL=3
 until [[ $EXITVAL -lt 2 ]] ; do
-dialog --cr-wrap --no-shadow --yes-label "4" --no-label "3" --help-button --help-label "README" --colors --defaultno --title " TDM " --yesno \
+dialog --cr-wrap --nocancel --no-shadow --extra-button --extra-label "README" --colors --title " TDM " --checklist \
 "
-TDM is included in the tdebase build.
+See the README for further details ..
 
-Select:
-runlevel \Zb\Z64\Zn - to login with TDM and boot into the GUI
-runlevel \Zb\Z63\Zn - to boot into a terminal - the Slackware default.
+A file \Zb\Z2rc.4.local.tdm\Zn, specifically for launching TDM, will be installed with tdebase.
 
-This option can be overridden later by editing /etc/inittab.
+These options will add commands to doinst.sh:
+[1] Selecting \Z3\Zbrc4l\Zn will copy \Zb\Z2rc.4.local.tdm\Zn to \Zb\Z2rc.4.local\Zn, overwriting any existing file.
+
+[2] Selecting \Z3\Zbrl4\Zn will set runlevel 4 in etc/inittab to enable login with TDM, or other DM.
+    Otherwise no change will be made to etc/inittab.
+
+With both options selected, TDM should be set up to run by default.
+ 
 " \
-13 75
+25 75 2 \
+" rc4l" "install rc.4.local for TDM" off \
+" rl4" "set runlevel 4" off \
+2> $TMPVARS/RUNLEVEL
 EXITVAL=$?
-[[ $EXITVAL == 0 ]] && echo 4 > $TMPVARS/RUNLEVEL
-[[ $EXITVAL == 1 ]] && echo 3 > $TMPVARS/RUNLEVEL
-[[ $EXITVAL == 2 ]] && dialog --cr-wrap --no-shadow --colors --ok-label "Return" --msgbox \
+[[ $EXITVAL == 3 ]] && dialog --cr-wrap --no-shadow --colors --ok-label "Return" --title " TDM README " --msgbox \
 "
 $(cat Core/tdebase/README|sed "s|/{TDE_installation_dir}|$(cat $TMPVARS/INSTALL_TDE)|;s|(|\\\Z6\\\Zb|;s|)|\\\Zn|")
 " \
@@ -612,7 +620,6 @@ EXITVAL=$?
 $(cat Apps/kvkbd/README)
 " \
 30 75
-#}
 done
 }
 
@@ -668,9 +675,9 @@ Create and/or update the git repositories local copies.
 
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
-[[ $(cat $TMPVARS/TDEVERSION) == 14.0.9 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
+[[ $(cat $TMPVARS/TDEVERSION) == 14.0.10 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
 [[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'." && LINES=18
-## testing for cgit!=no will allow =yes or null, which is the 14.0.9 build case
+## testing for cgit!=no will allow =yes or null, which is the 14.0.10 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "
@@ -737,7 +744,6 @@ export KEEP_BUILD=$(cat $TMPVARS/KEEP_BUILD)
 export RUNLEVEL=$(cat $TMPVARS/RUNLEVEL)
 export PRE_DOWNLOAD=$(cat $TMPVARS/PRE_DOWNLOAD)
 export TDEPFX=$(cat $TMPVARS/TDEPFX)
-export WinLock=$(cat $TMPVARS/WinLock)
 
 ## Set installation directory for tqt
 TQTDIR=$INSTALL_TDE
@@ -767,7 +773,7 @@ export PLUGIN_INSTALL_DIR=$(cat $TMPVARS/SYS_CNF_DIR | cut -d/ -f3)
 [[ $EXIT_FAIL == "exit 1" ]] && AOF=stop
 #
 ## if tdebase selected
-[[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && TDMRL=$RUNLEVEL
+[[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && [[ $(cat $TMPVARS/RUNLEVEL) == *rl4* ]] && TDMRL=4
 #
 ## koffice - only if it is being built
 [[ $(grep -o "Apps/koffice " $TMPVARS/TDEbuilds) ]] && {

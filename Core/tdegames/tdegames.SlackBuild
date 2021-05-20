@@ -110,8 +110,6 @@ mkdir_install_fn
 
 doinst_sh_fn
 
-## tdefifteen has been added to 14.0.x and 14.1.0 builds
-[[ $TDEVERSION != 14.0.9 ]] && TDE15=" * tdefifteen: A sliding tile puzzle."
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -155,7 +153,7 @@ $PRGNAM: * ktron: Like ksnake, but without fruits.
 $PRGNAM: * ktuberling: Kids game: make your own potato
 $PRGNAM: * lskat: 2 player skat card game.
 $PRGNAM: * twin4: Place 4 pieces in a row.
-$PRGNAM:${TDE15:-}
+$PRGNAM: * tdefifteen: A sliding tile puzzle.
 " > $PKG/install/slack-desc
 
 makepkg_fn
