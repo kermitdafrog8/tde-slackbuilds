@@ -35,44 +35,14 @@ untar_fn
 
 listdocs_fn
 
-## There are issues building with cmake - see README
-USE_CMAKE_MM=${USE_CMAKE_MM:-no}
-
-[[ $USE_CMAKE_MM == no ]] && {
-
-## /usr/bin/ld: cannot find -ltqt-mt/-ltqt - for gentable build
-[[ $TDEVERSION == 14.1.0 ]] && \
-sed -i 's|(QT_LDFLAGS|(TQT_LDFLAGS|' noatun/library/Makefile.am
-
-ltoolupdate_fn
-
 chown_fn
 
 cd_builddir_fn
 
-CFLAGS="$SLKRCFLAGS" \
-CXXFLAGS="$SLKRCFLAGS" \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --disable-rpath \
-   --enable-closure
+## akode is required for ARTS_AKODE plugin & JUK
+[[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && aRts_AKODE=ON && JUK=ON
 
-true # don't go to cmake if ./configure fails
-
-} || {
-
-chown_fn
-
-cd_builddir_fn
-
-## akode is required for ARTS_AKODE
-AKODE=OFF && [[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && AKODE=ON
-## JUK requires musicbrainz and akode - ** to be completed for musicbrainz test **
-JUK=OFF && [[ $AKODE == ON ]] && :
-
-cmake \
+cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
@@ -82,7 +52,7 @@ cmake \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DWITH_ALSA="ON" \
-    -DWITH_ARTS_AKODE="$AKODE" \
+    -DWITH_ARTS_AKODE="${aRts_AKODE:-OFF}" \
     -DWITH_ARTS_AUDIOFILE="ON" \
     -DWITH_ARTS_MPEGLIB="ON" \
     -DWITH_ARTS_XINE="ON" \
@@ -97,7 +67,7 @@ cmake \
     -DWITH_VORBIS="ON" \
     -DBUILD_ARTS="ON" \
     -DBUILD_DOC="ON" \
-    -DBUILD_JUK="$JUK" \
+    -DBUILD_JUK="${JUK:-OFF}" \
     -DBUILD_KABOODLE="ON" \
     -DBUILD_KAPPFINDER_DATA="ON" \
     -DBUILD_KAUDIOCREATOR="ON" \
@@ -112,8 +82,6 @@ cmake \
     -DBUILD_TDEMID="ON" \
     -Wno-dev \
     ..
-
-}
 
 make_fn
 

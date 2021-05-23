@@ -37,23 +37,17 @@ getsource_fn
 untar_fn
 
 ## patch for clang
-echo $'
---- Makefile
-+++ Makefile
-@@ -21 +21 @@
--CC=cc
-+CC=$(COMPILER)
-' | while read line
-do
-patch -p0
-done
+sed -i 's|CC=cc|CC=$(COMPILER)|' Makefile
+
+## suppress compiler warnings
+[[ $(cat $TMPVARS/BuildOptions) == *no_warn* ]] && sed -i 's|Wall|& -w|' Makefile
 
 listdocs_fn
 
 chown_fn
 
 make || exit 1
-make DESTDIR=$PKG install || exit 1
+DESTDIR=$PKG make install || exit 1
 
 installdocs_fn
 

@@ -42,7 +42,7 @@ cd_builddir_fn
 AKODE=OFF && [[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && AKODE=ON
 FREEVERB=OFF && [[ -s $INSTALL_TDE/include/arts/artsmodules.h ]] && FREEVERB=ON
 
-cmake \
+cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

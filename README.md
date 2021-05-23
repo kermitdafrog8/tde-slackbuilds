@@ -11,10 +11,9 @@ For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series
 
 [<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png)
 
-The default is to install the packages as they are built, which is necessary initially for the required packages and for some interdependencies [for example, tdesdk requires tdepim].  
+The Required packages will need to be installed as they are built, because they provide dependencies for other TDE packages.
 
-Run **INST=0 ./BUILD-TDE.sh** to build only.  
-This is a global option so can't be used where the build list includes packages which will need to be installed as dependencies for other packages in the build list.
+Only building the packages is a global option. It therefore can't be used where the build list includes packages which will need to be installed as dependencies for other packages in the build list [for example tdesdk needs tdepim to be installed].
 
 Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.  
 Information about dependencies for some packages has been added at the bottom of the dialog screen.
@@ -29,15 +28,13 @@ If you're curious about what this might involve, [take a look at a sample build 
 ***Other command line options*** that can be used to set some build parameters:
 * TDE_MIRROR= - override the trinitydesktop.org geoIP redirector to use https - example, *https://trinitydesktop.mirrorservice.org/trinity*. URLs @ https://www.trinitydesktop.org/mirrorstatus.php
 * BUILD= - sets the package build identifier, overriding the SlackBuild default of 1
-* USE_CMAKE_MM=yes - to build tdemultimedia with cmake - see Core/tdemultimedia/README.
-* VERBOSE=1 - show command lines during cmake builds; and error messages
 
 ---
 
 ***The directory structure*** for the SlackBuild scripts is in line with the Trinity release source repositories:  
 ```
 Deps [dependencies/]
-Core []
+Core [core/]
 Libs [libraries/]
 Apps [applications/]
 ```

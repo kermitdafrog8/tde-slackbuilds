@@ -82,7 +82,7 @@ chown_fn
 mkdir -p $PRGNAM-$lang/build
 cd $PRGNAM-$lang/build
 
-cmake \
+cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

@@ -87,8 +87,7 @@ CXX=$COMPILER_CXX \
   --mandir=/usr/man \
   --enable-ocaml=no
 
-make $NUMJOBS || exit 1
-make install-strip DESTDIR=$PKG || exit 1
+make_fn
 
 ## The primary purpose of this build is for 'dot' for kscope, tdeedu, ...
 ## To include the pdf and html documentation, comment out this line:

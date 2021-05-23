@@ -63,7 +63,7 @@ chown_fn
 
 cd_builddir_fn
 
-cmake \
+cmake ${G_NINJA:-} \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \

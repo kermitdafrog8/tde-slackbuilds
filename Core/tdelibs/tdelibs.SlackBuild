@@ -46,10 +46,7 @@ echo $'--- tdecmshell/main.cpp
 @@ -101 +107 @@
 -        kdWarning(780) << "Could not find module \'" << module << "\'." << endl;
 +        kdError(780) << "Could not find \'" << path << "\'." << endl;
-' | while read line
-do
-patch -N -p0
-done || true
+' | patch -N -p0 || true
 
 ## allow for configuration files directory == /etc/tde
 ## and plugins in $INSTALL_TDE/lib$LIBDIRSUFFIX/tde
@@ -63,7 +60,6 @@ tdelfeditor/tdelfeditor.cpp \
 tdeio/tests/kurifiltertest.cpp \
 tdeio/tests/kmimetypetest.sh.cmake \
 tdeio/tests/jobtest.cpp \
-tdeio/kssl/kopenssl.cc \
 tdeio/kssl/kopenssl.cpp \
 tdeinit/tdestartupconfig.cpp \
 tdecore/tdeconfig_compiler/tests/test9main.cpp
@@ -71,6 +67,10 @@ do
 sed -i "s|trinity|$PLUGIN_INSTALL_DIR|g" $file || true
 done
 sed -i "s|\"trinity\"|\"$PLUGIN_INSTALL_DIR\"|"  tdecore/tdeapplication.cpp || true
+
+## change hard-coded path
+sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" tdecore/tests/kurltest.cpp || true
+sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" cmake/modules/TDESetupPaths.cmake || true
 
 ## Patching for preferred formatting of help files
 patch -N -p0 << EOF || true
@@ -135,7 +135,7 @@ sed -i 's|TQT_INCLUDE_DIRS}|&\n  ${AVAHI_TQT_INCLUDE_DIRS}|' ../dnssd/CMakeLists
 ## just show message without failing if no spell checker is installed
 sed -i 's|tde_message_fatal( "Spell checker|message( "Spell checker|' ../CMakeLists.txt
 
-cmake \
+cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

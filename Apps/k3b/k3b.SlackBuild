@@ -49,7 +49,7 @@ cd_builddir_fn
 # Check for musicbrainz:
 [[ -s /usr/include/musicbrainz/mb_c.h ]] && MUSICBRAINZ="ON"
 
-cmake \
+cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

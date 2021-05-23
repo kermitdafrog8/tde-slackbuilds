@@ -44,7 +44,7 @@ cd_builddir_fn
 
 ## TDEFileReplace has been moved from tdewebdev for R14.1.0
 [[ $TDEVERSION == 14.1.0 ]] && TDEFileReplace="-DBUILD_TDEFILEREPLACE=ON"
-cmake \
+cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

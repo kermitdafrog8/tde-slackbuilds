@@ -44,7 +44,7 @@ cd_builddir_fn
 # If speex is installed, include it in the build for jingle
 [[ -s /usr/include/speex/speex.h ]] && SPX="ON"
 
-cmake \
+cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

@@ -216,7 +216,7 @@ done
 ## - double quote $SLK[R]CFLAGS with cmake in the SBs for it to recognize the whole string
 INST_RPATH="$TQTDIR/lib$LIBDIRSUFFIX"
 [[ $TQTDIR != $INSTALL_TDE ]] && INST_RPATH="$INST_RPATH:$INSTALL_TDE/lib$LIBDIRSUFFIX"
-SLKCFLAGS="-O2 ${SET_march:-}" # for Misc and libart-lgpl
+SLKCFLAGS="-O2 ${NO_WARN:-} ${SET_march:-}" # for Misc and libart-lgpl
 SLKRCFLAGS="$SLKCFLAGS -Wl,-rpath,'$INST_RPATH'" # for TQt/TDE
 [[ $ARCH == x86_64 ]] && \
 SLKCFLAGS="$SLKCFLAGS -fPIC" && \
@@ -350,8 +350,12 @@ cd build-$PRGNAM
 
 make_fn ()
 {
-make ${NUMJOBS:-} || exit 1
-make DESTDIR=$PKG install || exit 1
+[[ -s build.ninja ]] && {
+MAKE_PRG=ninja && [[ ${VERBOSE:-} == 1 ]] && MAKE_PRG='ninja -v'
+} || {
+[[ ${VERBOSE:-} == 1 ]] && MAKE_PRG='make --debug=b'
+}
+DESTDIR=$PKG ${MAKE_PRG:-make} ${NUMJOBS:-} install || exit 1
 }
 
 installdocs_fn ()

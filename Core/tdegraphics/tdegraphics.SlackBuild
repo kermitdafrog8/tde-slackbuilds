@@ -56,7 +56,7 @@ cd_builddir_fn
 
 # If imlib is installed, include Kuickshow:
 [[ -s /usr/include/Imlib.h ]] && KUICKSHOW=ON
-cmake \
+cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

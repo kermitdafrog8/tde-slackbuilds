@@ -101,11 +101,11 @@ To display and select the shift characters:
 <sbr/>
 3rd &amp; 4th level characters which are printed using &AltGr; &amp; &AltGr;+&Shift; as modifier keys, can be displayed and printed in a similar way.
 <sbr/><sbr/>
-There are therefore six sets of characters which can be displayed -
+There are therefore four sets of characters which can be displayed -
 <sbr/>
-<keycap>Lower</keycap>&ensp; &Shift;&ensp; &Caps;&ensp; &Caps;+&Shift;&ensp; &AltGr;&ensp; &AltGr;+&Shift;
+<keycap>Lower</keycap>&ensp; &Shift;&ensp; &AltGr;&ensp; &AltGr;+&Shift;
 <sbr/><sbr/>
-&Caps; can be used with &AltGr; &amp; &AltGr;+&Shift; and mostly gives the correct display, but may not depending on how the unicode character has been defined.
+For each of these, &Caps; will toggle the case of alpha characters where a lower/upper pair is defined in UnicodeData.txt &amp;&amp; &TQt; &amp;&amp; libX11.
 
 </sect1>
 

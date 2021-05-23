@@ -65,10 +65,7 @@ echo $'
 -				<pos x="435" y="323" anchor="s" />
 +				<normal color="#ff0000" font="Sans 11" />
 +				<pos x="435" y="260" anchor="s" />
-' | while read line
-do
-patch -N -p0
-done || true
+' | patch -N -p0 || true
 
 ## enable konqueror filemanagement ViewMode to be set - TDE bug 1963
 echo $'
@@ -96,10 +93,7 @@ echo $'
 +++ konqueror/listview/konq_treeview.desktop
 @@ -87,0 +88 @@
 +X-TDE-BrowserView-Built-Into=konqueror
-' | while read line
-do
-patch -N -p0
-done || true
+' | patch -N -p0 || true
 
 ## allow for configuration files directory == /etc/tde
 ## and plugins in $INSTALL_TDE/lib$LIBDIRSUFFIX/tde
@@ -134,7 +128,7 @@ chown_fn
 
 cd_builddir_fn
 
-cmake \
+cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

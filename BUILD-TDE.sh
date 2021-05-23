@@ -1,10 +1,10 @@
 #!/bin/sh
 
-## suppress error messages
-[[ $VERBOSE != 1 ]] && exec 2>/dev/null
-
 export TMPVARS=/tmp/build/vars
 [[ ! -d $TMPVARS ]] && mkdir -p $TMPVARS
+
+## suppress standard error output unless verbose output has been set on a previous run
+[[ $(cat $TMPVARS/BuildOptions) == *verbose* ]] || exec 2>/dev/null
 
 ## remove marker for git admin/cmake to update or clone only once per run of this script
 rm -f $TMPVARS/admin-cmake-done
@@ -78,7 +78,6 @@ build_core()
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # These need to be set here:
-export INST=${INST:-1}
 TMP=${TMP:-/tmp}
 export LIBPNG_TMP=$TMP
 export BUILD_TDE_ROOT=$(pwd)
@@ -599,7 +598,7 @@ dialog --cr-wrap --nocancel --no-shadow --extra-button --extra-label "README" --
 See the README for further details ..
 
 [1] Use Win keys either as modifier keys,
-                     or for characters set with xmodmap.
+                     or to print characters set with xmodmap.
 
 [2] Alternative text on the num pad keys.
 
@@ -676,8 +675,8 @@ Create and/or update the git repositories local copies.
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
 [[ $(cat $TMPVARS/TDEVERSION) == 14.0.10 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
-[[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'." && LINES=18
-## testing for cgit!=no will allow =yes or null, which is the 14.0.10 build case
+[[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
+## testing for cgit!=no will allow =yes, or null, which is the 14.0.10 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "
@@ -694,7 +693,7 @@ This would be useful for running the build off-line.
 $PRE_DOWNLOAD_MESSAGE
  
 " \
-${LINES:-17} 75
+18 75
 [[ $? == 0 ]] && echo yes > $TMPVARS/PRE_DOWNLOAD
 [[ $? == 1 ]] && echo no > $TMPVARS/PRE_DOWNLOAD
 }
@@ -705,6 +704,7 @@ ${LINES:-17} 75
 # 'uname -m' won't identify a 32 bit system with a 64 bit kernel
 [[ $(getconf LONG_BIT) == 64 ]] && LIBDIRSUFFIX="64" || LIBDIRSUFFIX=""
 
+## if there are no packages to be built, run the set up ..
 [[ ! -e $TMPVARS/TDEbuilds ]] && run_dialog
 
 # option to change to stop the build when it fails
@@ -722,6 +722,38 @@ Do you still want it to do that or change to <\Z1S\Zb\Z0top\Zn> ?
 
 fi
 fi
+
+
+## for a first run, 'install' is set 'on' - subsequently, options are as previously set ..
+[[ -e $TMPVARS/BuildOptions ]] && {
+[[ $(cat $TMPVARS/BuildOptions) == *install* ]] && OPT_1=on || OPT_1=off
+[[ $(cat $TMPVARS/BuildOptions) == *no_warn* ]] && OPT_2=on
+[[ $(cat $TMPVARS/BuildOptions) == *ninja* ]] && OPT_3=on
+[[ $(cat $TMPVARS/BuildOptions) == *verbose* ]] && OPT_4=on
+}
+dialog --cr-wrap --nocancel --no-shadow --colors --title " Build options " --checklist \
+"
+Confirm or change these build options ..
+
+[1] \Z3\Zbinstall\Zn - install packages as they are built - needed for \Zb\Zr\Z4R\Znequired packages and some interdependencies
+
+[2] \Z3\Zbno_warn\Zn - don't display any compiler warning messages
+
+[3] \Z3\Zbninja\Zn - use ninja for cmake builds
+
+[4] \Z3\Zbverbose\Zn - show command lines during cmake builds, 'make' debugging information, and standard error output. Using this is only recommended if fault finding.
+ 
+" \
+25 75 4 \
+" install" "install built packages" ${OPT_1:-on} \
+" no_warn" "suppress compiler warnings" ${OPT_2:-off} \
+" ninja" "use ninja for cmake builds" ${OPT_3:-off} \
+" verbose" "show command lines" ${OPT_4:-off} \
+2> $TMPVARS/BuildOptions
+[[ $(cat $TMPVARS/BuildOptions) == *install* ]] && export INST=1 || export INST=0
+[[ $(cat $TMPVARS/BuildOptions) == *no_warn* ]] && export NO_WARN="-w"
+[[ $(cat $TMPVARS/BuildOptions) == *ninja* ]] && export G_NINJA="-G Ninja"
+[[ $(cat $TMPVARS/BuildOptions) == *verbose* ]] && export VERBOSE=1 || exec 2>/dev/null
 
 
 ######################
