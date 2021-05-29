@@ -179,6 +179,16 @@ rm share/templates/*.*.*
 mv $TEMP_DIR/* share/templates/
 } || true
 
+[[ $VERSION == 1.0.2 ]] && {
+## only package man pages for required locales
+for file in man/ink*.*.pod.in
+do
+ [[ $I18N != *$(echo $file | cut -d"." -f2)* ]] && rm $file
+done
+## and install them to $prefix, as per most other Slackware packages
+sed -i 's|MANFILE_DEST "${SHARE_INSTALL}|MANFILE_DEST "${CMAKE_INSTALL_PREFIX}|' CMakeScripts/Pod2man.cmake
+}
+
 listdocs_fn
 
 chown_fn
@@ -231,6 +241,7 @@ make_fn
 
 installdocs_fn
 
+[[ $VERSION == 0.92.4 ]] && {
 ## only package man pages for required locales
 mkdir -p $PKG/usr/man/man1/
 mv $PKG/usr/local/share/man/man1/* $PKG/usr/man/man1/
@@ -243,8 +254,11 @@ rm $PKG/usr/man/man1/inkscape.*.1
 mv $TEMP_DIR/* $PKG/usr/man/man1/
 rm -rf $TEMP_DIR
 } || true
+
+## man pages are gzipped by WITH_MANPAGE_COMPRESSION="ON" for 1.0.2
 INSTALL_TDE=/usr
 mangzip_fn
+}
 
 strip_fn
 
