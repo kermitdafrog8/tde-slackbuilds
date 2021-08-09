@@ -44,6 +44,7 @@ sed -i 's|Default Gateway" ), LINK_QUALITY|Default Gateway" ), GATEWAY|' src/kne
 ## for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/knemod/$Lang.po ]] && langs="$langs $Lang";done
 
+## add misc docs
 listdocs_fn
 
 chown_fn
@@ -59,7 +60,7 @@ cmake ${G_NINJA:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DWITH_LIBIW="OFF" \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS="ON" \

@@ -44,14 +44,15 @@ sed 's|tagaac|tagspeex|g;s|aacfile.*$|taglib_speexfiletyperesolver.cpp speexfile
 sed -i -e 's|wav )|wav )\nadd_subdirectory( speex )|' \
 -e 's|tagaac-static|tagaac-static tagspeex-static|' amarok/src/metadata/CMakeLists.txt
 
+[[ $TDEVERSION == 14.0.10 ]] && {
 ## remove help documentation build instruction from all [non-en] locales ...
 sed -i '/tde_create_handbook/,+3d' doc/??{,_??}/CMakeLists.txt || true
 #
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 lpos="" # the *.po files list
-langs="" # the languages
-ldocs="" # the help docs
+langs="en" # the languages
+ldocs="en" # the help docs
 for Lang in $I18N
 do
 [[ -d po/$Lang ]] && {
@@ -66,8 +67,14 @@ ldocs="$ldocs $Lang"
 }
 done
 #
-sed -i "s|\${po_files}|$lpos|" po/CMakeLists.txt
-[[ $langs != "" ]] && TRANS=ON
+sed -i "s|\${po_files}|$lpos|" po/CMakeLists.txt || true
+} || {
+## for slack-desc
+langs="en"
+for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+ldocs="en"
+for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
+}
 
 listdocs_fn
 
@@ -102,7 +109,7 @@ cmake ${G_NINJA:-} \
     -DWITH_AMAZON="ON" \
     -DWITH_DAAP="OFF" \
     -DWITH_EMBEDDED_SQLITE="OFF" \
-    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DWITH_IFP="OFF" \
     -DWITH_INOTIFY="OFF" \
     -DWITH_IPOD="OFF" \
@@ -118,7 +125,7 @@ cmake ${G_NINJA:-} \
     -DWITH_XINE=${XINE:-"OFF"} \
     -DWITH_YAUAP=${YAUAP:-"OFF"} \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
     ..
 
@@ -146,10 +153,10 @@ echo "
 $PRGNAM: Amarok music player for TDE
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en$langs
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM: With help documentation for:
-$PRGNAM: en$ldocs
+$PRGNAM: $ldocs
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

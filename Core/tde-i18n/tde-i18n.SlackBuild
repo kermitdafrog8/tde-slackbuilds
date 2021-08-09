@@ -51,6 +51,11 @@ echo -e "\033[39;1m"
 echo "Extracting the translations source from $(basename $SOURCE) ..."
 echo -e "\033[0m"
 tar xf $SOURCE $PRGNAM-trinity-$TDEVERSION/translations
+} || {
+mkdir -p $PRGNAM # need -p for git builds if more than one lang
+(cd $BUILD_TDE_ROOT/src/cgit
+cp -a tdei18n/cgit/tde-i18n/plain/{template,translations} $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
+cp -a --parents cmake/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/)
 }
 
 for lang in $I18N
@@ -64,14 +69,14 @@ tar -xf $SOURCE $PRGNAM-trinity-$TDEVERSION/$PRGNAM-$lang
 cd $PRGNAM*
 
 true # don't go to cgit if extracting fails
-
 } || {
-mkdir -p $PRGNAM # need -p for git builds if more than one lang
 cd $PRGNAM
 echo -e "\n copying $PRGNAM-$lang source files to build area ... \n"
 (cd $BUILD_TDE_ROOT/src/cgit
-cp -a tdei18n/cgit/tde-i18n/plain/tde-i18n-$lang $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
-cp -a --parents {admin,cmake}/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/tde-i18n-$lang/)
+cp -a tdei18n/cgit/tde-i18n/plain/tde-i18n-$lang $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/)
+(cd $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/$PRGNAM-$lang/
+ln -sf ../template/commonCMakeLists.txt CMakeLists.txt
+ln -s ../cmake cmake)
 }
 
 ## language specific patches

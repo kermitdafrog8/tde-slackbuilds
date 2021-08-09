@@ -49,7 +49,6 @@ cmake ${G_NINJA:-} \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
@@ -58,8 +57,6 @@ cmake ${G_NINJA:-} \
 make_fn
 
 installdocs_fn
-
-[[ $TDEVERSION != 14.0.10 ]] && mangzip_fn
 
 strip_fn
 
@@ -79,13 +76,13 @@ $PRGNAM: abakus is an improvement in the limited simulation of a calculator.
 $PRGNAM: Can be built and used with mpfr.
 $PRGNAM: Customizable precision up to 75 digits.
 $PRGNAM:
-$PRGNAM: Copy/paste or type in and evaluate complex expressions. Exponentiation
-$PRGNAM: is right-associative, for example:  (2^3)^2*e^4/pi  2^3^2*e^4/pi
-$PRGNAM:      [The answers given by abakus:  1112.26437907   8898.11503252]
+$PRGNAM: Copy/paste or type in and evaluate complex expressions.
+$PRGNAM: Exponentiation is right-associative,
+$PRGNAM:  for example:  (2^3)^2 == 8^2,  2^3^2 == 2^9
+$PRGNAM: So, (2^3)^2*e^4/pi=1112.26437907; 2^3^2*e^4/pi=8898.11503252
 $PRGNAM:
 $PRGNAM: With language support for:
 $PRGNAM: $langs
-$PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn

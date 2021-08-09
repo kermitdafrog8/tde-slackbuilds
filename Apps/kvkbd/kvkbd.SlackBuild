@@ -33,29 +33,6 @@ getsource_fn
 
 untar_fn
 
-## These patches could be broken by ongoing development.
-## To build kvkbd with these patches, revert the repo to revisions known to work
-[[ $TDEVERSION != 14.0.10 ]] && {
-(cd $BUILD_TDE_ROOT/src/cgit/$PRGNAM/
-git reset HEAD *
-rm -rf .git/worktrees/*
-## don't need info about 'detached HEAD' state - only using the repo as a build source
-git config advice.detachedHead false
-[[ $TDEVERSION == 14.1.0 ]] && git checkout -f 4c4e0c2  || git checkout -f df2b743
-## overwrite the files in the build area set up by untar_fn with the source now in 'detached HEAD' state ..
-echo -e "\n copying $PRGNAM 'detached HEAD' state sources to build area ... \n"
-(cd $BUILD_TDE_ROOT/src/cgit
-cp -a --parents $PRGNAM/* $TMP_BUILD/tmp-$PRGNAM/
-cp -a --parents cmake/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/)
-
-## and then switch back to master branch ready for the next pull ..
-echo -e "\n ### Switching cgit source back to master branch ### \n"
-git checkout master
-echo
-)
-}
-# ###
-
 ## copy the helpfile docs to the build tree
 cp -a $SRCDIR/doc .
 cp $SRCDIR/dock.png src/
@@ -160,6 +137,7 @@ patch -N -p0 << EOF || true
 +	resize ( 64,31 );
 EOF
 
+[[ $TDEVERSION == 14.0.10 ]] && {
 ## Caps+AltGr[+Shift] displayed characters should be toggled from the non-Caps state
 patch -N -p0 << EOF || true
 --- src/VButton.cpp
@@ -181,6 +159,7 @@ patch -N -p0 << EOF || true
 +		}
 +		else if (shift)
 EOF
+}
 
 ## blank character display where AltGr does not provide extra characters
 [[ $(cat $TMPVARS/Kvkbd_OPTS) == *blank* ]] && {
@@ -252,6 +231,7 @@ patch -N -p0 << EOF || true
 EOF
 }
 
+[[ $TDEVERSION == 14.0.10 ]] && {
 ## another combining character to display
 patch -N -p0 << EOF || true
 --- src/Xutils.cpp
@@ -259,6 +239,7 @@ patch -N -p0 << EOF || true
 @@ -871,0 +872 @@
 +  { 0x01000358L, 0x02d9 }, /*   combining dot above right ˙ dot above */
 EOF
+}
 
 ## for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
@@ -276,7 +257,7 @@ cmake ${G_NINJA:-} \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \

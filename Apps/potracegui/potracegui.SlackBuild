@@ -33,7 +33,7 @@ getsource_fn
 
 untar_fn
 
-sed "s|po/|${PO_PATH:-po/}|" $SRCDIR/reformat-message.patch | patch -p0
+patch -p0 < $SRCDIR/reformat-message.patch
 
 ## for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
@@ -53,7 +53,7 @@ cmake ${G_NINJA:-} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \

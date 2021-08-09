@@ -44,7 +44,7 @@ dialog --cr-wrap --yes-label "Re-use" --no-label "New" --defaultno --no-shadow -
  * after only downloading the sources" \
 13 75
 [[ $? == 0 ]] && echo no > $TMPVARS/build-new
-[[ $? == 1 ]] && rm -f $TMPVARS/TDEbuilds
+[[ $? == 1 ]] && rm -f $TMPVARS/*
 
 
 build_core()
@@ -253,7 +253,7 @@ dialog --cr-wrap --nocancel --no-shadow --colors --help-button --help-label "REA
  Multiple selections may be made - space separated.
 
  Build language packages/support for any of:
-\Zb\Z6af ar az be bg bn br bs ca cs csb cy da de el en_GB eo es et eu fa fi fr fy ga gl he hi hr hu is it ja kk km ko lt lv mk mn ms nb nds nl nn pa pl pt pt_BR ro ru rw se sk sl sr sr@Latn ss sv ta te tg th tr uk uz uz@cyrillic vi wa zh_CN zh_TW\Zn
+\Zb\Z6af ar az be bg bn br bs ca cs csb cy da de el en_GB eo es es_AR et eu fa fi fr fy ga gl he hi hr hu is it ja kk km ko lt lv mk mn ms nb nds nl nn pa pl pt pt_BR ro ru rw se sk sl sr sr@Latn ss sv ta te tg th tr uk uz uz@cyrillic vi wa zh_CN zh_TW\Zn
  
 " \
 25 75 \
@@ -329,6 +329,7 @@ If following the build method on the previous screen, the answer here should pro
 [[ $? == 1 ]] && echo no > $TMPVARS/KEEP_BUILD
 
 
+[[ $(cat $TMPVARS/TDEVERSION) != 14.0.10 ]] && TQCA=tqca && TQCA_MSG="The TQt Cryptographic Architecture"
 rm -f $TMPVARS/TDEbuilds
 dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Packages Selection " --item-help --checklist \
 "
@@ -346,9 +347,9 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Deps/dbus-tqt" "\Zb\Zr\Z4R\Zn A simple IPC library" off "\Zb\Z6   \Zn" \
 "Deps/dbus-1-tqt" "\Zb\Zr\Z4R\Zn D-Bus bindings" off "\Zb\Z6   \Zn" \
 "Deps/libart-lgpl" "\Zb\Zr\Z4R\Zn The LGPL'd component of libart" off "\Zb\Z6   \Zn" \
-"Deps/tqca-tls" "\Zb\Zr\Z4R\Zn Plugin to provide SSL/TLS capability" off "\Zb\Z6   \Zn" \
-"Deps/avahi-tqt" "Avahi support" off "\Zb\Z6 Optional for tdelibs and used if installed. Requires Avahi. \Zn" \
-"Core/tdelibs" "\Zb\Zr\Z4R\Zn TDE libraries" off "\Zb\Z6 Will build with Avahi support if avahi/avahi-tqt are installed. \Zn" \
+"Deps/${TQCA:-tqca-tls}" "\Zb\Zr\Z4R\Zn ${TQCA_MSG:-Plugin to provide SSL/TLS capability}" off "" \
+"Deps/avahi-tqt" "Avahi support" off "\Zb\Z6 Optional for tdelibs and used if installed. Requires avahi. \Zn" \
+"Core/tdelibs" "\Zb\Zr\Z4R\Zn TDE libraries" off "\Zb\Z6 Will build with avahi support if avahi & avahi-tqt are installed. \Zn" \
 "Core/tdebase" "\Zb\Zr\Z4R\Zn TDE base" off "\Zb\Z6   \Zn" \
 "Core/tde-i18n" "Additional language support for TDE" off "\Zb\Z6 Required when any \Zb\Z3Additional language support\Zb\Z6 has been selected \Zn" \
 "Deps/akode" "A player and plugins for aRts music formats" off "\Zb\Z6 For tdemultimedia - aRts-plugin and Juk, and amarok engine \Zn" \
@@ -517,6 +518,27 @@ ${DLG_BOX:-0 0}
 [[ $? == 1 ]] && echo leave >  $TMPVARS/PKG_CONFIG_PATH_MOD
 }
 
+
+## set up for development builds - 14.0.x [aka 14.0.11] & 14.1.0
+[[ $(cat $TMPVARS/TDEVERSION) != 14.0.10 ]]  && {
+## only run this if tdelibs has been selected
+rm -f $TMPVARS/GCC_VIS
+[[ $(grep -o tdelibs $TMPVARS/TDEbuilds) ]] && {
+dialog --cr-wrap --nocancel --no-shadow --colors --title " Gcc visibility " --menu \
+"
+If gcc visibility support [-fvisibility=hidden -fvisibility-inlines-hidden] is required, it has to be built in to tdelibs for the package builds that call the 'tde_setup_gcc_visibility()' macro.
+
+It will default for those packages to whatever is set here, but if enabled, can be set OFF with the command line option GCC_VIS=0.
+
+Set gcc visibility support in tdelibs ..
+ 
+" \
+21 60 2 \
+"ON" "" \
+"OFF" "" \
+2> $TMPVARS/GCC_VIS
+}
+}
 
 ## only run this if tdebase has been selected
 rm -f $TMPVARS/RUNLEVEL
@@ -723,7 +745,7 @@ Do you still want it to do that or change to <\Z1S\Zb\Z0top\Zn> ?
 fi
 fi
 
-
+[[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 ## for a first run, 'install' is set 'on' - subsequently, options are as previously set ..
 [[ -e $TMPVARS/BuildOptions ]] && {
 [[ $(cat $TMPVARS/BuildOptions) == *install* ]] && OPT_1=on || OPT_1=off
@@ -754,7 +776,7 @@ Confirm or change these build options ..
 [[ $(cat $TMPVARS/BuildOptions) == *no_warn* ]] && export NO_WARN="-w"
 [[ $(cat $TMPVARS/BuildOptions) == *ninja* ]] && export G_NINJA="-G Ninja"
 [[ $(cat $TMPVARS/BuildOptions) == *verbose* ]] && export VERBOSE=1 || exec 2>/dev/null
-
+}
 
 ######################
 # there should be no need to make any changes below
@@ -769,7 +791,7 @@ export ARCH=$(cat $TMPVARS/ARCH)	# set again for the 'continue' option
 export TDE_MIRROR=${TDE_MIRROR:-https://mirror.ppa.trinitydesktop.org/trinity}
 export NUMJOBS=$(cat $TMPVARS/NUMJOBS)
 export I18N=$(cat $TMPVARS/I18N)
-export LINGUAS="$I18N 1" ## dummy locale as LINGUAS="" builds all translations
+export LINGUAS="$I18N 1" ## 1 == dummy locale as LINGUAS="" builds all translations
 export TQT_OPTS=$(cat $TMPVARS/TQT_OPTS)
 export EXIT_FAIL=$(cat $TMPVARS/EXIT_FAIL)
 export KEEP_BUILD=$(cat $TMPVARS/KEEP_BUILD)
@@ -837,6 +859,25 @@ INST_PACKAGE=yes && [[ $INST == 0 ]] && INST_PACKAGE=no
 ## whether using tde prefix
 [[ -e $TMPVARS/TDEPFX ]] && tde_prefix=\\Zn\\Zb\\Z2tde\\Zn && [[ ! -s $TMPVARS/TDEPFX ]] && tde_prefix=no
 #
+
+## Set up gcc visibilty .. ##
+## If GCC_VIS has been set on the command line, export it
+[[ $GCC_VIS ]] && export GCC_VIS || {
+## set up for development builds - 14.0.x [aka 14.0.11] & 14.1.0
+[[ $TDEVERSION != 14.0.10 ]] && {
+## If tdelibs has been built before, the header will exist, so test that:
+[[ $(grep "KDE_HAVE_GCC_VISIBILITY 1" $INSTALL_TDE/include/kdemacros.h) ]] && \
+GCC_VIS=ON || GCC_VIS=OFF
+## if tdelibs is being built, override any header setting with the dialog output:
+[[ -s $TMPVARS/GCC_VIS ]] && GCC_VIS=$(cat $TMPVARS/GCC_VIS)
+export GCC_VIS
+} || {
+## otherwise for 14.0.10 builds, continue to set it off
+export GCC_VIS=OFF
+}
+}
+#
+
 ## start dialog
 EXITVAL=2
 until [[ $EXITVAL -lt 2 ]] ; do

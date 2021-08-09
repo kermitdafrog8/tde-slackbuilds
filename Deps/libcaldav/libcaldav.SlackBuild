@@ -33,6 +33,7 @@ getsource_fn
 
 untar_fn
 
+## add misc docs
 listdocs_fn
 
 chown_fn
@@ -50,7 +51,7 @@ cmake ${G_NINJA:-} \
     -DBUILD_DOC="ON" \
     -DBUILD_CALDAV_TEST="OFF" \
     -DBUILD_UNITTEST="OFF" \
-    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -Wno-dev \
     ..
 

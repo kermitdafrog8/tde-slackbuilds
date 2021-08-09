@@ -111,8 +111,7 @@ if [ "$P1" == "--download" ]; then
   echo "Download complete."
   exit 0
 fi
-} || \
-{
+} || {
 ## otherwise, not R14.0.10 or misc, and we are creating/updating git,
 ## so [1] start with admin/cmake:
 [[ $(cat $TMPVARS/DL_CGIT) == yes ]] && {
@@ -135,8 +134,8 @@ git pull
 git fetch origin r14.0.x:r14.0.x)
 
 ## if admin and cmake don't exist, clone them
-[[ ! -d admin ]] && git clone https://mirror.git.trinitydesktop.org/cgit/admin admin
-[[ ! -d cmake ]] && git clone https://mirror.git.trinitydesktop.org/cgit/cmake cmake
+[[ ! -d admin ]] && git clone https://mirror.git.trinitydesktop.org/gitea/TDE/admin admin
+[[ ! -d cmake ]] && git clone https://mirror.git.trinitydesktop.org/gitea/TDE/tde-common-cmake cmake
 
 ## place a marker so that admin/cmake update or clone only once per run of BUILD-TDE.sh
 touch $TMPVARS/admin-cmake-done
@@ -155,7 +154,7 @@ git pull
 git fetch origin r14.0.x:r14.0.x)
 ## if the local repository for PRGNAM doesn't exist, clone it ..
 [[ ! -d $PRGNAM ]] && \
-git clone https://mirror.git.trinitydesktop.org/cgit/$PRGNAM
+git clone https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM
 
 ## if arts/tdelibs, need libltdl
 [[ " arts tdelibs " == *$PRGNAM* ]] && {
@@ -167,7 +166,7 @@ git pull
 git fetch origin r14.0.x:r14.0.x)
 
 [[ ! -d libltdl ]] && \
-git clone https://mirror.git.trinitydesktop.org/cgit/libltdl
+git clone https://mirror.git.trinitydesktop.org/gitea/TDE/libltdl
 }
 
 ## if tdenetwork, need libtdevnc, but not yet for 14.0.x==14.0.11[?] which uses krfb/libvncserver
@@ -181,29 +180,32 @@ git pull
 )
 
 [[ ! -d libtdevnc ]] && \
-git clone https://mirror.git.trinitydesktop.org/cgit/libtdevnc
+git clone https://mirror.git.trinitydesktop.org/gitea/TDE/libtdevnc
 }
 
 true # prevent the following i18n download (attempts) if this routine fails
-} || \
-{
+} || {
 ## still creating/updating git
 ## so [3] for tde-i18n-$lang:
 
 ## Use wget to download the required i18n repos to avoid the ~1x10^6 byte download for the full tde-i18n
 ## - same for both creating and updating
+
+cd tdei18n
+# ### will download the template, translations, and tde-i18n-$lang modules to:
+# ### $BUILD_TDE_ROOT/src/cgit/tdei18n/cgit/tde-i18n/plain/...
+wget -m --no-parent --no-host-directories https://mirror.git.trinitydesktop.org/cgit/tde-i18n/plain/translations/desktop_files/entry.desktop/entry.desktop.pot
+rm -rf cgit/tde-i18n/plain/template
+wget -m --no-parent --no-host-directories https://mirror.git.trinitydesktop.org/cgit/tde-i18n/plain/template/
+
 for lang in $I18N
 do
-cd tdei18n
 ## remove the previous repo to avoid build failures caused by any unused old files
 rm -rf cgit/tde-i18n/plain/tde-i18n-$lang
 wget -m --no-parent --no-host-directories https://mirror.git.trinitydesktop.org/cgit/tde-i18n/plain/tde-i18n-$lang/
-##will download the tde-i18n-$lang files to:
-##$BUILD_TDE_ROOT/src/cgit/tdei18n/cgit/tde-i18n/plain/tde-i18n-$lang/*
-## remove admin and cmake links which are downloaded as files
-rm cgit/tde-i18n/plain/tde-i18n-$lang/{admin,cmake}
-cd ..
+wget -m --no-parent --no-host-directories https://mirror.git.trinitydesktop.org/cgit/tde-i18n/plain/translations/desktop_files/entry.desktop/$lang.po || true # in case it doesn't exist
 done
+cd ..
 }
 }
 }
@@ -371,10 +373,10 @@ find $PKG$INSTALL_TDE/doc -type f -exec chmod 644 {} \;
 
 mangzip_fn ()
 {
-[[ -d $PKG$INSTALL_TDE/man ]] && {
+[[ ! -d $PKG$INSTALL_TDE/man ]] && true || { # true == don't let the SB fail if there are no man pages ..
   find $PKG$INSTALL_TDE/man -type f -name "*.?" -exec gzip -9f {} \;
   for i in $(find $PKG$INSTALL_TDE/man -type l -name "*.?") ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
-}
+} # .. but let the SB fail if there is a problem with the gzipping
 }
 
 strip_fn ()

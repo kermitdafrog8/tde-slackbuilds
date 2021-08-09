@@ -47,6 +47,7 @@ chown_fn
 
 cd_builddir_fn
 
+[[ $TDEVERSION != 14.0.10 ]] && B_E_T='-DBUILD_EXTRA_THEME="ON"'
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
@@ -55,9 +56,10 @@ cmake ${G_NINJA:-} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS="ON" \
+    ${B_E_T:-} \
     -Wno-dev \
     ..
 

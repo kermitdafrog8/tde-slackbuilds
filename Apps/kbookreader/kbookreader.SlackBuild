@@ -52,7 +52,7 @@ cmake ${G_NINJA:-} \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS="ON" \
-    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -Wno-dev \
     ..
 

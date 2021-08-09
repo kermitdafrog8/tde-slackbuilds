@@ -33,6 +33,12 @@ getsource_fn
 
 untar_fn
 
+[[ $TDEVERSION != 14.0.10 ]] && {
+## using cmake common rules
+mkdir doc/misc
+mv README* FAQ doc/misc/
+}
+
 ## for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
@@ -54,7 +60,7 @@ cmake ${G_NINJA:-} \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS="ON" \
-    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DWITH_DPMS="ON" \
     -DWITH_XTEST="ON" \
     -DWITH_XINERAMA="ON" \

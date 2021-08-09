@@ -35,18 +35,8 @@ getsource_fn
 untar_fn
 
 ## for slack-desc
-langs="en"
-ldocs="en"
-for Lang in $I18N
-do
-[[ -s translations/messages/$Lang.po ]] && {
-langs="$langs $Lang"
-## ... and within that loop as doc locale only exists where translation exists
-[[ -d doc/$Lang ]] && {
-ldocs="$ldocs $Lang"
-}
-}
-done
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+ldocs="en";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
 
 listdocs_fn
 

@@ -50,7 +50,7 @@ cmake ${G_NINJA:-} \
     -DWITH_ALSA="ON" \
     -DWITH_AUDIOFILE="ON" \
     -DWITH_ESOUND="OFF" \
-    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DWITH_JACK="OFF" \
     -DWITH_MAD="ON" \
     -DWITH_SNDIO="OFF" \

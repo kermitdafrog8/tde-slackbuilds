@@ -34,6 +34,26 @@ getsource_fn
 
 untar_fn
 
+[[ $TDEVERSION != 14.0.10 ]] && {
+## using cmake common rules
+find doc -name CMakeLists.txt | xargs rm
+
+sed -i '/tde_conditional_add_subdirectory( BUILD_DOC doc )/d' CMakeLists.txt
+sed -i 's|k3bsetup )|&\
+\
+\
+##### other data\
+\
+tde_conditional_add_project_docs( BUILD_DOC )|' CMakeLists.txt
+
+mv doc/tdeioslave doc/en
+mv doc/* doc/en || true
+mv doc/en/en doc/en/tdeioslave
+
+mkdir doc/misc
+mv FAQ doc/misc/
+}
+
 listdocs_fn
 
 chown_fn

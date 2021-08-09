@@ -33,6 +33,9 @@ getsource_fn
 
 untar_fn
 
+## for slack-desc
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+
 listdocs_fn
 
 chown_fn
@@ -46,7 +49,7 @@ cmake ${G_NINJA:-} \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DWITH_GCC_VISIBILITY="OFF" \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -Wno-dev \
     ..
 
@@ -76,8 +79,8 @@ echo "
 $PRGNAM: A DBUS notification to TDE interface
 $PRGNAM:
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
