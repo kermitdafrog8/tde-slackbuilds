@@ -34,7 +34,7 @@ getsource_fn
 untar_fn
 
 ## for slack-desc
-langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$Lang $langs";done
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 

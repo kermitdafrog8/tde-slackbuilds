@@ -28,8 +28,8 @@ VERSION=1.16
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-SRCURL="https://downloads.sourceforge.net/project/potrace/$VERSION/potrace-$VERSION.tar.gz"
 ARCHIVE_TYPE="tar.gz"
+SRCURL="https://downloads.sourceforge.net/project/potrace/$VERSION/potrace-$VERSION.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
 getsource_fn

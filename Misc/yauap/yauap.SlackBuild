@@ -28,8 +28,8 @@ VERSION=0.2.4
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-SRCURL="https://download.savannah.nongnu.org/releases/yauap/yauap-$VERSION.tar.gz"
 ARCHIVE_TYPE="tar.gz"
+SRCURL="https://download.savannah.nongnu.org/releases/yauap/yauap-$VERSION.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
 getsource_fn
@@ -46,8 +46,9 @@ listdocs_fn
 
 chown_fn
 
-make || exit 1
-DESTDIR=$PKG make install || exit 1
+## parallel jobs causes a build failure
+NUMJOBS=-j1
+make_fn
 
 installdocs_fn
 

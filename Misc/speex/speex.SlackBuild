@@ -34,8 +34,8 @@ VERSION=1.2.0
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-SRCURL="https://ftp.osuosl.org/pub/xiph/releases/speex/speex-$VERSION.tar.gz"
 ARCHIVE_TYPE="tar.gz"
+SRCURL="https://ftp.osuosl.org/pub/xiph/releases/speex/speex-$VERSION.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
 getsource_fn

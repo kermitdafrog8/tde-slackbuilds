@@ -329,6 +329,42 @@ If following the build method on the previous screen, the answer here should pro
 [[ $? == 1 ]] && echo no > $TMPVARS/KEEP_BUILD
 
 
+## new apps for 14.0.x & 14.1.0
+[[ $(cat $TMPVARS/TDEVERSION) != 14.0.10 ]] && {
+# Use non-breaking space - U00a0 - in strings
+# nbsp prefixing Misc avoids double quote in TDEbuilds list
+app_1="Apps/codeine"
+about_1="Simple multimedia player"
+status_1=off
+comment_1="\Zb\Z6 \Zn"
+
+app_2="Apps/klamav"
+about_2="Antivirus manager for ClamAV"
+status_2=off
+comment_2="\Zb\Z6 ClamAV is a build time requirement, included in klamav.Slackbuild \Zn"
+## if ClamAV isn't installed, the klamav.SlackBuild will show the download URL, and build and install ClamAV from the downloaded archive.
+
+app_3=" Misc/imlib2"
+about_3="An image loading and rendering library"
+status_3=off
+comment_3="\Zb\Z6 Build-time requirement for kompose \Zn"
+
+app_4="Apps/kompose"
+about_4="Full-screen window/desktop manager"
+status_4=off
+comment_4="\Zb\Z6 Imlib2 is a build time requirement \Zn"
+
+app_5="Apps/kplayer"
+about_5="Multimedia player with MPlayer backend"
+status_5=off
+comment_5="\Zb\Z6 MPlayer is a run time requirement \Zn"
+
+app_6="Apps/twin-style-suse2"
+about_6="SUSE window decorations"
+status_6=off
+comment_6="\Zb\Z6 \Zn"
+}
+#
 [[ $(cat $TMPVARS/TDEVERSION) != 14.0.10 ]] && TQCA=tqca && TQCA_MSG="The TQt Cryptographic Architecture"
 rm -f $TMPVARS/TDEbuilds
 dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Packages Selection " --item-help --checklist \
@@ -340,7 +376,7 @@ The packages selected form the build list and so dependencies are listed before 
 Look out for messages in the bottom line of the screen, especially relating to dependencies.
 
 Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TDE packages." \
-0 0 0 \
+0 85 0 \
 "Deps/tqt3" "\Zb\Zr\Z4R\Zn The Qt package for TDE" off "\Zb\Z6  \Zn" \
 "Deps/tqtinterface" "\Zb\Zr\Z4R\Zn TDE bindings to tqt3." off "\Zb\Z6  \Zn" \
 "Deps/arts" "\Zb\Zr\Z4R\Zn Sound server for TDE" off "\Zb\Z6   \Zn" \
@@ -385,6 +421,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 " Misc/moodbar" "GStreamer plugin for Amarok for moodbar feature" off "\Zb\Z6 Runtime option for Amarok \Zn" \
 " Misc/yauap" "A simple commandline audio player" off "\Zb\Z6 Provides an optional engine for Amarok \Zn" \
 "Apps/amarok" "A Music Player" off "\Zb\Z6 Optional dependencies - xine-lib, mp4v2, speex, moodbar, akode, yauap \Zn" \
+${app_1:-} ${about_1:-} ${status_1:-} ${comment_1:-} \
 "Apps/digikam" "A digital photo management application + Showfoto viewer" off "\Zb\Z6 Requires kipi-plugins libkdcraw libkexiv2 libkipi.  \Zn" \
 "Apps/dolphin" "Dolphin file manager for TDE" off "\Zb\Z6 A d3lphin.desktop file is included - see dolphin.SlackBuild.  \Zn" \
 "Apps/filelight" "Graphical diskspace display" off "\Zb\Z6 Runtime requirement x/xdpyinfo \Zn" \
@@ -402,6 +439,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/kdbusnotification" "A DBUS notification to TDE interface" off "\Zb\Z6   \Zn" \
 "Apps/kile" "A TEX and LATEX source editor and shell" off "\Zb\Z6   \Zn" \
 "Apps/kkbswitch" "A keyboard layout indicator" off "\Zb\Z6   \Zn" \
+${app_2:-} ${about_2:-} ${status_2:-} ${comment_2:-} \
 "Apps/knemo" "The TDE Network Monitor" off "\Zb\Z6   \Zn" \
 "Apps/knetstats" "A network monitor that shows rx/tx LEDs" off "\Zb\Z6   \Zn" \
 "Apps/knights" "A graphical chess interface" off "\Zb\Z6   \Zn" \
@@ -409,6 +447,9 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 " Misc/GraphicsMagick" "Swiss army knife of image processing" off "\Zb\Z6 Buildtime option for chalk[krita] in koffice \Zn" \
 "Apps/koffice" "Office Suite" off "\Zb\Z6 Optional build-time dependencies - GraphicsMagick, libpng14  \Zn" \
 "Apps/koffice-i18n" "Internationalization files for koffice" off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for koffice \Zn" \
+${app_3:-} ${about_3:-} ${status_3:-} ${comment_3:-} \
+${app_4:-} ${about_4:-} ${status_4:-} ${comment_4:-} \
+${app_5:-} ${about_5:-} ${status_5:-} ${comment_5:-} \
 "Apps/krusader" "File manager for TDE" off "\Zb\Z6   \Zn" \
 "Apps/kscope" "A source-editing environment for C and C-style languages." off "\Zb\Z6 Runtime options cscope [d/cscope], ctags [ap/vim], dot [graphviz] \Zn" \
 "Apps/ksensors" "A graphical interface for sensors" off "\Zb\Z6 Runtime requirement ap/lm_sensors \Zn" \
@@ -429,13 +470,16 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/tdesudo" "Graphical frontend for the sudo command" off "\Zb\Z6   \Zn" \
 "Apps/tdmtheme" "TDM theme editor module" off "\Zb\Z6   \Zn" \
 "Apps/twin-style-crystal" "Twin theme" off "\Zb\Z6   \Zn" \
+${app_6:-} ${about_6:-} ${status_6:-} ${comment_6:-} \
 "Apps/yakuake" "Quake-style terminal emulator" off "\Zb\Z6   \Zn" \
 " Misc/lxml" "Python bindings for libxml2 and libxslt" off "\Zb\Z6 Required to use Inkscape online help \Zn" \
 " Misc/inkscape" "SVG editor - an alternative to potracegui [and GraphicsMagick]." off "\Zb\Z6 Requires lxml if online help facility is required; potrace is a build-time dependency. \Zn" \
 2> $TMPVARS/TDEbuilds
-# successful builds are removed from the TDEbuilds list by '$dir ' so add a space to the last entry
-# and the " needs to be removed because the Misc entries are double-quoted
-sed -i 's|$| |;s|" M|M|g;s|"||g' $TMPVARS/TDEbuilds
+# successful builds are removed from the TDEbuilds list as '$dir ' so add a space to the last entry
+# and the " needs to be removed because the Misc entries are double-quoted,
+## and if they're not, they have a non-breaking space prefixed
+sed -i 's|$| |;s|" M|M|g;s|"||g;s| ||g' $TMPVARS/TDEbuilds
+##                                ^ == nbsp
 
 
 ## this dialog will only run if any of the selected packages has a README

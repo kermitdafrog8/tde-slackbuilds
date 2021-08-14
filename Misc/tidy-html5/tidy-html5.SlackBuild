@@ -28,8 +28,8 @@ VERSION=5.6.0
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-SRCURL="https://github.com/htacg/tidy-html5/archive/$VERSION.tar.gz"
 ARCHIVE_TYPE="tar.gz"
+SRCURL="https://github.com/htacg/tidy-html5/archive/$VERSION.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
 getsource_fn

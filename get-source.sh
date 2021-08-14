@@ -357,7 +357,8 @@ MAKE_PRG=ninja && [[ ${VERBOSE:-} == 1 ]] && MAKE_PRG='ninja -v'
 } || {
 [[ ${VERBOSE:-} == 1 ]] && MAKE_PRG='make --debug=b'
 }
-DESTDIR=$PKG ${MAKE_PRG:-make} ${NUMJOBS:-} install || exit 1
+${MAKE_PRG:-make} ${NUMJOBS:-} || exit 1
+DESTDIR=$PKG ${MAKE_PRG:-make} install || exit 1
 }
 
 installdocs_fn ()

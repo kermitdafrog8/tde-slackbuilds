@@ -28,8 +28,8 @@ VERSION=0.1.2
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-SRCURL="http://pkgs.fedoraproject.org/repo/pkgs/${PRGNAM}/${PRGNAM}-${VERSION}.tar.gz/28c8eb65e83b30f71b84be4fab949360/${PRGNAM}-${VERSION}.tar.gz"
 ARCHIVE_TYPE="tar.gz"
+SRCURL="http://pkgs.fedoraproject.org/repo/pkgs/${PRGNAM}/${PRGNAM}-${VERSION}.$ARCHIVE_TYPE/28c8eb65e83b30f71b84be4fab949360/${PRGNAM}-${VERSION}.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
 getsource_fn

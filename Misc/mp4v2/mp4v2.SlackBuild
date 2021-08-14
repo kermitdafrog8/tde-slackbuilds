@@ -28,8 +28,8 @@ VERSION=2.0.0
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-SRCURL="https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${PRGNAM}/${PRGNAM}-${VERSION}.tar.bz2"
 ARCHIVE_TYPE="tar.bz2"
+SRCURL="https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${PRGNAM}/${PRGNAM}-${VERSION}.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
 getsource_fn
@@ -74,6 +74,9 @@ patch -N -p0 << EOF || true
 +    switch( static_cast<unsigned int>( code ) ) {
 EOF
 
+## Fix man pages being installed with no content
+sed -i 's|doc/man|@srcdir@/&|' GNUmakefile.in
+
 listdocs_fn
 
 chown_fn
@@ -81,8 +84,6 @@ chown_fn
 cd_builddir_fn
 
 CXXFLAGS="$SLKCFLAGS" \
-CFLAGS="$SLKCFLAGS" \
-CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
   --prefix=/usr \
@@ -94,8 +95,6 @@ make_fn
 
 installdocs_fn
 
-## can't work out why man pages aren't being installed, so use this work-around
-cp ../doc/man/man1/* $PKG/usr/man/man1/
 INSTALL_TDE=/usr
 mangzip_fn
 
