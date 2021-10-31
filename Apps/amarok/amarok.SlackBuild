@@ -44,37 +44,11 @@ sed 's|tagaac|tagspeex|g;s|aacfile.*$|taglib_speexfiletyperesolver.cpp speexfile
 sed -i -e 's|wav )|wav )\nadd_subdirectory( speex )|' \
 -e 's|tagaac-static|tagaac-static tagspeex-static|' amarok/src/metadata/CMakeLists.txt
 
-[[ $TDEVERSION == 14.0.10 ]] && {
-## remove help documentation build instruction from all [non-en] locales ...
-sed -i '/tde_create_handbook/,+3d' doc/??{,_??}/CMakeLists.txt || true
-#
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-lpos="" # the *.po files list
-langs="en" # the languages
-ldocs="en" # the help docs
-for Lang in $I18N
-do
-[[ -d po/$Lang ]] && {
-lpos="$lpos $Lang/$PRGNAM.po"
-langs="$langs $Lang"
-## ... and restore help documentation for the selected and available locales
-[[ -e doc/$Lang/CMakeLists.txt ]] && {
-[[ $Lang == ru ]] && NOINDEX=NOINDEX
-echo "tde_create_handbook( ${NOINDEX:-} LANG $Lang DESTINATION $PRGNAM )" >> doc/$Lang/CMakeLists.txt
-ldocs="$ldocs $Lang"
-}
-}
-done
-#
-sed -i "s|\${po_files}|$lpos|" po/CMakeLists.txt || true
-} || {
 ## for slack-desc
 langs="en"
 for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 ldocs="en"
 for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
-}
 
 listdocs_fn
 

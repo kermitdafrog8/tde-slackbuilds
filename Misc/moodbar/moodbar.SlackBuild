@@ -42,8 +42,8 @@ chown_fn
 
 cd_builddir_fn
 
-CXXFLAGS="$SLKCFLAGS" \
 CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \

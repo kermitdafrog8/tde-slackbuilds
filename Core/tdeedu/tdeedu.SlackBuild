@@ -28,6 +28,7 @@ VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
+[[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 # ### Kalzium Chemical Equation Solver - start
 ## Needs OCaml and facile
 ocaml_installed_fn () { [[ -s /usr/local/lib$LIBDIRSUFFIX/ocaml/libnums.a ]] && \
@@ -80,6 +81,7 @@ ocaml_installed_fn || { echo -e " installation of ocaml/facile failed \n" ; exit
 } && \
 OCAML="ON"
 # ### Kalzium Chemical Equation Solver - end
+}
 
 source ../../get-source.sh
 getsource_fn

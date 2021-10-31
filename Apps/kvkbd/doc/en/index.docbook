@@ -340,7 +340,7 @@ Then <keycap>LWin</keycap> would print <emphasis role="bold">"</emphasis> and <k
 
 Create a character that doesn't have a direct unicode mapping, but is composed of unicode characters in the font being used.
 <sbr/><sbr/>
-As an example -- a-ogonek 'ą' [U<emphasis role="bold">0105</emphasis>] + combining acute '´' [U<emphasis role="bold">0301</emphasis>]́
+As an example -- a-ogonek 'ą' [U<emphasis role="bold">0105</emphasis>] + combining acute '´' [U<emphasis role="bold">0301</emphasis>]
 <sbr/><sbr/>
 
 Add the character and chosen key combination to the ~/.XCompose file:

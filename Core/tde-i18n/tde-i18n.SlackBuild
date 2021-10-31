@@ -35,12 +35,7 @@ getsource_fn
 ## extract, build, and remove source for each language package one at a time
 
 cd $TMP_BUILD/tmp-$PRGNAM
-[[ $TDEVERSION == 14.0.10 ]] && {
-# extract the cmake source once only
-echo -e "\033[39;1m"
-echo "Extracting the cmake source from $(basename $SOURCE) ..."
-echo -e "\033[0m"
-tar xf $SOURCE $PRGNAM-trinity-$TDEVERSION/cmake
+[[ $TDEVERSION == 14.0.11 ]] && {
 # extract the template source once only
 echo -e "\033[39;1m"
 echo "Extracting the template source from $(basename $SOURCE) ..."
@@ -51,6 +46,15 @@ echo -e "\033[39;1m"
 echo "Extracting the translations source from $(basename $SOURCE) ..."
 echo -e "\033[0m"
 tar xf $SOURCE $PRGNAM-trinity-$TDEVERSION/translations
+# extract the cmake source once only
+## it's unlikely that this is being run without the required packages,
+## in which case the cmake archive will exist
+echo -e "\033[39;1m"
+echo "Extracting the cmake source from $(basename $SRCDIR/cmake-$TDEVERSION.tar.xz) ..."
+echo -e "\033[0m"
+(cd $PRGNAM-trinity-$TDEVERSION
+tar xf $SRCDIR/cmake-$TDEVERSION.tar.xz
+mv cmake-trinity-$TDEVERSION cmake)
 } || {
 mkdir -p $PRGNAM # need -p for git builds if more than one lang
 (cd $BUILD_TDE_ROOT/src/cgit
@@ -60,13 +64,16 @@ cp -a --parents cmake/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/)
 
 for lang in $I18N
 do
-[[ $TDEVERSION == 14.0.10 ]] && {
+[[ $TDEVERSION == 14.0.11 ]] && {
 # extract the source for one language at a time for each iteration of the loop
 echo -e "\033[39;1m"
 echo "Extracting the $PRGNAM-$lang source from $(basename $SOURCE) ..."
 echo -e "\033[0m"
 tar -xf $SOURCE $PRGNAM-trinity-$TDEVERSION/$PRGNAM-$lang
-cd $PRGNAM*
+cd $PRGNAM-trinity-$TDEVERSION
+## link cmake into the $PRGNAM-$lang top level
+(cd $PRGNAM-$lang
+ln -s ../cmake .)
 
 true # don't go to cgit if extracting fails
 } || {
@@ -80,7 +87,7 @@ ln -s ../cmake cmake)
 }
 
 ## language specific patches
-patch -N -p0 < $SRCDIR/tde-i18n-$lang-patch || true # continue if patch file doesn't exist
+patch -N -p0 < $SB_SRCDIR/tde-i18n-$lang-patch || true # continue if patch file doesn't exist
 
 chown_fn
 

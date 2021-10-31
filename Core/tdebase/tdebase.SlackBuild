@@ -122,6 +122,10 @@ patch -N -p0 << EOF || true
  
 EOF
 
+## find htsearch - add this Slackware default path to list of possible locations
+## rather than set HTDIG_SEARCH_BINARY which fixes the location
+sed -i 's|HINTS|&\n      /var/www/cgi-bin|' khelpcenter/searchhandlers/CMakeLists.txt
+
 listdocs_fn
 
 chown_fn
@@ -265,8 +269,10 @@ else
 fi
 ' > $PKG/etc/X11/xinit/xinitrc.tde
 chmod 755 $PKG/etc/X11/xinit/xinitrc.tde
+[[ $(cat $TMPVARS/RUNLEVEL) == *xinitrc* ]] && {
 (cd $PKG/etc/X11/xinit/
 ln -sf xinitrc.tde xinitrc)
+}
 
 ##############################################################################
 

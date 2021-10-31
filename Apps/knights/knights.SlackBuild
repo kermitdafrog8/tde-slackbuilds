@@ -36,7 +36,7 @@ untar_fn
 # there is a Spanish language file in the source, but it has no translations in it ..
 # the included es.po file is a Google translation - if you don't want to use it,
 # then comment out the following line:
-cp $SRCDIR/es.po translations/messages/
+cp $SB_SRCDIR/es.po translations/messages/
 
 # for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
@@ -47,7 +47,6 @@ chown_fn
 
 cd_builddir_fn
 
-[[ $TDEVERSION != 14.0.10 ]] && B_E_T='-DBUILD_EXTRA_THEME="ON"'
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
@@ -59,7 +58,7 @@ cmake ${G_NINJA:-} \
     -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS="ON" \
-    ${B_E_T:-} \
+    -DBUILD_EXTRA_THEME="ON" \
     -Wno-dev \
     ..
 

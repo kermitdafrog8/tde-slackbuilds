@@ -62,26 +62,28 @@ mkdir -p $TMP_BUILD/tmp-$PRGNAM
 mkdir -p $PKG
 rm -rf $PKG/*
 rm -rf $TMP_BUILD/tmp-$PRGNAM/*
-rm -rf $OUTPUT/{checkout,configure,make,install,error,makepkg,patch}-$PRGNAM.log
+rm -rf $OUTPUT/*-$PRGNAM.log
 }
 
 # Where do we look for sources?
-SRCDIR=$(cd $(dirname $0); pwd)
+SRCDIR=$BUILD_TDE_ROOT/src
+## SlackBuild source directory for local patches
+SB_SRCDIR=$(cd $(dirname $0); pwd)
 
-## if 14.0.10 or misc, download archive:
-[[ $TDEVERSION == 14.0.10 || $TDEMIR_SUBDIR == misc ]] && {
+## for 14.0.11 onwards, check for cmake archive ..
+[[ $TDEVERSION == 14.0.11 && ! -s $SRCDIR/cmake-$TDEVERSION.tar.xz ]] && (
+    echo -e "\nDownloading to $SRCDIR"
+    wget -T 20 -O $SRCDIR/cmake-$TDEVERSION.tar.xz $TDE_MIRROR/releases/R$TDEVERSION/main/common/cmake-trinity-$TDEVERSION.tar.xz
+    echo -e "----\n"
+)
+
+## if 14.0.11 or misc, download archive:
+[[ $TDEVERSION == 14.0.11 || $TDEMIR_SUBDIR == misc ]] && {
 ## check for and remove any zero byte archive files
-[[ ! -s $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} ]] && \
-rm $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} 2>/dev/null || true
-## R14.0.6+ archive names include -trinity.
-## To maintain compatibility with the previous naming convention,
-## sym-link any pre-downloaded R14.0.6+ archives
-[[ $TDEVERSION == 14.0.10 ]] && [[ -s $SRCDIR/../../src/$PRGNAM-trinity-$VERSION.tar.xz ]] && \
-(cd $SRCDIR/../../src/
-ln -sf $PRGNAM-trinity-$VERSION.tar.xz $PRGNAM-$VERSION.tar.xz)
-
-ln -sf $SRCDIR/../../src/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} $SRCDIR
+[[ ! -s $SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} ]] && \
+rm $SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} 2>/dev/null || true
 SOURCE=$SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"}
+
 # SRCURL for non-TDE archives, set in the SB, will override the Trinity default *tar.xz URL
 SRCURL=${SRCURL:-"$TDE_MIRROR/releases/R$VERSION/main$TDEMIR_SUBDIR/$PRGNAM-trinity-$VERSION.tar.xz"}
 # Source file availability:
@@ -93,16 +95,16 @@ if ! [ -f $SOURCE ]; then
   [ -w "$SRCDIR" ] || SOURCE="$OUTPUT/$(basename $SOURCE)"
   if ! [ "x$SRCURL" == "x" ]; then
     echo -e "\nDownloading to $(dirname $SOURCE)"
-    wget -T 20 -O "$SOURCE" "$SRCURL" 
+    wget -T 20 -O "$SOURCE" "$SRCURL"
     if [ $? -ne 0 -o ! -s "$SOURCE" ]; then
-      echo "Downloading '$(basename $SOURCE)' failed... aborting the build."
-      mv -f "$SOURCE" "$SOURCE".FAIL
+      echo "Downloading '$(basename $SOURCE)' failed... cancelling the build."
+      rm -f "$SOURCE"
 ## set this for BUILD-TDE.sh to stop on failure
       [[ $EXIT_FAIL == "exit 1" ]] && touch $TMPVARS/download-failure
       ${EXIT_FAIL:-":"}
     fi
   else
-    echo "File '$(basename $SOURCE)' not available... aborting the build."
+    echo "File '$(basename $SOURCE)' not available... cancelling the build."
     ${EXIT_FAIL:-":"}
   fi
 fi
@@ -112,7 +114,7 @@ if [ "$P1" == "--download" ]; then
   exit 0
 fi
 } || {
-## otherwise, not R14.0.10 or misc, and we are creating/updating git,
+## otherwise, not R14.0.11 or misc, and we are creating/updating git,
 ## so [1] start with admin/cmake:
 [[ $(cat $TMPVARS/DL_CGIT) == yes ]] && {
 cd $BUILD_TDE_ROOT/src/cgit
@@ -244,17 +246,21 @@ cd $TMP_BUILD/tmp-$PRGNAM
 ##
 ## [1] firstly test for R14 or misc ..
 ##
-[[ $TDEVERSION == 14.0.10 || $TDEMIR_SUBDIR == misc ]] && {
-
+[[ $TDEVERSION == 14.0.11 || $TDEMIR_SUBDIR == misc ]] && {
 ## unpack R14 or misc
 echo -e "\n unpacking $(basename $SOURCE) ... \n"
 tar -xf $SOURCE
+[[ $TDEMIR_SUBDIR != misc ]] && (
+cd $PRGNAM*
+tar -xf $SRCDIR/cmake-$TDEVERSION.tar.xz
+mv cmake-trinity-$TDEVERSION cmake
+)
 
 : # if this fails, don't try a git build, and go to [3]
 
 } || {
 
-## [2] not 14.0.10 nor misc, so must be git ..
+## [2] not 14.0.11 nor misc, so must be git ..
 ## but is it [2a] 14.0.x ..
 [[ $TDEVERSION == 14.0.x ]] && {
 
@@ -320,7 +326,7 @@ cd $PRGNAM*
 listdocs_fn ()
 {
 DOCDIR=$PWD # this is set for installdocs_fn
-DOCS=$(for file in AUTHORS* rfc4791.pdf ChangeLog* COPYING* CreatingThemes FAQ* HOWTO INSTALL* KNOWNBUGS* LICEN?E* NEWS* *README{$,^[\.*\.txt],/}* ${RM_LIST:-} ${KEYS_LIST:-} TODO* *.lsm ^[README]*.txt PKG-INFO doc/licenses/* doc/FAQ.txt REMARKS ; do [[ -s $file ]] && ls -1 $file;done ) || true
+DOCS=$(for file in AUTHORS* rfc4791.pdf ChangeLog* COPYING* CreatingThemes FAQ* HOWTO INSTALL* KNOWNBUGS* LICEN?E* NEWS* *README{$,.md,^[\.*\.txt],/}* ^[README]*.txt ${RM_LIST:-} ${KEYS_LIST:-} TODO* *.lsm PKG-INFO doc/licenses/* doc/FAQ.txt REMARKS ; do [[ -s $file ]] && ls -1 $file;done ) || true
 }
 
 chown_fn ()
@@ -363,11 +369,9 @@ DESTDIR=$PKG ${MAKE_PRG:-make} install || exit 1
 
 installdocs_fn ()
 {
-[[ $TDEMIR_SUBDIR == misc || $PRGNAM == libart-lgpl ]] && INSTALL_TDE=/usr
+[[ $INSTALL_TDE != "/usr/local" ]] && [[ $TDEMIR_SUBDIR == misc || $PRGNAM == libart-lgpl ]] && INSTALL_TDE=/usr
 mkdir -p $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
 (cd ${DOCDIR:-};cp -a --parents ${DOCS:-} $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION) || true # DOCDIR might not exist
-## leave this commented out in case anybody wants to reinstate it
-#cat $SRCDIR/$(basename $0) > $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 chown -R root:root $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
 find $PKG$INSTALL_TDE/doc -type f -exec chmod 644 {} \;
 }

@@ -33,7 +33,7 @@ getsource_fn
 
 untar_fn
 
-patch -p0 < $SRCDIR/reformat-message.patch
+patch -p0 < $SB_SRCDIR/reformat-message.patch
 
 ## for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done

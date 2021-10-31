@@ -33,14 +33,6 @@ getsource_fn
 
 untar_fn
 
-<<'comment'
-## abandoned attempt to include ffmpeg decoder - see README
-## edit headers locations for Slackware package
-sed -i 's|ffmpeg/avcodec.h|libavcodec/avcodec.h|' akode/plugins/ffmpeg_decoder/ffmpeg_decoder.cpp
-sed -i 's|ffmpeg/avformat.h|libavformat/avformat.h|' akode/plugins/ffmpeg_decoder/ffmpeg_decoder.cpp
-sed -i 's|ffmpeg/avio.h|libavformat/avio.h|' akode/plugins/ffmpeg_decoder/ffmpeg_decoder.cpp
-comment
-
 chown_fn
 
 cd_builddir_fn
@@ -61,11 +53,11 @@ cmake ${G_NINJA:-} \
     -DWITH_PULSE_SINK="ON" \
     -DWITH_OSS_SINK="OFF" \
     -DWITH_SUN_SINK="OFF" \
-    -DWITH_FFMPEG_DECODER="OFF" \
+    -DWITH_FFMPEG_DECODER="ON" \
     -DWITH_MPC_DECODER="ON" \
     -DWITH_MPEG_DECODER="ON" \
-    -DWITH_SRC_RESAMPLER="OFF" \
-    -DWITH_XIPH_DECODER="OFF" \
+    -DWITH_SRC_RESAMPLER="ON" \
+    -DWITH_XIPH_DECODER="ON" \
     -Wno-dev \
     ..
 
@@ -85,12 +77,12 @@ echo "
        |-----handy-ruler------------------------------------------------------|
 $PRGNAM: akode - player and plugins for aRts music formats
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: - Ogg Vorbis
+$PRGNAM: - Musepack (MPC)
+$PRGNAM: - FLAC
+$PRGNAM: - Speex
+$PRGNAM: - Libmad (MPEG-1 and MPEG-2)
+$PRGNAM: - Libsamplerate
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

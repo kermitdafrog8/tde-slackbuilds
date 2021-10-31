@@ -34,7 +34,6 @@ getsource_fn
 
 untar_fn
 
-[[ $TDEVERSION != 14.0.10 ]] && {
 ## using cmake common rules
 find doc -name CMakeLists.txt | xargs rm
 
@@ -47,12 +46,11 @@ sed -i 's|k3bsetup )|&\
 tde_conditional_add_project_docs( BUILD_DOC )|' CMakeLists.txt
 
 mv doc/tdeioslave doc/en
-mv doc/* doc/en || true
 mv doc/en/en doc/en/tdeioslave
+mv doc/*.* doc/en/
 
 mkdir doc/misc
 mv FAQ doc/misc/
-}
 
 listdocs_fn
 
@@ -86,7 +84,7 @@ cmake ${G_NINJA:-} \
     -DWITH_ALSA="ON" \
     -DWITH_ARTS="ON" \
     -DWITH_FFMPEG=${FFMPEG:-"OFF"} \
-    -DWITH_FFMPEG_ALL_CODECS="OFF" \
+    -DWITH_FFMPEG_ALL_CODECS=${FFMPEG:-"OFF"} \
     -DWITH_FLAC="ON" \
     -DWITH_SNDFILE="ON" \
     -DWITH_TAGLIB="ON" \

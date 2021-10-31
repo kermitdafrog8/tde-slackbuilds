@@ -129,7 +129,7 @@ sed -i 's|TQT_INCLUDE_DIRS}|&\n  ${AVAHI_TQT_INCLUDE_DIRS}|' ../dnssd/CMakeLists
 
 ## Slackware doesn't include Hspell
 ## Prioritise Aspell according to its slack-desc:
-# GNU Aspell is a spell checker designed to eventually replace Ispell.
+# "GNU Aspell is a spell checker designed to eventually replace Ispell."
 [[ -d /usr/lib$LIBDIRSUFFIX/ispell ]] && ISPELL=ON && DEF_SP_CHKR=ISPELL
 [[ -d /usr/lib$LIBDIRSUFFIX/aspell ]] && ASPELL=ON && DEF_SP_CHKR=ASPELL # override ISPELL if both installed
 ## just show message without failing if no spell checker is installed
@@ -154,7 +154,6 @@ cmake ${G_NINJA:-} \
     -DWITH_ASPELL=${ASPELL:-"OFF"} \
     -DWITH_AVAHI=${AVAHI:-"OFF"} \
     -DWITH_CONSOLEKIT="OFF" \
-    -DWITH_CRYPTSETUP="ON" \
     -DWITH_CUPS="ON" \
     -DWITH_DEVKITPOWER="ON" \
     -DWITH_ELFICON="OFF" \
@@ -178,15 +177,12 @@ cmake ${G_NINJA:-} \
     -DWITH_OLD_XDG_STD="OFF" \
     -DWITH_OPENEXR="ON" \
     -DWITH_PCRE="ON" \
-    -DWITH_PCSC="OFF" \
-    -DWITH_PKCS="OFF" \
     -DWITH_SSL="ON" \
     -DWITH_SUDO_TDESU_BACKEND="ON" \
     -DWITH_TDEHWLIB="ON" \
     -DWITH_TDEHWLIB_DAEMONS="ON" \
     -DWITH_TDEICONLOADER_DEBUG="OFF" \
     -DWITH_TIFF="ON" \
-    -DWITH_UDEVIL="ON" \
     -DWITH_UDISKS2="ON" \
     -DWITH_UDISKS="ON" \
     -DWITH_UPOWER="OFF" \

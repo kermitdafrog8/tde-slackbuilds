@@ -56,6 +56,8 @@ chown_fn
 
 cd_builddir_fn
 
+[[ $GCC_VIS == ON ]] && EN_GCC_VIS="--enable-gcc-hidden-visibility"
+
 CFLAGS="$SLKRCFLAGS" \
 CXXFLAGS="$SLKRCFLAGS" \
 CC=$COMPILER \
@@ -63,6 +65,7 @@ CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
    --mandir=$INSTALL_TDE/man \
+   ${EN_GCC_VIS:-} \
    --disable-rpath \
    --enable-closure
 

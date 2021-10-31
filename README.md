@@ -6,7 +6,7 @@
 .. for Slackware 14.2 or current on i586+ and x86_64.  
 .. see 'Cross compiling for RPi3' for building for armv7/aarch64.
 
-Build the release version 14.0.10 from tar archives; or the development versions 14.0.x, 14.1.0 from trinitydesktop cgit.  
+Build the release version 14.0.11 from tar archives; or the development versions 14.0.x, 14.1.0 from trinitydesktop gitea.  
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input.  
 
 [<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png)
@@ -18,7 +18,7 @@ Only building the packages is a global option. It therefore can't be used where 
 Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.  
 Information about dependencies for some packages has been added at the bottom of the dialog screen.
 
-14.0.10 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.x/14.1.0] cloned or updated from cgit.  
+14.0.11 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.x/14.1.0] cloned or updated from gitea.  
 Downloading can be done pre-build [useful for an off-line build], or during the build.
 
 If you're curious about what this might involve, [take a look at a sample build set up](https://ray-v.github.io/A_typical_TDE_SlackBuild.html).
@@ -36,7 +36,7 @@ If you're curious about what this might involve, [take a look at a sample build 
 Deps [dependencies/]
 Core [core/]
 Libs [libraries/]
-Apps [applications/]
+Apps [applications/*/]
 ```
 Other directories are:  
 ```
@@ -121,7 +121,7 @@ Includes:
 
 [3] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.
 
-[4] The README for a native build for Raspberry Pi3 [[README-Raspberry-Pi3.md](./README-Raspberry-Pi3.md)] is now rather dated and cross compiling is a better option.
+[4] The README for a native build for Raspberry Pi3 [[README-Raspberry-Pi3.md](./README-Raspberry-Pi3.md)] is now out-of-date and cross compiling is a better option.
 
 [5] Building the kalzium equation solver needs ocaml and facile installed. They will be built, packaged, and installed during the tdeedu build if the source archives are pre-downloaded to the 'src' directory.  
 https://github.com/ocaml/ocaml/archive/4.05.0.tar.gz  

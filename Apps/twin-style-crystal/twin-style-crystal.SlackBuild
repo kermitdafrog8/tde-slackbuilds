@@ -40,22 +40,7 @@ listdocs_fn
 
 chown_fn
 
-[[ $TDEVERSION == 14.0.10 ]] && ltoolupdate_fn
-
 cd_builddir_fn
-
-[[ $TDEVERSION == 14.0.10 ]] && {
-
-CFLAGS="$SLKRCFLAGS" \
-CXXFLAGS="$SLKRCFLAGS" \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --disable-rpath \
-   --enable-closure
-
-} || {
 
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -70,8 +55,6 @@ cmake ${G_NINJA:-} \
     -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
     ..
-
-}
 
 make_fn
 

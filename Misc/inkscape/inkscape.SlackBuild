@@ -28,16 +28,20 @@ PRGNAM=inkscape
 ## too late for log file name, but sort that out when Sl current is released as Sl 15
 ## and this script updated for v1.x.x only
 echo 0.92.4 > $TMPVARS/INKSC_VERS && {
-## v 1.0.2 for Slackware current
-[[ $(ls /var/log/packages/poppler-*) == *-2[1-9].* ]] && echo 1.0.2 > $TMPVARS/INKSC_VERS ; }
+## v 1.1 for Slackware current
+[[ $(ls /var/log/packages/poppler-*) == *-2[1-9].* ]] && echo 1.1 > $TMPVARS/INKSC_VERS ; }
 VERSION=$(cat $TMPVARS/INKSC_VERS)
 BUILD=${BUILD:-1}
 
-ARCHIVE_TYPE="tar.bz2" && [[ $VERSION == 1.0.2 ]] && ARCHIVE_TYPE="tar.xz"
+ARCHIVE_TYPE="tar.bz2" && [[ $VERSION == 1.1 ]] && ARCHIVE_TYPE="tar.xz"
 SRCURL="https://media.inkscape.org/dl/resources/file/$PRGNAM-$VERSION.$ARCHIVE_TYPE"
-source ../../get-source.sh
 
-## inkscape v1.0.2 for Slackware current needs gdl and double-conversion
+source ../../get-source.sh
+## need this here for CXX_FLAGS for double-conversion
+getsource_fn
+
+## inkscape v1.1 for Slackware current needs gdl and double-conversion
+[[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 # ### gdl and double-conversion  - start
 [[ $(ls /var/log/packages/poppler-*) == *-2[1-9].* ]] && {
 ## If they are already installed, go to end
@@ -83,7 +87,7 @@ cd double-conversion-3.1.5/
 
 cd cmake/
 # LIBDIRSUFFIX not required - builds to lib$LIBDIRSUFFIX ..
-cmake ${G_NINJA:-} ../ -DBUILD_SHARED_LIBS=ON
+cmake ${G_NINJA:-} ../ -DBUILD_SHARED_LIBS=ON -DCMAKE_CXX_FLAGS="$SLKCFLAGS"
 
 PKG=$TMP_BUILD/package-double-conversion
 make_fn
@@ -102,15 +106,14 @@ echo -e "\n ############ \n\n\033[39;1m gdl and/or double-conversion are not ins
 }
 }
 # ### gdl and double-conversion - end
-
-getsource_fn
+}
 
 untar_fn
 
 ## install to .../lib64 on 64-bit system
 ## add -DLIB_SUFFIX=$LIBDIRSUFFIX to cmake
-[[ -d /lib64 ]] && \
-{ ## set RPATH
+[[ -d /lib64 ]] && {
+## set RPATH
 sed -i 's|ORIGIN/../lib/inkscape|ORIGIN/../lib${LIB_SUFFIX}/inkscape|' CMakeLists.txt
 ## set output directory
 sed -i 's|/lib |/lib${LIB_SUFFIX} |' CMakeLists.txt
@@ -179,7 +182,7 @@ rm share/templates/*.*.*
 mv $TEMP_DIR/* share/templates/
 } || true
 
-[[ $VERSION == 1.0.2 ]] && {
+[[ $VERSION == 1.1 ]] && {
 ## only package man pages for required locales
 for file in man/ink*.*.pod.in
 do
@@ -197,9 +200,9 @@ cd_builddir_fn
 
 ## default options have been pulled from CMakeLists.txt
 ## These next two determine the RPATH for the inkscape library relative to the binary:
-## INKSCAPE_INSTALL_LIBDIR is an addition for v1.0.2 and is relative to CMAKE_INSTALL_PREFIX/
+## INKSCAPE_INSTALL_LIBDIR is an addition for v1.1 and is relative to CMAKE_INSTALL_PREFIX/
 ## LIB_SUFFIX is used for v0.92.4
-# ### TODO docs and man to /usr/local ..
+#
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
@@ -239,6 +242,7 @@ cmake ${G_NINJA:-} \
 
 make_fn
 
+INSTALL_TDE="/usr/local"
 installdocs_fn
 
 [[ $VERSION == 0.92.4 ]] && {
@@ -255,7 +259,7 @@ mv $TEMP_DIR/* $PKG/usr/man/man1/
 rm -rf $TEMP_DIR
 } || true
 
-## man pages are gzipped by WITH_MANPAGE_COMPRESSION="ON" for 1.0.2
+## man pages are gzipped by WITH_MANPAGE_COMPRESSION="ON" for 1.1
 INSTALL_TDE=/usr
 mangzip_fn
 }

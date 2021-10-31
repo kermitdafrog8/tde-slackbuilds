@@ -34,32 +34,123 @@ getsource_fn
 
 untar_fn
 
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang";done
-sed -i "s|SUBDIRS =.*$|SUBDIRS =$langs|" po/Makefile.am
+# for slack-desc
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang".po" ]] && langs="$langs $Lang";done
 
 listdocs_fn
 
-ltoolupdate_fn
+## use latest version of dcraw.c
+cp $SB_SRCDIR/dcraw.c libkdcraw/dcraw/
+## .. and the corresponding supported cameras list
+cp $SB_SRCDIR/CAMERALIST libkdcraw/dcraw/
+## .. and the updated man page
+cp $SB_SRCDIR/dcraw.1 libkdcraw/dcraw/
+## .. and which requires jasper
+sed -i '72i    find_package( Jasper )\
+    if( JASPER_FOUND )\
+        set( HAVE_JASPER 1 )\
+     else()\
+        tde_message_fatal( "jasper library is required, but was not found on your system" )\
+    endif()\
+' ConfigureChecks.cmake
+#
+sed -i 's|MATH_LIBC.*$|&\n     ${JASPER_LIBRARIES}|' libkdcraw/dcraw/CMakeLists.txt # OK after jasper check
+## .. and install the list of supported cameras
+echo "INSTALL(
+    FILES CAMERALIST
+    DESTINATION \${CMAKE_INSTALL_PREFIX}/doc/$PRGNAM-$VERSION
+    RENAME CameraList
+    COMPONENT doc
+)" >> libkdcraw/dcraw/CMakeLists.txt
+#
+## and revert the name of the cli binary and man page to dcraw as it's not a TDE/TQt application
+## and is confusing where kdcraw is used for the libraw library built
+sed -i 's| kdcraw| dcraw|' libkdcraw/dcraw/CMakeLists.txt
+
+patch -p0 -N << EOF
+--- libkdcraw/dcraw/CMakeLists.txt
++++ libkdcraw/dcraw/CMakeLists.txt
+@@ -4,4 +4,2 @@
+   \${CMAKE_CURRENT_SOURCE_DIR}
+-  \${TDE_INCLUDE_DIR}
+-  \${TQT_INCLUDE_DIRS}
+   \${LCMS_INCLUDE_DIRS}
+@@ -10,8 +8,2 @@
+ 
+-link_directories(
+-  \${TQT_LIBRARY_DIRS}
+-  \${TDE_LIB_DIR}
+-)
+-
+-
+ ##### dcraw (executable)
+EOF
+
+## tqt libs required for raw2png
+sed -i 's|\##### test programs|link_directories(\
+  ${TQT_LIBRARY_DIRS}\
+)\
+\
+&|' libkdcraw/test/CMakeLists.txt
+## .. and install libraw sample [test] programs
+patch -p0 -N << EOF
+--- libkdcraw/test/CMakeLists.txt
++++ libkdcraw/test/CMakeLists.txt
+@@ -22,0 +23 @@
++  DESTINATION \${BIN_INSTALL_DIR}
+@@ -30,0 +32 @@
++  DESTINATION \${BIN_INSTALL_DIR}
+@@ -38,0 +41 @@
++  DESTINATION \${BIN_INSTALL_DIR}
+@@ -46,0 +50 @@
++  DESTINATION \${BIN_INSTALL_DIR}
+@@ -54,0 +59 @@
++  DESTINATION \${BIN_INSTALL_DIR}
+@@ -62,0 +68 @@
++  DESTINATION \${BIN_INSTALL_DIR}
+@@ -70,0 +77 @@
++  DESTINATION \${BIN_INSTALL_DIR}
+EOF
+## .. add two more libraw sample programs
+echo 'tde_add_executable( half_mt AUTOMOC
+  DESTINATION ${BIN_INSTALL_DIR}
+  SOURCES ../libraw/samples/half_mt.c
+  LINK raw-static
+)
+
+tde_add_executable( dcraw_half AUTOMOC
+  DESTINATION ${BIN_INSTALL_DIR}
+  SOURCES ../libraw/samples/dcraw_half.c
+  LINK raw-static
+)' >> libkdcraw/test/CMakeLists.txt
 
 chown_fn
 
 cd_builddir_fn
 
-CFLAGS="$SLKRCFLAGS" \
-CXXFLAGS="$SLKRCFLAGS" \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --disable-rpath \
-   --enable-openmp \
-   --enable-closure
+cmake ${G_NINJA:-} \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
+    -DWITH_LCMS="ON" \
+    -DWITH_OPENMP="ON" \
+    -DBUILD_KDCRAW="ON" \
+    -DBUILD_TESTS="ON" \
+    -DBUILD_TRANSLATIONS="ON" \
+    -Wno-dev \
+    ..
 
 make_fn
 
 installdocs_fn
+
+mangzip_fn
 
 strip_fn
 
@@ -76,17 +167,17 @@ echo "
 # exactly 11 lines for the formatting to be correct.  It's also customary to
 # leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: libkdcraw (dcraw Library Wrapper)
+$PRGNAM: libkdcraw (LibRaw Library Wrapper)
 $PRGNAM:
-$PRGNAM: Libkdcraw is a C++ interface around dcraw binary program used to
-$PRGNAM: decode RAW picture files. The library documentation is available
-$PRGNAM: on header files. This library is used by kipi-plugins, digiKam
-$PRGNAM: and other kipi host programs.
+$PRGNAM: Libkdcraw is a C++ interface around the LibRaw library used to decode
+$PRGNAM: RAW picture files and used by kipi-plugins, digiKam, gwenview and
+$PRGNAM: ksquirrel.
+$PRGNAM:
+$PRGNAM: The cameras supported by the cli program dcraw are listed in
+$PRGNAM: $INSTALL_TDE/doc/$PRGNAM-$VERSION/CameraList
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en$langs
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: $langs
 " > $PKG/install/slack-desc
 
 makepkg_fn

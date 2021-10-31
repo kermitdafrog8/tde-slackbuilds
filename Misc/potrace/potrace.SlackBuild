@@ -43,20 +43,18 @@ chown_fn
 cd_builddir_fn
 
 CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
 CC=$COMPILER \
-CXX=$COMPILER_CXX \
 ../configure \
   --prefix=/usr/local \
-  --libdir=/usr/lib$LIBDIRSUFFIX \
+  --libdir=/usr/local/lib$LIBDIRSUFFIX \
   --with-libpotrace \
-  --mandir=/usr/man
+  --mandir=/usr/local/man
 
 make_fn
 
 installdocs_fn
 
-INSTALL_TDE=/usr
+INSTALL_TDE=/usr/local
 mangzip_fn
 
 strip_fn

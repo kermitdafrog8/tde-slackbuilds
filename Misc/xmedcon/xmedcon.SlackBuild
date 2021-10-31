@@ -44,9 +44,7 @@ chown_fn
 #cd_builddir_fn - don't use
 
 CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
 CC=$COMPILER \
-CXX=$COMPILER_CXX \
 ./configure \
   --prefix=/usr \
   --libdir=/usr/lib$LIBDIRSUFFIX \
@@ -56,6 +54,7 @@ CXX=$COMPILER_CXX \
   --docdir=/usr/doc/$PRGNAM-$VERSION \
   --disable-static
 
+NUMJOBS=-j1
 make_fn
 
 installdocs_fn

@@ -47,6 +47,8 @@ chown_fn
 
 cd_builddir_fn
 
+[[ $GCC_VIS == ON ]] && EN_GCC_VIS="--enable-gcc-hidden-visibility"
+
 CFLAGS="$SLKRCFLAGS" \
 CXXFLAGS="$SLKRCFLAGS" \
 CC=$COMPILER \
@@ -54,6 +56,7 @@ CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
    --disable-rpath \
+   ${EN_GCC_VIS:-} \
    --enable-closure \
    --enable-k3bdevices # do not activate hal/dbus support (use k3bdevice instead)
 

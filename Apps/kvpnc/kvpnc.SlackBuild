@@ -39,19 +39,6 @@ for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $L
 ldocs="en tdeioslave"
 for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
 
-[[ $TDEVERSION == 14.0.10 ]] && {
-## add misc docs
-MISC_FILES=$(cd doc/misc/;ls README* pptp.txt)
-cat << EOF > doc/misc/CMakeLists.txt
-INSTALL(
-    FILES $MISC_FILES
-    DESTINATION \${CMAKE_INSTALL_PREFIX}/doc/\${PROJECT_NAME}-\$ENV{TDEVERSION}
-    COMPONENT doc
-)
-EOF
-sed -i 's|add_subdirectory( tdeioslave )|&\nadd_subdirectory( misc )|' doc/CMakeLists.txt
-}
-
 chown_fn
 
 cd_builddir_fn

@@ -58,6 +58,7 @@ cmake ${G_NINJA:-} \
     -DBUILD_KTEATIME="ON" \
     -DBUILD_KTUX="ON" \
     -DBUILD_KWEATHER="ON" \
+    -DBUILD_KONQ_KWEATHER="ON" \
     -DBUILD_KWORLDWATCH="ON" \
     -Wno-dev \
     ..

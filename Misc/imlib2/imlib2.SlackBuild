@@ -80,7 +80,7 @@ $PRGNAM: * Apply filters to images
 $PRGNAM: * Scale images
 $PRGNAM: * Apply color correction .. and more
 $PRGNAM:
-$PRGNAM: See index.html for the full list.
+$PRGNAM: See /usr/doc/$PRGNAM-$VERSION/index.html for the full list.
 $PRGNAM:
 " > $PKG/install/slack-desc
 

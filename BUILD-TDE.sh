@@ -102,7 +102,7 @@ Set the version of TDE to be built.
  
 " \
 13 75 3 \
-"14.0.10" "the R14.0.10 release - source from archives" \
+"14.0.11" "the R14.0.11 release - source from archives" \
 "14.0.x" "next release preview - source from Trinity git" \
 "14.1.0" "R14.1.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
@@ -300,7 +300,7 @@ A practical build method could be:
 
  1] build the \Zb\Zr\Z4R\Znequired packages with the <\Z1S\Zb\Z0top\Zn> option.
     This script will then exit on a failure. When the problem has been
-    fixed, restart the build with the \Z3\ZbTDE build\Zn|<Re-use> option.
+    fixed, restart the build with the \Z3\ZbTDE build\Zn|<\Z1R\Zb\Z0e-use\Zn> option.
 
  2] then build other packages with the \Zr\Z4\ZbContinue\Zn option which allows
     this script to continue to the end of the build list whether or
@@ -308,7 +308,7 @@ A practical build method could be:
     \Zr\Z4\ZbContinue\Zn is probably the better choice if only downloading sources.
 
  3] re-run the build for the remaining programs with the
-    \Z3\ZbTDE build\Zn|<Re-use> option and select <Stop> in the confirmation
+    \Z3\ZbTDE build\Zn|<\Z1R\Zb\Z0e-use\Zn> option and select <\Z1S\Zb\Z0top\Zn> in the confirmation
     screen.
  " \
 27 75
@@ -329,9 +329,8 @@ If following the build method on the previous screen, the answer here should pro
 [[ $? == 1 ]] && echo no > $TMPVARS/KEEP_BUILD
 
 
-## new apps for 14.0.x & 14.1.0
-[[ $(cat $TMPVARS/TDEVERSION) != 14.0.10 ]] && {
-# Use non-breaking space - U00a0 - in strings
+## new apps for 14.0.11 & 14.1.0
+# Use non-breaking space - U00a0 - in strings for this to work with 'dialog'
 # nbsp prefixing Misc avoids double quote in TDEbuilds list
 app_1="Apps/codeine"
 about_1="Simple multimedia player"
@@ -354,18 +353,19 @@ about_4="Full-screen window/desktop manager"
 status_4=off
 comment_4="\Zb\Z6 Imlib2 is a build time requirement \Zn"
 
+## there is no 14.0.x/11 port for this
+[[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 ]] && {
 app_5="Apps/kplayer"
 about_5="Multimedia player with MPlayer backend"
 status_5=off
 comment_5="\Zb\Z6 MPlayer is a run time requirement \Zn"
+}
 
 app_6="Apps/twin-style-suse2"
 about_6="SUSE window decorations"
 status_6=off
 comment_6="\Zb\Z6 \Zn"
-}
-#
-[[ $(cat $TMPVARS/TDEVERSION) != 14.0.10 ]] && TQCA=tqca && TQCA_MSG="The TQt Cryptographic Architecture"
+
 rm -f $TMPVARS/TDEbuilds
 dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Packages Selection " --item-help --checklist \
 "
@@ -376,18 +376,19 @@ The packages selected form the build list and so dependencies are listed before 
 Look out for messages in the bottom line of the screen, especially relating to dependencies.
 
 Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TDE packages." \
-0 85 0 \
+17 85 0 \
 "Deps/tqt3" "\Zb\Zr\Z4R\Zn The Qt package for TDE" off "\Zb\Z6  \Zn" \
 "Deps/tqtinterface" "\Zb\Zr\Z4R\Zn TDE bindings to tqt3." off "\Zb\Z6  \Zn" \
 "Deps/arts" "\Zb\Zr\Z4R\Zn Sound server for TDE" off "\Zb\Z6   \Zn" \
 "Deps/dbus-tqt" "\Zb\Zr\Z4R\Zn A simple IPC library" off "\Zb\Z6   \Zn" \
 "Deps/dbus-1-tqt" "\Zb\Zr\Z4R\Zn D-Bus bindings" off "\Zb\Z6   \Zn" \
 "Deps/libart-lgpl" "\Zb\Zr\Z4R\Zn The LGPL'd component of libart" off "\Zb\Z6   \Zn" \
-"Deps/${TQCA:-tqca-tls}" "\Zb\Zr\Z4R\Zn ${TQCA_MSG:-Plugin to provide SSL/TLS capability}" off "" \
+"Deps/tqca" "\Zb\Zr\Z4R\Zn The TQt Cryptographic Architecture" off "" \
 "Deps/avahi-tqt" "Avahi support" off "\Zb\Z6 Optional for tdelibs and used if installed. Requires avahi. \Zn" \
 "Core/tdelibs" "\Zb\Zr\Z4R\Zn TDE libraries" off "\Zb\Z6 Will build with avahi support if avahi & avahi-tqt are installed. \Zn" \
 "Core/tdebase" "\Zb\Zr\Z4R\Zn TDE base" off "\Zb\Z6   \Zn" \
 "Core/tde-i18n" "Additional language support for TDE" off "\Zb\Z6 Required when any \Zb\Z3Additional language support\Zb\Z6 has been selected \Zn" \
+" Misc/speex" "Audio compression format designed for speech" off "\Zb\Z6 Buildtime option for akode [xiph], tdenetwork and amarok. Requires l/speexdsp  \Zn" \
 "Deps/akode" "A player and plugins for aRts music formats" off "\Zb\Z6 For tdemultimedia - aRts-plugin and Juk, and amarok engine \Zn" \
 "Core/tdemultimedia" "Multimedia packages for TDE" off "\Zb\Z6 Optional build-time dependency -> akode \Zn" \
 "Core/tdeaccessibility" "Accessibility programs" off "\Zb\Z6 Optional build-time dependencies -> akode + tdemultimedia \Zn" \
@@ -398,7 +399,6 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Core/tdegames" "Games for TDE - atlantik, kasteroids, katomic, etc." off "\Zb\Z6   \Zn" \
 " Misc/imlib" "An image loading and rendering library" off "\Zb\Z6 Build-time option for tdegraphics - needed for kuickshow \Zn" \
 "Core/tdegraphics" "Misc graphics apps" off "\Zb\Z6   \Zn" \
-" Misc/speex" "Audio compression format designed for speech" off "\Zb\Z6 Buildtime option for tdenetwork and amarok. Requires l/speexdsp  \Zn" \
 "Core/tdenetwork" "Networking applications for TDE" off "\Zb\Z6 Optional build-time dependency -> speex \Zn" \
 "Deps/libcaldav" "Calendaring Extensions to WebDAV" off "\Zb\Z6 Optional dependency for korganizer [tdepim] \Zn" \
 "Deps/libcarddav" "Online address support" off "\Zb\Z6 Optional dependency for korganizer [tdepim] \Zn" \
@@ -563,26 +563,29 @@ ${DLG_BOX:-0 0}
 }
 
 
-## set up for development builds - 14.0.x [aka 14.0.11] & 14.1.0
-[[ $(cat $TMPVARS/TDEVERSION) != 14.0.10 ]]  && {
-## only run this if tdelibs has been selected
+## GCC visibility option
+## If tdelibs has been built, the header will exist:
+[[ $(grep "KDE_HAVE_GCC_VISIBILITY 1" $(cat $TMPVARS/INSTALL_TDE)/include/kdemacros.h) ]] && \
+GCC_VIS_M=ON || GCC_VIS_M=OFF
+#
+## only run this if any of listed Deps or tdelibs has been selected
 rm -f $TMPVARS/GCC_VIS
-[[ $(grep -o tdelibs $TMPVARS/TDEbuilds) ]] && {
+[[ $(grep -oE 'arts|dbus-1-tqt|libart-lgpl|tqca|avahi-tqt|tdelibs' $TMPVARS/TDEbuilds) ]] && {
 dialog --cr-wrap --nocancel --no-shadow --colors --title " Gcc visibility " --menu \
 "
-If gcc visibility support [-fvisibility=hidden -fvisibility-inlines-hidden] is required, it has to be built in to tdelibs for the package builds that call the 'tde_setup_gcc_visibility()' macro.
+If gcc hidden visibility support is required it needs to be set ON for the \Zb\Zr\Z4R\Znequired dependencies and tdelibs.
 
-It will default for those packages to whatever is set here, but if enabled, can be set OFF with the command line option GCC_VIS=0.
+For any subsequent package builds which are dependent on the setting in tdelibs, it will default to whatever is set here, but if enabled, can be set OFF with the command line option GCC_VIS=0.
 
-Set gcc visibility support in tdelibs ..
+The current setting is \Zb\Z2$GCC_VIS_M\Zn
  
 " \
-21 60 2 \
+20 60 2 \
 "ON" "" \
 "OFF" "" \
 2> $TMPVARS/GCC_VIS
 }
-}
+
 
 ## only run this if tdebase has been selected
 rm -f $TMPVARS/RUNLEVEL
@@ -590,24 +593,26 @@ rm -f $TMPVARS/RUNLEVEL
 ## the default exit status for the extra button is 3 - exit from a help button is 2 which is needed for RUNLEVEL
 EXITVAL=3
 until [[ $EXITVAL -lt 2 ]] ; do
-dialog --cr-wrap --nocancel --no-shadow --extra-button --extra-label "README" --colors --title " TDM " --checklist \
+dialog --cr-wrap --nocancel --no-shadow --extra-button --extra-label "README" --colors --title " TDM & starttde " --checklist \
 "
 See the README for further details ..
 
-A file \Zb\Z2rc.4.local.tdm\Zn, specifically for launching TDM, will be installed with tdebase.
+\Zb\Z2rc.4.local.tdm\Zn and \Zb\Z2xinitrc.tde\Zn, specifically for launching TDM & TDE, will be installed with tdebase.
 
-These options will add commands to doinst.sh:
-[1] Selecting \Z3\Zbrc4l\Zn will copy \Zb\Z2rc.4.local.tdm\Zn to \Zb\Z2rc.4.local\Zn, overwriting any existing file.
+These options will be enabled by doinst.sh:
+[1] \Z3\Zbrc4l\Zn will copy \Zb\Z2rc.4.local.tdm\Zn to \Zb\Z2rc.4.local\Zn, overwriting any existing file.
 
-[2] Selecting \Z3\Zbrl4\Zn will set runlevel 4 in etc/inittab to enable login with TDM, or other DM.
-    Otherwise no change will be made to etc/inittab.
+[2] \Z3\Zbrl4\Zn will set runlevel 4 in inittab to enable login with TDM.
 
-With both options selected, TDM should be set up to run by default.
+[3] \Z3\Zbxinitrc\Zn will sym-link \Zb\Z2xinitrc\Zn to \Zb\Z2xinitrc.tde\Zn to run TDE.
+
+With all options selected, TDM & TDE should be set up to run by default.
  
 " \
-25 75 2 \
-" rc4l" "install rc.4.local for TDM" off \
-" rl4" "set runlevel 4" off \
+27 75 3 \
+" rc4l" "install rc.4.local for TDM" on \
+" rl4" "set runlevel 4" on \
+" xinitrc" "startup script == starttde"  on \
 2> $TMPVARS/RUNLEVEL
 EXITVAL=$?
 [[ $EXITVAL == 3 ]] && dialog --cr-wrap --no-shadow --colors --ok-label "Return" --title " TDM README " --msgbox \
@@ -740,9 +745,8 @@ Create and/or update the git repositories local copies.
 
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
-[[ $(cat $TMPVARS/TDEVERSION) == 14.0.10 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded."
-[[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
-## testing for cgit!=no will allow =yes, or null, which is the 14.0.10 build case
+[[ $(cat $TMPVARS/TDEVERSION) == 14.0.11 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
+## testing for cgit!=no will allow =yes, or null, which is the 14.0.11 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "
@@ -751,7 +755,7 @@ This would be useful for running the build off-line.
 \Z1Y\Zb\Z0es\Zn
  Download the sources for the build list without building packages.
  The build list will be retained, and BUILD-TDE.sh will need to be
- re-run selecting the \Z3\ZbTDE build\Zn|<Re-use> option to build the packages.
+ re-run selecting the \Z3\ZbTDE build\Zn|<\Z1R\Zb\Z0e-use\Zn> option to build the packages.
 
 \Zr\Z4\ZbNo\Zn
  Download sources as each package is built.
@@ -807,7 +811,7 @@ Confirm or change these build options ..
 
 [3] \Z3\Zbninja\Zn - use ninja for cmake builds
 
-[4] \Z3\Zbverbose\Zn - show command lines during cmake builds, 'make' debugging information, and standard error output. Using this is only recommended if fault finding.
+[4] \Z3\Zbverbose\Zn - show -> command lines during cmake builds; 'make' debugging information; and standard error output. Using this is only recommended if fault finding.
  
 " \
 25 75 4 \
@@ -871,7 +875,7 @@ export PLUGIN_INSTALL_DIR=$(cat $TMPVARS/SYS_CNF_DIR | cut -d/ -f3)
 [[ $EXIT_FAIL == "exit 1" ]] && AOF=stop
 #
 ## if tdebase selected
-[[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && [[ $(cat $TMPVARS/RUNLEVEL) == *rl4* ]] && TDMRL=4
+[[ $(grep -o tdebase $TMPVARS/TDEbuilds) ]] && [[ $RUNLEVEL == *rl4* ]] && TDMRL=4
 #
 ## koffice - only if it is being built
 [[ $(grep -o "Apps/koffice " $TMPVARS/TDEbuilds) ]] && {
@@ -905,20 +909,14 @@ INST_PACKAGE=yes && [[ $INST == 0 ]] && INST_PACKAGE=no
 #
 
 ## Set up gcc visibilty .. ##
-## If GCC_VIS has been set on the command line, export it
+## If GCC_VIS has been set on the command line, use that value
 [[ $GCC_VIS ]] && export GCC_VIS || {
-## set up for development builds - 14.0.x [aka 14.0.11] & 14.1.0
-[[ $TDEVERSION != 14.0.10 ]] && {
-## If tdelibs has been built before, the header will exist, so test that:
+## Otherwise, if tdelibs has been built before, the header will exist, so test that, and set GCC_VIS accordingly:
 [[ $(grep "KDE_HAVE_GCC_VISIBILITY 1" $INSTALL_TDE/include/kdemacros.h) ]] && \
 GCC_VIS=ON || GCC_VIS=OFF
-## if tdelibs is being built, override any header setting with the dialog output:
+## But, if tdelibs or any listed Deps package is being built, or re-built, override any set value with the dialog output:
 [[ -s $TMPVARS/GCC_VIS ]] && GCC_VIS=$(cat $TMPVARS/GCC_VIS)
 export GCC_VIS
-} || {
-## otherwise for 14.0.10 builds, continue to set it off
-export GCC_VIS=OFF
-}
 }
 #
 
@@ -980,7 +978,9 @@ do
    { [[ $dir == Deps* ]] && export TDEMIR_SUBDIR="/dependencies"; } \
 || { [[ $dir == Core* ]] && export TDEMIR_SUBDIR="/core"; } \
 || { [[ $dir == Libs* ]] && export TDEMIR_SUBDIR="/libraries"; } \
-|| { [[ $dir == Apps* ]] && export TDEMIR_SUBDIR="/applications"; } \
+|| { [[ $dir == Apps* ]] \
+&& SUB_DIR=$(grep $dir$ $BUILD_TDE_ROOT/apps-list|cut -d- -f1) \
+&& export TDEMIR_SUBDIR="/applications/$SUB_DIR"; } \
 || { [[ $dir == *Misc* ]] && export TDEMIR_SUBDIR="misc"; } # used for untar_fn - leading slash deliberately omitted
 
   # Get the package name

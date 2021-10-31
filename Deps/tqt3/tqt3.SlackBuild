@@ -101,6 +101,7 @@ chown_fn
 #cd_builddir_fn - don't use
 
 ## datadir is where mkspecs is installed
+## gcc visibility hidden is the default in mkspecs/..qmake.conf
 echo "yes" | \
  ./configure \
  -no-exceptions \

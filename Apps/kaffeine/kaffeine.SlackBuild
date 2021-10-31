@@ -33,11 +33,9 @@ getsource_fn
 
 untar_fn
 
-[[ $TDEVERSION != 14.0.10 ]] && {
 ## using cmake common rules
 mkdir doc/misc
 mv README* FAQ doc/misc/
-}
 
 ## for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done

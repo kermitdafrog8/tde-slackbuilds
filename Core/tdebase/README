@@ -19,7 +19,4 @@ To enable TDM if this isn't the case, either
 [1] add this test to rc.4 above other session manager options
 or
 [2] copy the contents of rc.4.local to rc.4 above other session manager options
-
-(Runlevel)
-Set this to 4 and TDM should work out-of-the-box.
  

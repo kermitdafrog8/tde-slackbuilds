@@ -58,8 +58,8 @@ chown_fn
 cd build
 
 cmake ${G_NINJA:-} \
+    -DCMAKE_C_FLAGS="$SLKCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr/local \
     -DMAN_INSTALL_DIR=/usr/man \

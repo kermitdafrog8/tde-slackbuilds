@@ -19,6 +19,6 @@ For example:
 
 [4] Show blank keys where AltGr doesn't produce a character.
 
-3rd and 4th level character sets on a keyboard generally don't cover the full set of keys.
+3rd and 4th level character sets on a keyboard generally don't cover all keys.
 Select this option to see only those characters which AltGr generates.
  

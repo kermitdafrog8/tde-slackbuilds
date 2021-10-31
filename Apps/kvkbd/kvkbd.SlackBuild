@@ -34,10 +34,10 @@ getsource_fn
 untar_fn
 
 ## copy the helpfile docs to the build tree
-cp -a $SRCDIR/doc .
-cp $SRCDIR/dock.png src/
+cp -a $SB_SRCDIR/doc .
+cp $SB_SRCDIR/dock.png src/
 ## copy translations
-cp $SRCDIR/translations/messages/* translations/messages/
+cp $SB_SRCDIR/translations/messages/* translations/messages/
 ## remove meinproc check - there are a number of validity errors relating to the use of <sbr/> etc.,
 ## which I feel provides a better presentation. The help file displays as intended.
 sed -i 's|--check --cache index.cache.bz2|--cache index.cache.bz2|' cmake/modules/TDEMacros.cmake
@@ -137,30 +137,6 @@ patch -N -p0 << EOF || true
 +	resize ( 64,31 );
 EOF
 
-[[ $TDEVERSION == 14.0.10 ]] && {
-## Caps+AltGr[+Shift] displayed characters should be toggled from the non-Caps state
-patch -N -p0 << EOF || true
---- src/VButton.cpp
-+++ src/VButton.cpp
-@@ -94,2 +94,13 @@
--		// Caps does not seem to make any difference when AltGr is pressed
--		if (shift)
-+		// If Caps is on, displayed alpha characters should be toggled from the AltGr case
-+		if (caps)
-+		{
-+			if (shift)
-+			{
-+				TQPushButton::setText(altGrShiftText.lower());
-+			}
-+			else
-+			{
-+				TQPushButton::setText(altGrText.upper());
-+			}
-+		}
-+		else if (shift)
-EOF
-}
-
 ## blank character display where AltGr does not provide extra characters
 [[ $(cat $TMPVARS/Kvkbd_OPTS) == *blank* ]] && {
 echo -e "\033[36;1m"'patching for blank keys ..'"\033[0m"
@@ -228,16 +204,6 @@ patch -N -p0 << EOF || true
 -	mod_keys.append ( rwin );
 +	connect ( rwin, TQT_SIGNAL ( keyClick ( unsigned int ) ), this, TQT_SLOT ( keyPress ( unsigned int ) ) );
 +	other_keys.append( rwin );
-EOF
-}
-
-[[ $TDEVERSION == 14.0.10 ]] && {
-## another combining character to display
-patch -N -p0 << EOF || true
---- src/Xutils.cpp
-+++ src/Xutils.cpp
-@@ -871,0 +872 @@
-+  { 0x01000358L, 0x02d9 }, /*   combining dot above right ˙ dot above */
 EOF
 }
 
