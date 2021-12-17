@@ -26,8 +26,10 @@ If you're curious about what this might involve, [take a look at a sample build 
 ---
 
 ***Other command line options*** that can be used to set some build parameters:
-* TDE_MIRROR= - override the trinitydesktop.org geoIP redirector to use https - example, *https://trinitydesktop.mirrorservice.org/trinity*. URLs @ https://www.trinitydesktop.org/mirrorstatus.php
+* TDE_MIRROR= - override the trinitydesktop.org geoIP redirector to use https - example, *https://trinitydesktop.mirrorservice.org/trinity*.  
+URLs for this and other locations are @ https://www.trinitydesktop.org/mirrorstatus.php
 * BUILD= - sets the package build identifier, overriding the SlackBuild default of 1
+* GCC_VIS=0 - override setting gcc visibility if it has been set ON in tdelibs
 
 ---
 
@@ -49,7 +51,6 @@ Other scripts:
 get-source.sh - a chunk of common code for the SlackBuilds
               - used for getting the sources, setting FLAGS,
                 creating build directories, ...
-
 ```
 There is an override in the Misc SlackBuilds for non-trinity source archive URLs. Non-trinity builds have been included where a TDE package requires a dependency that is not in Slackware, or where it's an alternative to a TDE package.
 
@@ -62,11 +63,13 @@ Deps/tqtinterface
 Deps/arts
 Deps/dbus-tqt
 Deps/dbus-1-tqt
-Deps/tqca-tls
+Deps/tqca
 Deps/libart-lgpl
 Core/tdelibs
 Core/tdebase
 ```
+The newly introduced cmake-trinity package for R14.0.11+ is downloaded with the first archive, usually tqt3.
+
 ---
 
 ***Internationalization***
