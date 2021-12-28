@@ -36,8 +36,8 @@ getsource_fn
 
 untar_fn
 
-## add -march and -mtune options to CFLAGS where they've been set in BUILD-TDE.sh
-sed -i "s|^QMAKE_CFLAGS[^_].*$|& $SET_march|" mkspecs/linux-g++/qmake.conf
+## add -march, -mtune and no_warn options to CFLAGS where they've been set in BUILD-TDE.sh
+sed -i "s|^QMAKE_CFLAGS[^_].*$|& $SET_march ${NO_WARN:-}|" mkspecs/linux-g++/qmake.conf
 
 ## RPATH is set to $ORIGIN/../lib to locate libs during the build
 ## and added during configure to apply only to tqt3 build
@@ -113,7 +113,7 @@ echo "yes" | \
  -datadir $TQTDIR/lib$LIBDIRSUFFIX/tqt \
  -translationdir $TQTDIR/share/tqt/translations \
  -release \
- -verbose \
+ ${VERBOSE:+-verbose} \
  -I/usr/include/freetype2 \
  -I/usr/include/mysql \
  -I/usr/include/tirpc \

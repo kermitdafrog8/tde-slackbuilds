@@ -6,8 +6,8 @@
 .. for Slackware 14.2 or current on i586+ and x86_64.  
 .. see 'Cross compiling for RPi3' for building for armv7/aarch64.
 
-Build the release version 14.0.11 from tar archives; or the development versions 14.0.x, 14.1.0 from trinitydesktop gitea.  
-For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input.  
+For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input,  
+which will build the release version 14.0.11, or the development versions 14.0.x, 14.1.0.
 
 [<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png)
 
@@ -18,7 +18,7 @@ Only building the packages is a global option. It therefore can't be used where 
 Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.  
 Information about dependencies for some packages has been added at the bottom of the dialog screen.
 
-14.0.11 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.x/14.1.0] cloned or updated from gitea.  
+14.0.11 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.x/14.1.0] cloned or updated from trinitydesktop gitea.  
 Downloading can be done pre-build [useful for an off-line build], or during the build.
 
 If you're curious about what this might involve, [take a look at a sample build set up](https://ray-v.github.io/A_typical_TDE_SlackBuild.html).
@@ -76,7 +76,7 @@ The newly introduced cmake-trinity package for R14.0.11+ is downloaded with the 
 
 i18n support [locale and html/help docs] in the packages is restricted to whatever is selected in the ./BUILD-TDE.sh 'Select Additional Languages' screen and, of that, to whatever is available in any individual package source.
 
-Additionally for the development builds, translations for the .desktop files are determined from the LINGUAS variable which is set in this build shell to the additional languages selected.
+Translations for the .desktop files are determined from the LINGUAS variable which is set in this build shell to the additional languages selected.
 
 There is an option in tde-i18n.SlackBuild to include a user created language specific patch file in the build.  
 It needs to be named *tde-i18n-{lang}-patch* and will then automatically be included for the build for that language.  
@@ -86,7 +86,7 @@ Because of its position in the Slackbuild and the patch -p0 option, the path to 
 
 ***Building the development versions from git sources***
 
-The individual TDE apps can be cloned from Trinity git, so the build is set up to do that - except for individual language packs of tde-i18n. The whole tde-i18n download is ~1x10^6 bytes, so to reduce that, wget is used to download individual tde-i18n-$lang packs as they are not git repositories.
+The build is set up to clone the individual TDE apps from trinitydesktop gitea - except for individual language packs of tde-i18n. The whole tde-i18n download is ~1x10^6 bytes, so to reduce that, wget is used to download individual tde-i18n-$lang packs as they are not git repositories.
 
 Once any git repository has been cloned, further downloads are updates only[2], giving the best options - only fetching what is needed, and incremental updates.
 
@@ -109,7 +109,7 @@ Includes:
 * Setting parameters for a 32-bit [armv7 hard float], or 64-bit [aarch64], build,  
    .. and building ..
 *  a cross compiler toolchain
-*  a 64-bit kernel which can be used for the 32-bit system
+*  a 64-bit kernel which can also be used for the 32-bit system
 *  qemu to run the TDE binaries built and used during compilation
 *  the required TDE apps
 *  a few other TDE and non-TDE apps to provide a basic, but useful, TDE desktop.
@@ -124,11 +124,12 @@ Includes:
 
 [3] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.
 
-[4] The README for a native build for Raspberry Pi3 [[README-Raspberry-Pi3.md](./README-Raspberry-Pi3.md)] is now out-of-date and cross compiling is a better option.
+[4] The README for a [native build for Raspberry Pi3](./README-Raspberry-Pi3.md) is out-of-date and cross compiling is a better option.
 
 [5] Building the kalzium equation solver needs ocaml and facile installed. They will be built, packaged, and installed during the tdeedu build if the source archives are pre-downloaded to the 'src' directory.  
 https://github.com/ocaml/ocaml/archive/4.05.0.tar.gz  
-http://www.recherche.enac.fr/opti/facile/distrib/facile-1.1.3.tar.gz
+http://www.recherche.enac.fr/opti/facile/distrib/facile-1.1.3.tar.gz  
+Further details are in the tdeedu README.
 
 ---
 

@@ -43,7 +43,7 @@ getsource_fn
 untar_fn
 
 # Thanks to SBo:
-sed -i s/r// README.TI-DSP
+sed -i 's/\r//' README.TI-DSP
 
 listdocs_fn
 
@@ -68,9 +68,6 @@ installdocs_fn
 
 INSTALL_TDE=/usr
 mangzip_fn
-
-# Fix libspeex.la Thanks SBo script:
-sed -i "s|-L$PKG.*/lib$LIBDIRSUFFIX ||" $PKG/usr/lib$LIBDIRSUFFIX/libspeex.la
 
 strip_fn
 
