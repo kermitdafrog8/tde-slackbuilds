@@ -1,0 +1,16 @@
+The checks for musepack and musicbrainz installed are done based on:
+
+Musepack
+""""""""
+The musepack decoder was built with gcc11.2 and libmpcdec source
+https://files.musepack.net/source/libmpcdec-1.2.6.tar.bz2
+with default prefix /usr/local
+and ./configure --libdir=/usr/local/lib64 --disable-static
+
+Musicbrainz
+"""""""""""
+Libmusicbrainz 2.1.5 was built with the SBo libmusicbrainz script with gcc7.3 and Archlinux patch to fix gcc6 errors - https://bugs.archlinux.org/task/50754?getfile=14619
+
+
+Later versions cause FTBFS errors, either with gcc or k3b.
+ 

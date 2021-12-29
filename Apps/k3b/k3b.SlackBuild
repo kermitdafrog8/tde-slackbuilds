@@ -59,13 +59,13 @@ chown_fn
 cd_builddir_fn
 
 # Check for ffmpeg:
-[[ -s /usr/include/libavcodec/avcodec.h ]] && FFMPEG="ON"
-# Check for lame:
-[[ -s /usr/include/lame/lame.h ]] && LAME="ON"
-# Check for musepack:
-[[ -s /usr/include/musepack/musepack.h ]] && MUSEPACK="ON"
+pkg-config libavcodec && FFMPEG="ON"
+# Check for lame [no .pc file]:
+ldconfig -p|grep libmp3lame 1>/dev/null && LAME="ON"
+# Check for musepack [no .pc file]:
+ldconfig -p|grep libmpcdec 1>/dev/null && MUSEPACK="ON"
 # Check for musicbrainz:
-[[ -s /usr/include/musicbrainz/mb_c.h ]] && MUSICBRAINZ="ON"
+pkg-config libmusicbrainz && MUSICBRAINZ="ON"
 
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
