@@ -661,15 +661,16 @@ sed -i 's|Apps/koffice|Misc/libpng &|' $TMPVARS/TDEbuilds
 ## only run this if kvkbd has been selected
 rm -f $TMPVARS/Kvkbd_OPTS
 [[ $(grep -o kvkbd $TMPVARS/TDEbuilds) ]] && {
-## the default exit status for the extra button is 3 - exit 2 from a help button is needed for Kvkbd_OPTS
+## the extra button is used because its default exit status is 3 - the help button gives exit 2 which is needed to direct the output to Kvkbd_OPTS
 EXITVAL=3
 until [[ $EXITVAL -lt 2 ]] ; do
 dialog --cr-wrap --nocancel --no-shadow --extra-button --extra-label "README" --colors --title " Kvkbd options " --checklist \
 "
 See the README for further details ..
 
-[1] Use Win keys either as modifier keys,
-                     or to print characters set with xmodmap.
+[1] Use Win keys
+    either as modifier keys,
+        or to print characters set with xmodmap.
 
 [2] Alternative text on the num pad keys.
 
@@ -678,7 +679,7 @@ See the README for further details ..
 [4] Show blank keys where AltGr doesn't produce a character.
  
 " \
-23 75 4 \
+24 75 4 \
 " Winlock" "Win keys as modifier keys" off \
 " numpad" "replace default text" on \
 " icons" "use small icons" on \

@@ -32,6 +32,131 @@ TAG=${TAG:-_tde}
 source ../../get-source.sh
 getsource_fn
 
+# Check for ffmpeg:
+pkg-config libavcodec && FFMPEG="ON"
+# Check for lame:
+ldconfig -p|grep libmp3lame 1>/dev/null && LAME="ON" # [use ldconfig - no .pc file]
+
+# Check for musepack:
+[[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
+# ### musepack - start
+musepack_installed_fn () { ldconfig -p|grep libmpcdec 1>/dev/null ;} # [use ldconfig - no .pc file]
+## If it's already installed, go to MUSEPACK="ON"
+musepack_installed_fn || {
+## otherwise, if the source archive is in 'src' ..
+[[ -s $BUILD_TDE_ROOT/src/libmpcdec-1.2.6.tar.bz2 ]] && {
+## .. build, package, and install it
+(
+echo -e "\n building musepack decoder \n"
+
+cd /$TMP_BUILD
+rm -rf *libmpcdec*
+tar xf $BUILD_TDE_ROOT/src/libmpcdec-1.2.6.tar.bz2
+cd libmpcdec-1.2.6/
+
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --libdir=\${exec_prefix}/lib${LIBDIRSUFFIX} --disable-static
+
+make
+DESTDIR=$TMP_BUILD/package-libmpcdec make install-strip
+
+cd $TMP_BUILD/package-libmpcdec
+makepkg -l y -c n $OUTPUT/libmpcdec-1.2.6-$ARCH-$BUILD.txz
+installpkg $OUTPUT/libmpcdec-1.2.6-$ARCH-$BUILD.txz
+)
+musepack_installed_fn || { echo -e " installation of musepack decoder failed \n" ; exit 1 ; }
+touch $TMPVARS/k3b-opts-built
+}
+} && \
+MUSEPACK="ON"
+# ### musepack - end
+}
+
+# Check for musicbrainz:
+[[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
+# ### musicbrainz - start
+musicbrainz_installed_fn () { pkg-config libmusicbrainz ;}
+## If it's already installed, go to MUSICBRAINZ="ON"
+musicbrainz_installed_fn || {
+## otherwise, if the source archive is in 'src' ..
+[[ -s $BUILD_TDE_ROOT/src/libmusicbrainz-2.1.5.tar.gz ]] && {
+## .. build, package, and install it
+(
+echo -e "\n building libmusicbrainz \n"
+
+cd /$TMP_BUILD
+rm -rf *libmusicbrainz*
+tar xf $BUILD_TDE_ROOT/src/libmusicbrainz-2.1.5.tar.gz
+cd libmusicbrainz-2.1.5/
+
+## patch for string.h - thanks to SBo - see https://slackbuilds.org/slackbuilds/14.2/libraries/libmusicbrainz/libmusicbrainz-2.1.5-include_stringh.patch
+echo $'--- lib/c_wrapper.cpp
++++ lib/c_wrapper.cpp
+@@ -23,0 +24 @@
++#include <string.h>
+--- lib/comhttpsocket.cpp
++++ lib/comhttpsocket.cpp
+@@ -21,0 +22 @@
++#include <string.h>
+--- lib/comsocket.cpp
++++ lib/comsocket.cpp
+@@ -39,0 +40 @@
++#include <string.h>
+--- lib/http.cpp
++++ lib/http.cpp
+@@ -26,0 +27 @@
++#include <string.h> 
+--- lib/sigclient.cpp
++++ lib/sigclient.cpp
+@@ -35,0 +36 @@
++#include <string.h>
+' | patch -p0
+
+## patch for gcc6 - thanks to Archlinux - see https://bugs.archlinux.org/task/50754?getfile=14619
+echo $'--- lib/sigclient.cpp
++++ lib/sigclient.cpp
+@@ -42,4 +42,4 @@
+-char tooShortTRM[] = { 0xf9, 0x80, 0x9a, 0xb1, 0x2b, 0x0f, 0x4d, 0x78, 
+-                       0x88, 0x62, 0xfb, 0x42, 0x5a, 0xde, 0x8a, 0xb9 };
+-char sigserverBusyTRM[] = { 0xc4, 0x57, 0xa4, 0xa8, 0xb3, 0x42, 0x4e, 0xc9, 
+-                            0x8f, 0x13, 0xb6, 0xbd, 0x26, 0xc0, 0xe4, 0x00 };
++char tooShortTRM[] = { (char)0xf9, (char)0x80, (char)0x9a, (char)0xb1, (char)0x2b, (char)0x0f, (char)0x4d, (char)0x78, 
++                       (char)0x88, (char)0x62, (char)0xfb, (char)0x42, (char)0x5a, (char)0xde, (char)0x8a, (char)0xb9 };
++char sigserverBusyTRM[] = { (char)0xc4, (char)0x57, (char)0xa4, (char)0xa8, (char)0xb3, (char)0x42, (char)0x4e, (char)0xc9, 
++                            (char)0x8f, (char)0x13, (char)0xb6, (char)0xbd, (char)0x26, (char)0xc0, (char)0xe4, (char)0x00 };
+--- lib/signature.cpp
++++ lib/signature.cpp
+@@ -48,2 +48,2 @@
+-char silenceTRM[] = { 0x7d, 0x15, 0x4f, 0x52, 0xb5, 0x36, 0x4f, 0xae, 
+-                      0xb5, 0x8b, 0x06, 0x66, 0x82, 0x6c, 0x2b, 0xac, 0x00 };
++char silenceTRM[] = { (char)0x7d, (char)0x15, (char)0x4f, (char)0x52, (char)0xb5, (char)0x36, (char)0x4f, (char)0xae, 
++                      (char)0xb5, (char)0x8b, (char)0x06, (char)0x66, (char)0x82, (char)0x6c, (char)0x2b, (char)0xac, (char)0x00 };
+' | patch -p0
+
+## work-around for gcc11+ - see https://gcc.gnu.org/gcc-11/porting_to.html
+[[ $(gcc --version) == *1[1-9]* ]] && CXXFLAGS_="-std=gnu++14"
+
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS ${CXXFLAGS_:-}" \
+./configure --libdir=\${exec_prefix}/lib${LIBDIRSUFFIX} --disable-static
+
+make
+DESTDIR=$TMP_BUILD/package-libmusicbrainz make install-strip
+
+cd $TMP_BUILD/package-libmusicbrainz
+makepkg -l y -c n $OUTPUT/libmusicbrainz-2.1.5-$ARCH-$BUILD.txz
+installpkg $OUTPUT/libmusicbrainz-2.1.5-$ARCH-$BUILD.txz
+)
+musicbrainz_installed_fn || { echo -e " installation of Musicbrainz failed \n" ; exit 1 ; }
+touch $TMPVARS/k3b-opts-built
+}
+} && \
+MUSICBRAINZ="ON"
+# ### musicbrainz - end
+}
+[[ -e $TMPVARS/k3b-opts-built ]] && echo -e "\n now building k3b \n" && rm $TMPVARS/k3b-opts-built
+
 untar_fn
 
 ## using cmake common rules
@@ -57,15 +182,6 @@ listdocs_fn
 chown_fn
 
 cd_builddir_fn
-
-# Check for ffmpeg:
-pkg-config libavcodec && FFMPEG="ON"
-# Check for lame [no .pc file]:
-ldconfig -p|grep libmp3lame 1>/dev/null && LAME="ON"
-# Check for musepack [no .pc file]:
-ldconfig -p|grep libmpcdec 1>/dev/null && MUSEPACK="ON"
-# Check for musicbrainz:
-pkg-config libmusicbrainz && MUSICBRAINZ="ON"
 
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \

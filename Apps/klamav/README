@@ -1,0 +1,8 @@
+klamav needs clamav as a build time requirement
+
+Download from:
+https://www.clamav.net/downloads/production/clamav-0.103.3.tar.gz
+
+If using wget, include a user agent otherwise '403 Forbidden' is returned.  
+For example, wget --user-agent='Mozilla'
+ 

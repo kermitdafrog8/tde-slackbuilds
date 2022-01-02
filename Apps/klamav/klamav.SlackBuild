@@ -95,7 +95,7 @@ echo -e "\n returning to building klamav \n"
 clamav_installed_fn || { echo -e "\033[39;1m"" ## installation of clamav failed ##\n""\033[0m" ; exit 1 ; }
 } || { ## .. but if the source archive isn't in 'src', display message ..
 echo -e "\n ############ \n\n\033[39;1m clamav is not installed and is required for this build \n
- Download \033[0m [including user-agent, otherwise returns '403 Forbidden']:
+ Download \033[0m [including user-agent, otherwise '403 Forbidden' is returned]:
 \n \033[39;1m wget -O $BUILD_TDE_ROOT/src/clamav-0.103.3.tar.gz --user-agent='Mozilla' https://www.clamav.net/downloads/production/clamav-0.103.3.tar.gz \033[0m
 \n and re-run this script .. \n\n ############ \n" ; exit 1 ; }
 }

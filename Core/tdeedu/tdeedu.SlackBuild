@@ -55,8 +55,8 @@ make ${NUMJOBS:-} world.opt || make world.opt
 DESTDIR=$TMP_BUILD/package-ocaml make install
 
 cd $TMP_BUILD/package-ocaml
-makepkg -l y -c n $OUTPUT/ocaml-4.05.0-x86_64-1.txz
-installpkg $OUTPUT/ocaml-4.05.0-x86_64-1.txz
+makepkg -l y -c n $OUTPUT/ocaml-4.05.0-$ARCH-$BUILD.txz
+installpkg $OUTPUT/ocaml-4.05.0-$ARCH-$BUILD.txz
 
 ## facile:
 echo -e "\n building facile \n"
@@ -72,8 +72,8 @@ make
 make FACILEDIR=$TMP_BUILD/package-facile/usr/local/lib$LIBDIRSUFFIX/ocaml/facile install
 
 cd $TMP_BUILD/package-facile
-makepkg -l y -c n $OUTPUT/facile-1.1.3-x86_64-1.txz
-installpkg $OUTPUT/facile-1.1.3-x86_64-1.txz
+makepkg -l y -c n $OUTPUT/facile-1.1.3-$ARCH-$BUILD.txz
+installpkg $OUTPUT/facile-1.1.3-$ARCH-$BUILD.txz
 )
 echo -e "\n returning to building tdeedu \n"
 ocaml_installed_fn || { echo -e " installation of ocaml/facile failed \n" ; exit 1 ; }

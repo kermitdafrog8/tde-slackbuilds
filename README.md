@@ -13,10 +13,10 @@ which will build the release version 14.0.11, or the development versions 14.0.x
 
 The Required packages will need to be installed as they are built, because they provide dependencies for other TDE packages.
 
-Only building the packages is a global option. It therefore can't be used where the build list includes packages which will need to be installed as dependencies for other packages in the build list [for example tdesdk needs tdepim to be installed].
-
 Any package, or set of packages, can be selected in the 'TDE Packages Selection' screen.  
 Information about dependencies for some packages has been added at the bottom of the dialog screen.
+
+Only building the packages is a global option. It therefore can't be used where the build list includes packages which will need to be installed as dependencies for other packages in the build list [for example tdesdk needs tdepim to be installed].
 
 14.0.11 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.x/14.1.0] cloned or updated from trinitydesktop gitea.  
 Downloading can be done pre-build [useful for an off-line build], or during the build.
@@ -53,6 +53,9 @@ get-source.sh - a chunk of common code for the SlackBuilds
                 creating build directories, ...
 ```
 There is an override in the Misc SlackBuilds for non-trinity source archive URLs. Non-trinity builds have been included where a TDE package requires a dependency that is not in Slackware, or where it's an alternative to a TDE package.
+
+Some SlackBuilds require non-Slackware packages which aren't in the build list. These can be added to the build if they are not already installed by downloading the source archives to the 'src' directory. They will then be built and installed during the xxx.SlackBuild.   
+See the READMEs in Core/tdeedu, Apps/k3b, Apps/klamav, Apps/koffice and Misc/inkscape for details, which can also be viewed while running ./BUILD-TDE.sh.
 
 ---
 
@@ -125,11 +128,6 @@ Includes:
 [3] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.
 
 [4] The README for a [native build for Raspberry Pi3](./README-Raspberry-Pi3.md) is out-of-date and cross compiling is a better option.
-
-[5] Building the kalzium equation solver needs ocaml and facile installed. They will be built, packaged, and installed during the tdeedu build if the source archives are pre-downloaded to the 'src' directory.  
-https://github.com/ocaml/ocaml/archive/4.05.0.tar.gz  
-http://www.recherche.enac.fr/opti/facile/distrib/facile-1.1.3.tar.gz  
-Further details are in the tdeedu README.
 
 ---
 

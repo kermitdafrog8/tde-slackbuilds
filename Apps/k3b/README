@@ -1,16 +1,15 @@
-The checks for musepack and musicbrainz installed are done based on:
+The k3b build includes options for the musepack decoder and musicbrainz.
+The old versions required are:
 
 Musepack
 """"""""
-The musepack decoder was built with gcc11.2 and libmpcdec source
+The libmpcdec source for the musepack decoder
 https://files.musepack.net/source/libmpcdec-1.2.6.tar.bz2
-with default prefix /usr/local
-and ./configure --libdir=/usr/local/lib64 --disable-static
 
 Musicbrainz
 """""""""""
-Libmusicbrainz 2.1.5 was built with the SBo libmusicbrainz script with gcc7.3 and Archlinux patch to fix gcc6 errors - https://bugs.archlinux.org/task/50754?getfile=14619
+The libmusicbrainz-2.1.5 source
+http://ftp.musicbrainz.org/pub/musicbrainz/historical/libmusicbrainz-2.1.5.tar.gz
 
-
-Later versions cause FTBFS errors, either with gcc or k3b.
+If these are placed in the 'src' directory, the packages will be built and installed during the k3b build.
  

@@ -1,0 +1,7 @@
+libpng14 is an optional build requirement for koffice.
+
+The source will be downloaded if selected with the koffice build, and on-line.
+
+Otherwise, download to the 'src' directory:
+https://downloads.sourceforge.net/project/libpng/libpng14/1.4.22/libpng-1.4.22.tar.xz
+ 
