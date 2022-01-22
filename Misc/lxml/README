@@ -1,9 +1,0 @@
-lxml is a Pythonic binding for the libxml2 and libxslt libraries.
-
-Required for online help functions for Inkscape.
-
-------------------------------------------------------------
-
-Cython, python3 and pysetuptools are optional build dependencies.
-cssselect and html5lib are optional runtime dependencies.
- 

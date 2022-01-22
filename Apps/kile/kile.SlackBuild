@@ -35,19 +35,26 @@ untar_fn
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-locas=""
+langs=""
 ldocs=""
-for Lang in $I18N;do [[ -d translations/$Lang ]] && locas="$locas $Lang" && \
+[[ $TDEVERSION == 14.0.11 ]] && {
+for Lang in $I18N;do [[ -d translations/$Lang ]] && langs="$langs $Lang" && \
 [[ -d translations/$Lang/doc ]] && ldocs="$ldocs $Lang";done
-sed -i "s|SUBDIRS=.*$|SUBDIRS=$locas|" translations/Makefile.am
+sed -i "s|SUBDIRS=.*$|SUBDIRS=$langs|" translations/Makefile.am
+} || {
+for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
+}
 
 listdocs_fn
 
-ltoolupdate_fn
+[[ $TDEVERSION == 14.0.11 ]] && ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
+
+[[ $TDEVERSION == 14.0.11 ]] && {
 
 [[ $GCC_VIS == ON ]] && EN_GCC_VIS="--enable-gcc-hidden-visibility"
 
@@ -60,6 +67,23 @@ CXX=$COMPILER_CXX \
    ${EN_GCC_VIS:-} \
    --disable-rpath \
    --enable-closure
+
+} || {
+
+cmake ${G_NINJA:-} \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
+    -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS="ON" \
+    -Wno-dev \
+    ..
+
+}
 
 make_fn
 
@@ -82,7 +106,7 @@ echo "
 $PRGNAM: Kile is a TEX and LATEX source editor and shell
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en$locas
+$PRGNAM: en$langs
 $PRGNAM:
 $PRGNAM: With help documentation for:
 $PRGNAM: en$ldocs

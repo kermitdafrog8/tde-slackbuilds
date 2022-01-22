@@ -26,11 +26,11 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=graphviz
-VERSION=2.42.3
+VERSION=2.46.1
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-ARCHIVE_TYPE="tar.gz"
+ARCHIVE_TYPE="tar.xz"
 SRCURL="https://ftp.osuosl.org/pub/blfs/conglomeration/graphviz/graphviz-$VERSION.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
@@ -38,14 +38,11 @@ getsource_fn
 
 untar_fn
 
-# Install PHP bindings to proper location.
-sed -i 's|/php/modules|/php/extensions|' configure
-
 # Fix for php-5.4 and patches from Arch (thanks!)
 patch -N -p0 << EOF || true
 --- plugin/gs/gvloadimage_gs.c
 +++ plugin/gs/gvloadimage_gs.c
-@@ -83,11 +83,11 @@
+@@ -76,11 +76,11 @@
  
      assert (err < 0);
  
@@ -62,10 +59,14 @@ patch -N -p0 << EOF || true
  	errsrc = "Ghostscript internal error";
 --- tclpkg/gv/gv_php_init.c
 +++ tclpkg/gv/gv_php_init.c
-@@ -27,0 +28 @@
+@@ -26,2 +26,3 @@
+ {
 +    TSRMLS_FETCH();
-@@ -32,0 +34 @@
+     return PHPWRITE(s, len);
+@@ -31,2 +32,3 @@
+ {
 +    TSRMLS_FETCH();
+     return PHPWRITE(s, len);
 EOF
 
 listdocs_fn
@@ -73,9 +74,6 @@ listdocs_fn
 chown_fn
 
 cd_builddir_fn
-
-## find ocaml headers
-#sed -i 's|/usr/lib$LIBPOSTFIX/ocaml|/usr/local/lib$LIBPOSTFIX/ocaml|' ../configure
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \

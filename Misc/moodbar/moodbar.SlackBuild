@@ -24,12 +24,12 @@
 #   SUCH DAMAGE.
 
 PRGNAM=moodbar
-VERSION=0.1.2
+VERSION=0.1.4
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
 ARCHIVE_TYPE="tar.gz"
-SRCURL="http://pkgs.fedoraproject.org/repo/pkgs/${PRGNAM}/${PRGNAM}-${VERSION}.$ARCHIVE_TYPE/28c8eb65e83b30f71b84be4fab949360/${PRGNAM}-${VERSION}.$ARCHIVE_TYPE"
+SRCURL="https://github.com/Mazhoon/moodbar/archive/v0.1.4.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
 getsource_fn
@@ -40,15 +40,10 @@ listdocs_fn
 
 chown_fn
 
-cd_builddir_fn
-
 CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
 CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-  --prefix=/usr \
-  --libdir=/usr/lib$LIBDIRSUFFIX \
+./autogen.sh \
+  --prefix=$(pkg-config --variable=prefix gstreamer-1.0) \
   --disable-static
 
 make_fn

@@ -25,7 +25,7 @@ If you're curious about what this might involve, [take a look at a sample build 
 
 ---
 
-***Other command line options*** that can be used to set some build parameters:
+***Command line options*** that can be used to set some build parameters:
 * TDE_MIRROR= - override the trinitydesktop.org geoIP redirector to use https - example, *https://trinitydesktop.mirrorservice.org/trinity*.  
 URLs for this and other locations are @ https://www.trinitydesktop.org/mirrorstatus.php
 * BUILD= - sets the package build identifier, overriding the SlackBuild default of 1

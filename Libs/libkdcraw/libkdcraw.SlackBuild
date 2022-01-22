@@ -41,6 +41,9 @@ listdocs_fn
 
 ## use latest version of dcraw.c
 cp $SB_SRCDIR/dcraw.c libkdcraw/dcraw/
+## .. modified as per the dcraw/README
+sed -i 's|      printf (_("Camera: %s %s\\n"), make, model);|      printf (_("Camera: %s\\n"), make);\
+      printf (_("Model: %s\\n"), model);|' libkdcraw/dcraw/dcraw.c
 ## .. and the corresponding supported cameras list
 cp $SB_SRCDIR/CAMERALIST libkdcraw/dcraw/
 ## .. and the updated man page
@@ -54,7 +57,7 @@ sed -i '72i    find_package( Jasper )\
     endif()\
 ' ConfigureChecks.cmake
 #
-sed -i 's|MATH_LIBC.*$|&\n     ${JASPER_LIBRARIES}|' libkdcraw/dcraw/CMakeLists.txt # OK after jasper check
+sed -i 's|MATH_LIBC.*$|&\n     ${JASPER_LIBRARIES}|' libkdcraw/dcraw/CMakeLists.txt
 ## .. and install the list of supported cameras
 echo "INSTALL(
     FILES CAMERALIST
@@ -66,6 +69,7 @@ echo "INSTALL(
 ## and revert the name of the cli binary and man page to dcraw as it's not a TDE/TQt application
 ## and is confusing where kdcraw is used for the libraw library built
 sed -i 's| kdcraw| dcraw|' libkdcraw/dcraw/CMakeLists.txt
+sed -i 's|BUILD_KDCRAW|BUILD_DCRAW|;s|Build kdcraw program|Build dcraw program|' {{,libkdcraw/}CMakeLists.txt,ConfigureChecks.cmake}
 
 patch -p0 -N << EOF
 --- libkdcraw/dcraw/CMakeLists.txt
@@ -140,7 +144,7 @@ cmake ${G_NINJA:-} \
     -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DWITH_LCMS="ON" \
     -DWITH_OPENMP="ON" \
-    -DBUILD_KDCRAW="ON" \
+    -DBUILD_DCRAW="ON" \
     -DBUILD_TESTS="ON" \
     -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \

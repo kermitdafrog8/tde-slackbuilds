@@ -52,6 +52,7 @@ chown_fn
 cd_builddir_fn
 
 [[ $GCC_VIS == ON ]] && EN_GCC_VIS="--enable-gcc-hidden-visibility"
+pkg-config sqlite3 && SYS_SQL3="--without-included-sqlite3"
 
 CFLAGS="$SLKRCFLAGS" \
 CXXFLAGS="$SLKRCFLAGS" \
@@ -61,6 +62,7 @@ CXX=$COMPILER_CXX \
    --prefix=$INSTALL_TDE \
    --mandir=$INSTALL_TDE/man \
    ${EN_GCC_VIS:-} \
+   ${SYS_SQL3:-} \
    --disable-rpath \
    --enable-closure
 

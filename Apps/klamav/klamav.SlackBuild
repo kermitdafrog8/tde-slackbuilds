@@ -33,7 +33,7 @@ source ../../get-source.sh
 ## klamav needs clamav as a build time requirement
 [[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 # ### clamav  - start
-clamav_installed_fn () { [[ $(ls {,/usr{,/local}}/lib$LIBDIRSUFFIX/libclamav.so 2>/dev/null) ]] ;}
+clamav_installed_fn () { ldconfig -p|grep libclamav 1>/dev/null ;}
 ## If it's already installed, go to end
 clamav_installed_fn || {
 ## otherwise, if the source archive is in 'src' ..
@@ -116,7 +116,8 @@ chown_fn
 
 cd_builddir_fn
 
-[[ ! -s /usr/lib$LIBDIRSUFFIX/pkgconfig/sqlite3.pc ]] && EMB_SQL="ON"
+! pkg-config sqlite3 && EMB_SQL="ON"
+
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \

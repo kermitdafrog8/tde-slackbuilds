@@ -136,7 +136,7 @@ git pull
 git fetch origin r14.0.x:r14.0.x)
 
 ## if admin and cmake don't exist, clone them
-[[ ! -d admin ]] && git clone https://mirror.git.trinitydesktop.org/gitea/TDE/admin admin
+[[ ! -d admin ]] && git clone https://mirror.git.trinitydesktop.org/gitea/TDE/tde-common-admin admin
 [[ ! -d cmake ]] && git clone https://mirror.git.trinitydesktop.org/gitea/TDE/tde-common-cmake cmake
 
 ## place a marker so that admin/cmake update or clone only once per run of BUILD-TDE.sh
@@ -261,16 +261,17 @@ mv cmake-trinity-$TDEVERSION cmake
 } || {
 
 ## [2] not 14.0.11 nor misc, so must be git ..
-## but is it [2a] 14.0.x ..
-[[ $TDEVERSION == 14.0.x ]] && {
+[[ $TDEVERSION == 14.1.0 ]] && DEV_BRANCH=master || DEV_BRANCH=r14.0.x
 
-## copy git r14.0.x content to build area:
+## copy git content to build area:
 (
 cd $BUILD_TDE_ROOT/src/cgit/$PRGNAM/
 echo -e "\n copying $PRGNAM git sources to build area ... \n"
 ## remove any old .git/worktrees records - only being used here as a build source
 rm -rf .git/worktrees/*
-git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/ r14.0.x
+## use FEAT as a command line option to checkout any other development branch ..
+## .. plus FEATa for admin, FEATc for cmake if required
+git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/ ${FEAT:-$DEV_BRANCH}
 
 ## work-around for some cr*p in admin in the r14.0.x branch of tdeio-locate
 ## it's a cmake build, so admin isn't needed
@@ -278,44 +279,29 @@ git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/ r14.0.x
 cd ../admin
 echo -e "\n copying admin git sources to build area ... \n"
 rm -rf .git/worktrees/*
-git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/admin/ r14.0.x
+git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/admin/ ${FEATa:-$DEV_BRANCH}
 }
 
 cd ../cmake
 echo -e "\n copying cmake git sources to build area ... \n"
 rm -rf .git/worktrees/*
-git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/cmake/ r14.0.x
+git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/cmake/ ${FEATc:-$DEV_BRANCH}
 
 [[ " arts tdelibs " == *$PRGNAM* ]] && {
 cd ../libltdl
 echo -e "\n copying libltdl git sources to build area ... \n"
 rm -rf .git/worktrees/*
-git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/libltdl/ r14.0.x
+git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/libltdl/ $DEV_BRANCH
 }
 
 [[ " tdenetwork " == *$PRGNAM* && $TDEVERSION != 14.0.x ]] && {
 cd ../libtdevnc/
 echo -e "\n copying libtdevnc git sources to build area ... \n"
 rm -rf .git/worktrees/*
-git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/libtdevnc/ r14.0.x
+git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/libtdevnc/ $DEV_BRANCH
 }
 echo # if this fails, SlackBuild will fail from [3]
 )
-}
-
-## .. or [2b] 14.1.0 ..
-[[ $TDEVERSION == 14.1.0 ]] && {
-## copy git repo but don't copy .git directory:
-echo -e "\n copying $PRGNAM git sources to build area ... \n"
-(cd $BUILD_TDE_ROOT/src/cgit
-cp -a --parents $PRGNAM/* $TMP_BUILD/tmp-$PRGNAM/
-cp -a --parents {admin,cmake}/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
-[[ " arts tdelibs " == *$PRGNAM* ]] && cp -a --parents libltdl/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
-[[ " tdenetwork " == *$PRGNAM* ]] && cp -a --parents libtdevnc/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/
-#
-echo # if this fails, SlackBuild will fail from [3]
-)
-}
 }
 #
 ## [3] finally, cd into source directory

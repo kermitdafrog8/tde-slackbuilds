@@ -418,7 +418,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Libs/libksquirrel" "A set of image codecs for KSquirrel" off "\Zb\Z6 Required for ksquirrel. Buildtime options include l/netpbm, t/transfig [fig2dev], Misc/xmedcon \Zn" \
 "Apps/abakus" "PC calculator" off "\Zb\Z6 optional dependency l/mpfr which requires l/gmp \Zn" \
 " Misc/mp4v2" "Create and modify mp4 files" off "\Zb\Z6 Buildtime option for Amarok  \Zn" \
-" Misc/moodbar" "GStreamer plugin for Amarok for moodbar feature" off "\Zb\Z6 Runtime option for Amarok \Zn" \
+" Misc/moodbar" "GStreamer plugin for Amarok for moodbar feature" off "\Zb\Z6 Requires gstreamer-1.x. Runtime option for Amarok \Zn" \
 " Misc/yauap" "A simple commandline audio player" off "\Zb\Z6 Provides an optional engine for Amarok \Zn" \
 "Apps/amarok" "A Music Player" off "\Zb\Z6 Optional dependencies - xine-lib, mp4v2, speex, moodbar, akode, yauap \Zn" \
 ${app_1:-} ${about_1:-} ${status_1:-} ${comment_1:-} \
@@ -472,8 +472,7 @@ ${app_5:-} ${about_5:-} ${status_5:-} ${comment_5:-} \
 "Apps/twin-style-crystal" "Twin theme" off "\Zb\Z6   \Zn" \
 ${app_6:-} ${about_6:-} ${status_6:-} ${comment_6:-} \
 "Apps/yakuake" "Quake-style terminal emulator" off "\Zb\Z6   \Zn" \
-" Misc/lxml" "Python bindings for libxml2 and libxslt" off "\Zb\Z6 Required to use Inkscape online help \Zn" \
-" Misc/inkscape" "SVG editor - an alternative to potracegui [and GraphicsMagick]." off "\Zb\Z6 Requires lxml if online help facility is required; potrace is a build-time dependency. \Zn" \
+" Misc/inkscape" "SVG editor - an alternative to potracegui [and GraphicsMagick]." off "\Zb\Z6 potrace is a build-time dependency. \Zn" \
 2> $TMPVARS/TDEbuilds
 # successful builds are removed from the TDEbuilds list as '$dir ' so add a space to the last entry
 # and the " needs to be removed because the Misc entries are double-quoted,

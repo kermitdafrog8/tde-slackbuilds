@@ -39,7 +39,7 @@ getsource_fn
 # ### double-conversion  - start
 {
 ## If it is already installed, go to end
-[[ -s /usr/local/lib$LIBDIRSUFFIX/libdouble-conversion.so ]] || {
+ldconfig -p|grep libdouble-conversion 1>/dev/null || {
 ## otherwise, if the source archive is in 'src' ..
 [[ -s $BUILD_TDE_ROOT/src/double-conversion-3.1.5.tar.gz ]] && {
 ## .. build, package, and install ..
