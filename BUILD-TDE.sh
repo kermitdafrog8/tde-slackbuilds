@@ -19,7 +19,7 @@ rm -f $TMPVARS/PRE_DOWNLOAD
 [[ -e $TMPVARS/TDEbuilds ]] || {
 dialog --cr-wrap --no-shadow --colors --title " Introduction " --msgbox \
 "
- Build selected TDE packages and non-TDE dependencies for Slackware 14.2/current.
+ Build selected TDE packages and non-TDE dependencies for Slackware.
 
  Source archives will be downloaded from a geoIP located mirror site and saved to the 'src' directory.
 
@@ -28,7 +28,7 @@ dialog --cr-wrap --no-shadow --colors --title " Introduction " --msgbox \
  US English is the default language and support for additional languages can be included in the packages.
 
  The final screen gives a summary of the build setup, with an option to cancel." \
-20 75
+19 75
 }
 
 
@@ -629,32 +629,97 @@ done
 rm -f $TMPVARS/Krita_OPTS
 dialog --cr-wrap --nocancel --no-shadow --colors --title " Building chalk in koffice " --item-help --checklist \
 "
-There are three options that can be set up for building the imaging app in koffice.
+There are three options that can be set up for building the imaging app.
 
-[1] It is called \Zb\Z3chalk\Zn in TDE but is known as \Zb\Z3krita\Zn most other places.
+[1] It is called \Zb\Z3chalk\Zn in TDE but was originally \Zb\Z3krita\Zn.
 
-[2] .pngs loaded into chalk/krita will crash if it is built with libpng-1.6, but will load if libpng-1.4 is used for the build.
-  If libpng is chosen here, it will be added to the build list and the package placed in $TMP - not installed. It will then be installed by koffice.SB if the libpng unversioned headers and libs are not linked to libpng14.
-  The koffice.SB will restore those links to libpng16 when the build has finished or failed.
+[2] .pngs saved from and loaded into chalk/krita will crash if it is built with libpng-1.6, but will load if libpng-1.4 is used.
+  Choosing \Zb\Z3libpng14\Zn here will unpack the libpng-1.4 archive for the headers to be used. The library is installed with Slackware's aaa_libraries.
+  Relevant files will be symlinked to the system libpng unversioned headers and libs if they are not linked to libpng14. Those symlinks will be reverted to libpng16 when the build has finished or failed.
+  This option will set libpng14 as the needed libpng for all koffice binaries in this build.
 
 [3] GraphicsMagick will enable an extended range of image formats to be loaded and saved. ImageMagick should be an alternative, but building fails with that, so without GM, the range of supported image formats will be limited.
-  If GM is chosen here, it will be added to the build list if not already selected or installed." \
-30 75 3 \
+  Choosing \Zb\Z3useGM\Zn here will add it to the build list if not already selected or installed.
+ " \
+34 75 3 \
 " krita" "Set the app name to krita" on "\Zb\Z6 otherwise will be \Zb\Z3chalk\Zn" \
 " libpng14" "Build with libpng-1.4" on "\Zb\Z6 otherwise will be \Zb\Z3libpng-1.6\Zn" \
 " useGM" "Use GraphicsMagick" on "\Zb\Z6  \Zn" \
 2> $TMPVARS/Krita_OPTS
+
 ## If GM has been selected and isn't in the build list or installed, add it to the build list before koffice
-GM_VERSION=$(grep VERSION:- $BUILD_TDE_ROOT/Misc/GraphicsMagick/GraphicsMagick.SlackBuild|cut -d- -f2|cut -d} -f1)
+GM_VERSION=$(grep VERSION= $BUILD_TDE_ROOT/Misc/GraphicsMagick/GraphicsMagick.SlackBuild|cut -d= -f2)
 [[ $(cat $TMPVARS/Krita_OPTS) == *useGM* ]] && \
 [[ $(cat $TMPVARS/TDEbuilds) != *GraphicsMagick* ]] && \
 [[ ! $(ls /var/log/packages/GraphicsMagick-$GM_VERSION*) ]] && \
 sed -i 's|Apps/koffice|Misc/GraphicsMagick &|' $TMPVARS/TDEbuilds
-## If libpng-1.4 has been selected and hasn't already been built, add it to the build list before koffice
-PNG_VERSION=$(grep VERSION:- $BUILD_TDE_ROOT/Misc/libpng/libpng.SlackBuild|cut -d- -f2|cut -d} -f1)
+## If libpng-1.4 has been selected, add it to the build list before koffice
 [[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && \
-[[ ! $(ls $LIBPNG_TMP/libpng-$PNG_VERSION-*-1.txz) ]] && \
 sed -i 's|Apps/koffice|Misc/libpng &|' $TMPVARS/TDEbuilds
+
+rm -f $TMPVARS/Koffice_OPTS
+[[ $(cat $TMPVARS/Krita_OPTS) == *krita* ]] && CHALK=krita
+## fully populate the DO_NOT_COMPILE list and remove applications selected to be built
+echo "autocorrect ${CHALK:-chalk} doc example filters karbon kchart kdgantt kexi kformula kivio koshell kounavail kplato kpresenter kross kspread kugar kword mimetypes pics plugins servicetypes templates tools" > $TMPVARS/DO_NOT_COMPILE
+#
+[[ $CHALK != krita ]] && {
+# Using non-breaking space - U00a0 - in strings
+app_c=" chalk"
+about_c="Image creation and editing"
+status_c=off
+comment_c="\Zb\Z6 Needs filters and servicetypes \Zn"
+} || {
+app_k=" krita"
+about_k="Image creation and editing"
+status_k=off
+comment_k="\Zb\Z6 Needs filters and servicetypes \Zn"
+}
+#
+ ### for the record, --separate-output generates output without quotes
+dialog --cr-wrap --nocancel --separate-output --no-shadow --colors --title " KOffice applications " --item-help --checklist \
+"
+Choose the applications to be built into koffice.
+Filters and servicetypes are required for most apps.
+ " \
+36 78 25 \
+" ALL" "Build all applications" off "\Zb\Z6 Overrides any off/on selections below \Zn" \
+" autocorrect" "Autocorrection for US English" off "\Zb\Z6  \Zn" \
+${app_c:-} ${about_c:-} ${status_c:-} ${comment_c:-} \
+" doc" "Application handbooks" off "\Zb\Z6  \Zn" \
+" example" "KOffice Example Application" off "\Zb\Z6  \Zn" \
+" filters" "Import/export filters" on "\Zb\Z6  \Zn" \
+" karbon" "A scalable graphics editor" off "\Zb\Z6 Needs filters and servicetypes \Zn" \
+" kchart" "Charts for visualizing numerical data" off "\Zb\Z6  \Zn" \
+" kexi" "Integrated data management" off "\Zb\Z6  \Zn" \
+" kformula" "A mathematical formula editor" off "\Zb\Z6 For use within other koffice applications \Zn" \
+" kivio" "Flowcharting" off "\Zb\Z6  \Zn" \
+" koshell" "KOffice Workspace" off "\Zb\Z6  \Zn" \
+" kounavail" "A placeholder for an empty part" off "\Zb\Z6  \Zn" \
+" kplato" "Project planning and management" off "\Zb\Z6 Required kdgantt will be included \Zn" \
+" kpresenter" "Presentation" off "\Zb\Z6  \Zn" \
+${app_k:-} ${about_k:-} ${status_k:-} ${comment_k:-} \
+" kross" "Scripting engine for ${CHALK:-chalk}, kexi, kspread" off "\Zb\Z6 Write scripts in Ruby or Python \Zn" \
+" kspread" "Spreadsheet" off "\Zb\Z6  \Zn" \
+" kugar" "Database report creation" off "\Zb\Z6  \Zn" \
+" kword" "Text editing, OASIS OpenDocument support" off "\Zb\Z6  \Zn" \
+" mimetypes" "OASIS OpenDocument .desktop files" off "\Zb\Z6  \Zn" \
+" pics" "Crystalsvg icons" off "\Zb\Z6  \Zn" \
+" plugins" "Scan for ${CHALK:-chalk}, kpresenter, and kword" off "\Zb\Z6  \Zn" \
+" servicetypes" "ServiceType .desktop files" on "\Zb\Z6  \Zn" \
+" templates" "Templates for the New menu in Konqueror" off "\Zb\Z6  \Zn" \
+" tools" "CLI document converter, tdeio_thumbnail module, etc" off "\Zb\Z6  \Zn" \
+2> $TMPVARS/Koffice_OPTS
+
+[[ $(grep -o ALL $TMPVARS/Koffice_OPTS) ]] && echo "" > $TMPVARS/DO_NOT_COMPILE || {
+## change nbsp to space if chalk/krita in build list
+sed -i "s| | |" $TMPVARS/Koffice_OPTS
+for app in $(cat $TMPVARS/Koffice_OPTS)
+do
+sed -i "s|$app||" $TMPVARS/DO_NOT_COMPILE
+done
+## kdgantt is a required build-time dependency for kplato
+[[ $(cat $TMPVARS/DO_NOT_COMPILE) != *kplato* ]] && sed -i 's|kdgantt||' $TMPVARS/DO_NOT_COMPILE
+}
 }
 
 ## only run this if kvkbd has been selected
@@ -733,12 +798,13 @@ Create and/or update the git repositories local copies.
    initially as selective updating is not supported
  * Local repositories will be created/updated as each package is built
    OR can be downloaded before the build -> see next screen
+ * For Misc archive downloads
 
 \Zr\Z4\ZbNo\Zn
  * The build will use sources already downloaded
  
 " \
-19 75
+20 75
 [[ $? == 0 ]] && echo yes > $TMPVARS/DL_CGIT
 [[ $? == 1 ]] && echo no > $TMPVARS/DL_CGIT
 }
@@ -1010,16 +1076,18 @@ do
   LOG="" && [[ $PRE_DOWNLOAD == yes ]] && LOG="source_download"
   script -c "sh $package.SlackBuild" $TMP/$TDE_PFX$package-$(eval echo $version)-${LOG:-"${ARCH_i18n:-$ARCH}-$build-build"}-log || ${EXIT_FAIL:-"true"}
 
+## if koffice was building with libpng14, and libpng was previously set to libpng16, restore the libpng16 installation
+[[ -e $TMPVARS/Restore-libpng16 ]] && source $BUILD_TDE_ROOT/get-source.sh && libpng16_fn && rm $TMPVARS/Restore-libpng16 || true
+
 # remove colorizing escape sequences from build-log
 # Re: http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
   sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$TDE_PFX$package-$(eval echo $version)-${LOG:-"${ARCH_i18n:-$ARCH}-$build-build"}-log || ${EXIT_FAIL:-"true"}
-
 
 ## skip build/packaging check and installation if only downloading sources
 [[ $PRE_DOWNLOAD == yes ]] || {
 ## tde-i18n package installation is handled in tde-i18n.SlackBuild because if more than one i18n package is being built, only the last one will be installed by upgradepkg here - test for last language in the I18N list to ensure they've all been built
 [[ $package == tde-i18n ]] && package=$package-$(cat $TMPVARS/LASTLANG)
-#
+
 ## Check that the package has been created,
 ## and if so, remove package name from TDEbuilds list
 [[ $(ls $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz) ]] && \
@@ -1029,13 +1097,11 @@ echo "
       Error:  $TDE_PFX$package package ${LOG:-build} failed
       Check the ${LOG:-build} log $TMP/$TDE_PFX$package-$(eval echo $version)-${LOG:-"${ARCH_i18n:-$ARCH}-$build-build"}-log
       "
-## if koffice was building with libpng14, restore the libpng16 headers for any following builds
-[[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && source $BUILD_TDE_ROOT/get-source.sh && libpng16_fn || true
 ## implement 'Action on failure'
 ${EXIT_FAIL:-":"}
 }
 ## install packages - any 'Cannot install /tmp/....txz: file not found' error message caused by build failure deliberately not suppressed.
-## create libpng-1.4 package only - it will be installed by the koffice.SB because it overrides libpng headers which for Sl14.2/current point to libpng16.
+## libpng-1.4 package is a dummy. The libpng SB has been retained in case any future Slackware version no longer provides the libpng14 library.
 [[ $INST == 1 ]] && [[ $package != tde-i18n* ]] && [[ $package != libpng ]] && upgradepkg --install-new --reinstall $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz
 }
 

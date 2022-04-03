@@ -30,14 +30,23 @@ TAG=${TAG:-_tde}
 
 ## ignore this if pre-downloading sources
 [[ $PRE_DOWNLOAD != yes ]] && {
-## build with libpng-1.4 - set in BUILD-TDE.sh - loading pngs in chalk/krita crashes with libpng16
+## loading pngs saved/exported in chalk/krita crashes with libpng-1.6, so build with libpng-1.4
 [[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && \
-[[ $(ls -l /usr/include/png.h) != *libpng14* ]] && \
-{ installpkg $LIBPNG_TMP/libpng-1.4.22-$ARCH-*.txz || \
-{ echo -e "\033[39;1m\n (re)install libpng-1.4 \n\033[0m" && \
-exit
+[[ $(ls -l /usr/include/png.h) != *libpng14* ]] && {
+## if libpng is linked to libpng16, set a marker to restore it after the build
+[[ $(ls -l /usr/lib64/libpng.so) == *libpng16* ]] && touch $TMPVARS/Restore-libpng16
+## use the libpng14 library which is installed with the aaa_libraries package
+ln -sf /usr/lib$LIBDIRSUFFIX/libpng14.so.14.22.0 /usr/lib$LIBDIRSUFFIX/libpng.so
+## use the headers from the libpng-1.4 archive
+ln -sf $TMP_BUILD/tmp-libpng/libpng-1.4.22/png.h /usr/include/png.h
+ln -sf $TMP_BUILD/tmp-libpng/libpng-1.4.22/pngconf.h /usr/include/pngconf.h
+## create libpng14.so if it doesn't exist
+[[ ! -e /usr/lib$LIBDIRSUFFIX/libpng14.so ]] && {
+ln -s /usr/lib$LIBDIRSUFFIX/libpng14.so.14.22.0 /usr/lib$LIBDIRSUFFIX/libpng14.so
+## and set a marker to test after the build whether libpng14.so was created here
+touch $TMPVARS/LPNG14so
 }
-} || true
+} || true # exit 0 if libpng 1.4 is already installed as the system libpng
 }
 
 source ../../get-source.sh
@@ -60,28 +69,24 @@ sed -i "s|Exec=.*$|Exec=$INSTALL_TDE/bin/chalk %U|" chalk/chalk.desktop
 sed -i 's|(Magick-config|(Wand-config|' configure.in.in
 
 ## revert name 'chalk' to 'krita' - option set in BUILD-TDE.sh
-[[ $(cat $TMPVARS/Krita_OPTS) == *krita* ]] && APP=krita && \
-(echo -e "\n Reverting chalk to krita .. \n"
+## but only if selected to be built at this time
+[[ $(cat $TMPVARS/Krita_OPTS) == *krita* && $(cat $TMPVARS/DO_NOT_COMPILE) != *krita* ]] && {
+echo -e "\n Reverting chalk to krita .. \n"
 ## Rename directories and files:
-mv chalk krita
-for file in $(find . -name "*chalk*")
-do
-rename chalk krita $file 2>/dev/null || true # errors will be corrected next loop
-done
-## repeat for instances of 'chalk' appearing twice:
-for file in $(find . -name "*chalk*")
-do
-rename chalk krita $file
-done
+find . -name "*chalk*" |sort -r|xargs rename chalk krita
 mv "krita/doc/Developing Chalk Plugins.odt" "krita/doc/Developing Krita Plugins.odt"
 ## Rename contents:
-find . -type f -exec sed -i -e 's/chalk/krita/g' {} \;
-find . -type f -exec sed -i -e 's/CHALK/KRITA/g' {} \;
-find . -type f -exec sed -i -e 's/Chalk/Krita/g' {} \;
-sed -i 's|Swedish for krita|Swedish for chalk|' krita/README)
+find . -type f -exec sed -i -e 's/chalk/krita/g;s/CHALK/KRITA/g;s/Chalk/Krita/g' {} \;
+sed -i 's|Swedish for krita|Swedish for chalk|' krita/README
+} || sed -i 's|krita|chalk|' $TMPVARS/DO_NOT_COMPILE # otherwise chalk won't be in the DO_NOT_COMPILE list and chalk libraries will be built
 
 ## Don't need translation files unless additional language == Polish
 [[ I18N != *pl* ]] && sed -i '/pl/d' kexi/tools/{add,delete}_column/Makefile.am
+
+## This isn't actually needed, but it's reassuring to see from the configure output that the filter is being built ..
+sed -i 's|KFORMULA$COMPILE_FILTER_KUGAR|&$COMPILE_FILTER_KRITA$COMPILE_FILTER_KIVIO$COMPILE_FILTER_KEXI|' filters/configure.in.mid
+
+[[ $(cat $TMPVARS/DO_NOT_COMPILE) == *kross* ]] && SCRIPTING=--disable-scripting
 
 listdocs_fn
 
@@ -91,6 +96,7 @@ chown_fn
 
 cd_builddir_fn
 
+DO_NOT_COMPILE=$(cat $TMPVARS/DO_NOT_COMPILE) \
 CFLAGS="$SLKRCFLAGS" \
 CXXFLAGS="$SLKRCFLAGS" \
 CC=$COMPILER \
@@ -98,6 +104,7 @@ CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
    --disable-rpath \
+   ${SCRIPTING:-} \
    --enable-closure
 
 make_fn
@@ -123,7 +130,7 @@ $PRGNAM: common basis, which assures that all office applications can work
 $PRGNAM: together.
 $PRGNAM:
 $PRGNAM: You can, for instance, insert a spreadsheet in a thesis without
-$PRGNAM: leaving the document. Editing the [spreadsheet] happens _inside_
+$PRGNAM: leaving the document. Editing [the spreadsheet] happens _inside_
 $PRGNAM: the thesis.
 $PRGNAM:
 $PRGNAM:
@@ -134,7 +141,7 @@ $PRGNAM:
 makepkg_fn
 
 ## restore libpng16 links
-[[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && libpng16_fn || true
+[[ -e $TMPVARS/Restore-libpng16 ]] && libpng16_fn && rm $TMPVARS/Restore-libpng16 || true
 
 ## restore libtqt-mt.la
 [[ $INSTALL_TDE == /usr ]] && \

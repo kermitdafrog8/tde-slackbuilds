@@ -26,23 +26,23 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=graphviz
-VERSION=2.46.1
+VERSION=2.50.0
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
 ARCHIVE_TYPE="tar.xz"
-SRCURL="https://ftp.osuosl.org/pub/blfs/conglomeration/graphviz/graphviz-$VERSION.$ARCHIVE_TYPE"
+SRCURL="https://gitlab.com/api/v4/projects/4207231/packages/generic/$PRGNAM-releases/$VERSION/$PRGNAM-$VERSION.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
 getsource_fn
 
 untar_fn
 
-# Fix for php-5.4 and patches from Arch (thanks!)
-patch -N -p0 << EOF || true
+# ghostscript918.patch from Arch (thanks!)
+patch -p0 << EOF
 --- plugin/gs/gvloadimage_gs.c
 +++ plugin/gs/gvloadimage_gs.c
-@@ -76,11 +76,11 @@
+@@ -74,11 +74,11 @@
  
      assert (err < 0);
  
@@ -57,17 +57,33 @@ patch -N -p0 << EOF || true
  	errsrc = "DPS error";
      else
  	errsrc = "Ghostscript internal error";
+EOF
+# Fix for php-5.4
+patch -p0 << EOF
 --- tclpkg/gv/gv_php_init.c
 +++ tclpkg/gv/gv_php_init.c
-@@ -26,2 +26,3 @@
- {
+@@ -27,2 +27,3 @@
 +    TSRMLS_FETCH();
      return PHPWRITE(s, len);
-@@ -31,2 +32,3 @@
- {
+ }
+@@ -33,2 +34,3 @@
 +    TSRMLS_FETCH();
      return PHPWRITE(s, len);
+ }
 EOF
+
+## The primary purpose of this build is for 'dot' for kscope, tdeedu, ...
+## To include the pdf and html documentation, build with 'GVZ_DOCS=1 ./BUILD-TDE.sh'
+[[ ! ${GVZ_DOCS:-} ]] && {
+patch -p0 << EOF
+--- Makefile.in
++++ Makefile.in
+@@ -623 +623 @@
+-SUBDIRS = \$(subdirs) lib plugin cmd tclpkg doc contrib share graphs rtest tests
++SUBDIRS = \$(subdirs) lib plugin cmd tclpkg contrib share graphs rtest tests
+EOF
+sed -i '/tcldot.html/d' tclpkg/tcldot/Makefile.in
+}
 
 listdocs_fn
 
@@ -86,10 +102,6 @@ CXX=$COMPILER_CXX \
   --enable-ocaml=no
 
 make_fn
-
-## The primary purpose of this build is for 'dot' for kscope, tdeedu, ...
-## To include the pdf and html documentation, comment out this line:
-rm -rf $PKG/usr/share/$PRGNAM/doc
 
 # Install config file for PHP.
 mkdir -p $PKG/etc/php.d
@@ -157,7 +169,7 @@ $PRGNAM: It has several main graph layout programs.  It also has
 $PRGNAM: web and interactive graphical interfaces, and auxiliary
 $PRGNAM: tools, libraries, and language bindings.
 $PRGNAM:
-$PRGNAM: Homepage: http://graphviz.org/
+$PRGNAM: Homepage: graphviz.org
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

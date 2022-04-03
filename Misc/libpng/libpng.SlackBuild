@@ -33,6 +33,13 @@ getsource_fn
 
 untar_fn
 
+## exit the build here as only the headers are required for the koffice [chalk/krita] build
+## but retain this script in case libpng14 is dropped from aaa_libraries in future
+## and libpng14.so.14.22.0 needs to be built.
+## Set a dummy package to remain compatible with the build system
+touch $LIBPNG_TMP/libpng-1.4.22-x86_64-${BUILD:-1}.txz
+exit
+
 listdocs_fn
 
 chown_fn

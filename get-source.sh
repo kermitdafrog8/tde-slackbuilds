@@ -395,7 +395,6 @@ cat $PKG/install/slack-desc | grep "^$PRGNAM" | grep -v handy > $OUTPUT/$PRGNAM-
 umask ${_UMASK_}
 }
 
-
 ## paths in doinst.sh should be relative to allow for installation to ROOT != "/"
 doinst_sh_fn ()
 {
@@ -413,14 +412,15 @@ echo "
 
 libpng16_fn ()
 {
-(cd /usr/bin
-ln -sf libpng16-config libpng-config )
+## restore libpng16 links
 (cd /usr/include
 ln -sf libpng16/pngconf.h pngconf.h
 ln -sf libpng16/png.h png.h )
-(cd /usr/lib$LIBDIRSUFFIX/pkgconfig
-ln -sf libpng16.pc libpng.pc )
 (cd /usr/lib$LIBDIRSUFFIX
-ln -sf libpng16.so libpng.so
-ln -sf libpng16.la libpng.la )
+ln -sf libpng16.so libpng.so )
+## if libpng14.so has been created for this build, remove it
+[[ -e $TMPVARS/LPNG14so ]] && {
+rm /usr/lib$LIBDIRSUFFIX/libpng14.so
+rm $TMPVARS/LPNG14so
+}
 }

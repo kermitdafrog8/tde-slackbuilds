@@ -42,6 +42,20 @@ for dir in $langdir
 do
 cd $dir
 
+## revert name 'chalk' to 'krita' if that has been done for koffice
+[[ $(ls $INSTALL_TDE/lib64/*.so) == *krita* ]] && {
+echo -e "\n Reverting chalk to krita for $dir .. \n"
+## Rename files and contents:
+mv ../template/messages/koffice/chalk.pot ../template/messages/koffice/krita.pot || true
+mv messages/koffice/chalk.po messages/koffice/krita.po
+mv docs/koffice/chalk docs/koffice/krita || true
+mv docs/koffice/krita/toolbar-chalk.png docs/koffice/krita/toolbar-krita.png || true
+sed -i -e 's/chalk/krita/g;s/Chalk/Krita/g' ../template/messages/koffice/{kofficefilters,krita}.pot
+sed -i -e 's/chalk/krita/g;s/Chalk/Krita/g' messages/koffice/{kofficefilters,krita,desktop_koffice}.po
+sed -i -e 's/chalk/krita/g;s/Chalk/Krita/g' configure.in
+find docs/koffice -type f -exec sed -i -e 's/chalk/krita/g;s/Chalk/Krita/g' {} \; || true
+}
+
 ltoolupdate_fn
 
 chown_fn

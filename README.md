@@ -3,8 +3,8 @@
 
 ---
 ***Build TDE [Trinity Desktop Environment]***  
-.. for Slackware 14.2 or current on i586+ and x86_64.  
-.. see 'Cross compiling for RPi3' for building for armv7/aarch64.
+.. for Slackware [x86_64/i586+/arm], and [Slarm64](http://slarm64.org/download.html) [aarch64].  
+See 'Cross compiling for RPi3' for building for arm_hf and aarch64.
 
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input,  
 which will build the release version 14.0.11, or the development versions 14.0.x, 14.1.0.
@@ -30,6 +30,8 @@ If you're curious about what this might involve, [take a look at a sample build 
 URLs for this and other locations are @ https://www.trinitydesktop.org/mirrorstatus.php
 * BUILD= - sets the package build identifier, overriding the SlackBuild default of 1
 * GCC_VIS=0 - override setting gcc visibility if it has been set ON in tdelibs
+* FEAT= - for development builds - see get-source.sh
+* GVZ_DOCS=1 - see graphviz.SlackBuild
 
 ---
 
@@ -48,7 +50,7 @@ src - to hold all the sources, either pre-downloaded
 ```
 Other scripts:  
 ```
-get-source.sh - a chunk of common code for the SlackBuilds
+get-source.sh - common code for the SlackBuilds
               - used for getting the sources, setting FLAGS,
                 creating build directories, ...
 ```
@@ -106,7 +108,7 @@ cd tde-slackbuilds
 git checkout gh-pages
 ```
 
-which can be viewed [online](https://ray-v.github.io/tde-slackbuilds/cross-compiling-TDE-for-the-RPi3.html).
+which can be [viewed online](https://ray-v.github.io/tde-slackbuilds/cross-compiling-TDE-for-the-RPi3.html).
 
 Includes:
 * Setting parameters for a 32-bit [armv7 hard float], or 64-bit [aarch64], build,  
