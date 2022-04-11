@@ -410,17 +410,3 @@ echo "
 " >> $PKG/install/doinst.sh
 }
 
-libpng16_fn ()
-{
-## restore libpng16 links
-(cd /usr/include
-ln -sf libpng16/pngconf.h pngconf.h
-ln -sf libpng16/png.h png.h )
-(cd /usr/lib$LIBDIRSUFFIX
-ln -sf libpng16.so libpng.so )
-## if libpng14.so has been created for this build, remove it
-[[ -e $TMPVARS/LPNG14so ]] && {
-rm /usr/lib$LIBDIRSUFFIX/libpng14.so
-rm $TMPVARS/LPNG14so
-}
-}

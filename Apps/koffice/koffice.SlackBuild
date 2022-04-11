@@ -28,31 +28,25 @@ VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
 
-## ignore this if pre-downloading sources
-[[ $PRE_DOWNLOAD != yes ]] && {
-## loading pngs saved/exported in chalk/krita crashes with libpng-1.6, so build with libpng-1.4
-[[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && \
-[[ $(ls -l /usr/include/png.h) != *libpng14* ]] && {
-## if libpng is linked to libpng16, set a marker to restore it after the build
-[[ $(ls -l /usr/lib64/libpng.so) == *libpng16* ]] && touch $TMPVARS/Restore-libpng16
-## use the libpng14 library which is installed with the aaa_libraries package
-ln -sf /usr/lib$LIBDIRSUFFIX/libpng14.so.14.22.0 /usr/lib$LIBDIRSUFFIX/libpng.so
-## use the headers from the libpng-1.4 archive
-ln -sf $TMP_BUILD/tmp-libpng/libpng-1.4.22/png.h /usr/include/png.h
-ln -sf $TMP_BUILD/tmp-libpng/libpng-1.4.22/pngconf.h /usr/include/pngconf.h
-## create libpng14.so if it doesn't exist
-[[ ! -e /usr/lib$LIBDIRSUFFIX/libpng14.so ]] && {
-ln -s /usr/lib$LIBDIRSUFFIX/libpng14.so.14.22.0 /usr/lib$LIBDIRSUFFIX/libpng14.so
-## and set a marker to test after the build whether libpng14.so was created here
-touch $TMPVARS/LPNG14so
-}
-} || true # exit 0 if libpng 1.4 is already installed as the system libpng
-}
-
 source ../../get-source.sh
 getsource_fn
 
 untar_fn
+
+## Workaround to prevent chalk/krita crashing when loading PNGs it has saved
+## Awaiting fix for koffice issue 20
+patch -p0 << EOF
+--- filters/chalk/png/kis_png_converter.cpp
++++ filters/chalk/png/kis_png_converter.cpp
+@@ -202,4 +202,7 @@
+     // read all PNG info up to image data
+     png_read_info(png_ptr, info_ptr);
++#if PNG_LIBPNG_VER >= 10600
++    png_set_invalid(png_ptr, info_ptr, PNG_INFO_iCCP);
++#endif
+ 
+     // Read information about the png
+EOF
 
 ## fix chalk crashing -
 ## - set liblcms as a direct dependency - see issue 37 for details
@@ -139,9 +133,6 @@ $PRGNAM:
 " > $PKG/install/slack-desc
 
 makepkg_fn
-
-## restore libpng16 links
-[[ -e $TMPVARS/Restore-libpng16 ]] && libpng16_fn && rm $TMPVARS/Restore-libpng16 || true
 
 ## restore libtqt-mt.la
 [[ $INSTALL_TDE == /usr ]] && \

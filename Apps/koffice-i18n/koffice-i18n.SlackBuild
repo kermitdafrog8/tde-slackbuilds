@@ -43,7 +43,7 @@ do
 cd $dir
 
 ## revert name 'chalk' to 'krita' if that has been done for koffice
-[[ $(ls $INSTALL_TDE/lib64/*.so) == *krita* ]] && {
+[[ $(ls $INSTALL_TDE/bin/krita) ]] && {
 echo -e "\n Reverting chalk to krita for $dir .. \n"
 ## Rename files and contents:
 mv ../template/messages/koffice/chalk.pot ../template/messages/koffice/krita.pot || true

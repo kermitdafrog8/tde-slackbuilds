@@ -79,7 +79,6 @@ build_core()
 
 # These need to be set here:
 TMP=${TMP:-/tmp}
-export LIBPNG_TMP=$TMP
 export BUILD_TDE_ROOT=$(pwd)
 
 # Place to build (TMP_BUILD), package (PKG), and output (OUTPUT) the program:
@@ -445,7 +444,7 @@ ${app_2:-} ${about_2:-} ${status_2:-} ${comment_2:-} \
 "Apps/knights" "A graphical chess interface" off "\Zb\Z6   \Zn" \
 "Apps/knmap" "A graphical nmap interface" off "\Zb\Z6 Might need tdesudo \Zn" \
 " Misc/GraphicsMagick" "Swiss army knife of image processing" off "\Zb\Z6 Buildtime option for chalk[krita] in koffice \Zn" \
-"Apps/koffice" "Office Suite" off "\Zb\Z6 Optional build-time dependencies - GraphicsMagick, libpng14  \Zn" \
+"Apps/koffice" "Office Suite" off "\Zb\Z6 Optional build-time dependency - GraphicsMagick \Zn" \
 "Apps/koffice-i18n" "Internationalization files for koffice" off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for koffice \Zn" \
 ${app_3:-} ${about_3:-} ${status_3:-} ${comment_3:-} \
 ${app_4:-} ${about_4:-} ${status_4:-} ${comment_4:-} \
@@ -505,7 +504,7 @@ Do you want to read them?
 10 75
 [[ $? == 0 ]] && dialog --no-collapse --cr-wrap --no-shadow --colors --ok-label "Close" --msgbox \
 "
-$(cat $TMPVARS/READMEs)" \
+$(cat $TMPVARS/READMEs|sed "s|<TDE-installation-directory>|$(cat $TMPVARS/INSTALL_TDE)|")" \
 30 75
 }
 
@@ -629,21 +628,15 @@ done
 rm -f $TMPVARS/Krita_OPTS
 dialog --cr-wrap --nocancel --no-shadow --colors --title " Building chalk in koffice " --item-help --checklist \
 "
-There are three options that can be set up for building the imaging app.
+There are two options that can be set for building the imaging app.
 
 [1] It is called \Zb\Z3chalk\Zn in TDE but was originally \Zb\Z3krita\Zn.
 
-[2] .pngs saved from and loaded into chalk/krita will crash if it is built with libpng-1.6, but will load if libpng-1.4 is used.
-  Choosing \Zb\Z3libpng14\Zn here will unpack the libpng-1.4 archive for the headers to be used. The library is installed with Slackware's aaa_libraries.
-  Relevant files will be symlinked to the system libpng unversioned headers and libs if they are not linked to libpng14. Those symlinks will be reverted to libpng16 when the build has finished or failed.
-  This option will set libpng14 as the needed libpng for all koffice binaries in this build.
-
-[3] GraphicsMagick will enable an extended range of image formats to be loaded and saved. ImageMagick should be an alternative, but building fails with that, so without GM, the range of supported image formats will be limited.
+[2] GraphicsMagick will enable an extended range of image formats to be loaded and saved. ImageMagick should be an alternative, but building fails with that, so without GM, the range of supported image formats will be limited.
   Choosing \Zb\Z3useGM\Zn here will add it to the build list if not already selected or installed.
  " \
-34 75 3 \
+21 75 2 \
 " krita" "Set the app name to krita" on "\Zb\Z6 otherwise will be \Zb\Z3chalk\Zn" \
-" libpng14" "Build with libpng-1.4" on "\Zb\Z6 otherwise will be \Zb\Z3libpng-1.6\Zn" \
 " useGM" "Use GraphicsMagick" on "\Zb\Z6  \Zn" \
 2> $TMPVARS/Krita_OPTS
 
@@ -653,9 +646,6 @@ GM_VERSION=$(grep VERSION= $BUILD_TDE_ROOT/Misc/GraphicsMagick/GraphicsMagick.Sl
 [[ $(cat $TMPVARS/TDEbuilds) != *GraphicsMagick* ]] && \
 [[ ! $(ls /var/log/packages/GraphicsMagick-$GM_VERSION*) ]] && \
 sed -i 's|Apps/koffice|Misc/GraphicsMagick &|' $TMPVARS/TDEbuilds
-## If libpng-1.4 has been selected, add it to the build list before koffice
-[[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && \
-sed -i 's|Apps/koffice|Misc/libpng &|' $TMPVARS/TDEbuilds
 
 rm -f $TMPVARS/Koffice_OPTS
 [[ $(cat $TMPVARS/Krita_OPTS) == *krita* ]] && CHALK=krita
@@ -875,9 +865,10 @@ Confirm or change these build options ..
 
 [2] \Z3\Zbno_warn\Zn - don't display any compiler warning messages
 
-[3] \Z3\Zbninja\Zn - use ninja for cmake builds
+[3] \Z3\Zbninja\Zn - use ninja for cmake builds [ignored for automake builds]
 
-[4] \Z3\Zbverbose\Zn - show -> command lines during cmake builds; 'make' debugging information; and standard error output. Using this is only recommended if fault finding.
+[4] \Z3\Zbverbose\Zn - show -> command lines during cmake builds; 'make' debugging information; and standard error output.
+Using this is only recommended if fault finding.
  
 " \
 25 75 4 \
@@ -946,13 +937,11 @@ export PLUGIN_INSTALL_DIR=$(cat $TMPVARS/SYS_CNF_DIR | cut -d/ -f3)
 ## koffice - only if it is being built
 [[ $(grep -o "Apps/koffice " $TMPVARS/TDEbuilds) ]] && {
 [[ $(cat $TMPVARS/Krita_OPTS) == *krita* ]] && RVT=yes || RVT=no
-[[ $(cat $TMPVARS/Krita_OPTS) == *libpng14* ]] && USE_PNG=yes || USE_PNG=no
 [[ $(cat $TMPVARS/Krita_OPTS) == *useGM* ]] && USE_GM=yes || USE_GM=no
 } && \
 KOFFICE="
 koffice:
  revert chalk to krita                  \Zb\Z6$RVT\Zn
- build with libpng14                    \Zb\Z6$USE_PNG\Zn
  build with GraphicsMagick              \Zb\Z6$USE_GM\Zn"
 #
 ## tqt3 options, if tqt3 is being built
@@ -1076,9 +1065,6 @@ do
   LOG="" && [[ $PRE_DOWNLOAD == yes ]] && LOG="source_download"
   script -c "sh $package.SlackBuild" $TMP/$TDE_PFX$package-$(eval echo $version)-${LOG:-"${ARCH_i18n:-$ARCH}-$build-build"}-log || ${EXIT_FAIL:-"true"}
 
-## if koffice was building with libpng14, and libpng was previously set to libpng16, restore the libpng16 installation
-[[ -e $TMPVARS/Restore-libpng16 ]] && source $BUILD_TDE_ROOT/get-source.sh && libpng16_fn && rm $TMPVARS/Restore-libpng16 || true
-
 # remove colorizing escape sequences from build-log
 # Re: http://serverfault.com/questions/71285/in-centos-4-4-how-can-i-strip-escape-sequences-from-a-text-file
   sed -ri "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $TMP/$TDE_PFX$package-$(eval echo $version)-${LOG:-"${ARCH_i18n:-$ARCH}-$build-build"}-log || ${EXIT_FAIL:-"true"}
@@ -1101,8 +1087,7 @@ echo "
 ${EXIT_FAIL:-":"}
 }
 ## install packages - any 'Cannot install /tmp/....txz: file not found' error message caused by build failure deliberately not suppressed.
-## libpng-1.4 package is a dummy. The libpng SB has been retained in case any future Slackware version no longer provides the libpng14 library.
-[[ $INST == 1 ]] && [[ $package != tde-i18n* ]] && [[ $package != libpng ]] && upgradepkg --install-new --reinstall $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz
+[[ $INST == 1 ]] && [[ $package != tde-i18n* ]] && upgradepkg --install-new --reinstall $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz
 }
 
   # back to original directory
