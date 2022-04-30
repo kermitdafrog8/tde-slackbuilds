@@ -48,6 +48,124 @@ rm -rf *ocaml*
 tar xf $BUILD_TDE_ROOT/src/4.05.0.tar.gz
 cd ocaml-4.05.0/
 
+## patch for error caused by glibc-2.34:
+## signals_asm.c:197:13: error: variably modified ‘sig_alt_stack’ at file scope
+##  197 | static char sig_alt_stack[SIGSTKSZ];
+##      |             ^~~~~~~~~~~~~
+## Refs: https://github.com/ocaml/ocaml/{issues/10250,pull/10266}
+##       https://github.com/dra27/ocaml/[pull/56]
+##         └ 0d2c1fd77b4715c70d0ffc4348f1bc2d3eaacbf7 refs/remotes/origin/alt-signal-stack-4.05
+##           └ commit 50c2d1275e537906ea144bd557fde31e0bf16e5f
+patch -p0 << EOF
+--- asmrun/fail.c
++++ asmrun/fail.c
+@@ -33,0 +34,2 @@
++extern void caml_terminate_signals(void);
++
+@@ -63 +65,4 @@
+-  if (caml_exception_pointer == NULL) caml_fatal_uncaught_exception(v);
++  if (caml_exception_pointer == NULL) {
++    caml_terminate_signals();
++    caml_fatal_uncaught_exception(v);
++  }
+--- asmrun/signals_asm.c
++++ asmrun/signals_asm.c
+@@ -197 +196,0 @@
+-static char sig_alt_stack[SIGSTKSZ];
+@@ -298,8 +297,18 @@
+-    stk.ss_sp = sig_alt_stack;
+-    stk.ss_size = SIGSTKSZ;
+-    stk.ss_flags = 0;
+-    SET_SIGACT(act, segv_handler);
+-    act.sa_flags |= SA_ONSTACK | SA_NODEFER;
+-    sigemptyset(&act.sa_mask);
+-    system_stack_top = (char *) &act;
+-    if (sigaltstack(&stk, NULL) == 0) { sigaction(SIGSEGV, &act, NULL); }
++    /* Allocate and select an alternate stack for handling signals,
++       especially SIGSEGV signals.
++       The alternate stack used to be statically-allocated for the main thread,
++       but this is incompatible with Glibc 2.34 and newer, where SIGSTKSZ
++       may not be a compile-time constant. */
++    stk.ss_sp = malloc(SIGSTKSZ);
++    if (stk.ss_sp != NULL) {
++      stk.ss_size = SIGSTKSZ;
++      stk.ss_flags = 0;
++      SET_SIGACT(act, segv_handler);
++      act.sa_flags |= SA_ONSTACK | SA_NODEFER;
++      sigemptyset(&act.sa_mask);
++      system_stack_top = (char *) &act;
++      if (sigaltstack(&stk, NULL) == 0)
++        sigaction(SIGSEGV, &act, NULL);
++      else
++        free(stk.ss_sp);
++    }
+@@ -309,0 +319,42 @@
++#endif
++}
++
++/* Termination of signal stuff */
++
++#if defined(TARGET_power) || defined(TARGET_s390x) \\
++    || defined(TARGET_sparc) && defined(SYS_solaris) \\
++    || defined(HAS_STACK_OVERFLOW_DETECTION)
++static void set_signal_default(int signum)
++{
++  struct sigaction act;
++  sigemptyset(&act.sa_mask);
++  act.sa_handler = SIG_DFL;
++  act.sa_flags = 0;
++  sigaction(signum, &act, NULL);
++}
++#endif
++
++void caml_terminate_signals(void)
++{
++#if defined(TARGET_sparc) && defined(SYS_solaris)
++  set_signal_default(SIGILL);
++#endif
++
++#if defined(TARGET_power)
++  set_signal_default(SIGTRAP);
++#endif
++
++#if defined(TARGET_s390x)
++  set_signal_default(SIGFPE);
++#endif
++
++#ifdef HAS_STACK_OVERFLOW_DETECTION
++  set_signal_default(SIGSEGV);
++  stack_t oldstk, stk;
++  stk.ss_flags = SS_DISABLE;
++  if (sigaltstack(&stk, &oldstk) == 0) {
++    /* If caml_init_signals failed, we are not using an alternate signal stack.
++       SS_DISABLE will be set in oldstk, and there is nothing to free in this
++       case. */
++    if (! (oldstk.ss_flags & SS_DISABLE)) free(oldstk.ss_sp);
++  }
+--- asmrun/startup.c
++++ asmrun/startup.c
+@@ -94,0 +95 @@
++extern void caml_terminate_signals(void);
+@@ -105,0 +107 @@
++  value res;
+@@ -140,0 +143 @@
++    caml_terminate_signals();
+@@ -144 +147,3 @@
+-  return caml_start_program();
++  res = caml_start_program();
++  caml_terminate_signals();
++  return res;
+--- byterun/sys.c
++++ byterun/sys.c
+@@ -113,0 +114,2 @@
++extern void caml_terminate_signals(void);
++
+@@ -146,0 +149,3 @@
++#ifdef NATIVE_CODE
++  caml_terminate_signals();
++#endif
+EOF
+
 ## force "gcc -fcommon" for gcc10 build - see https://github.com/ocaml/ocaml/issues/9622
 ./configure -cc "gcc -fcommon" -libdir /usr/local/lib$LIBDIRSUFFIX/ocaml
 ## finish build with -j1 if there are race condition errors
@@ -75,7 +193,7 @@ cd $TMP_BUILD/package-facile
 makepkg -l y -c n $OUTPUT/facile-1.1.3-$ARCH-$BUILD.txz
 installpkg $OUTPUT/facile-1.1.3-$ARCH-$BUILD.txz
 )
-echo -e "\n returning to building tdeedu \n"
+echo -e "\n now building tdeedu \n"
 ocaml_installed_fn || { echo -e " installation of ocaml/facile failed \n" ; exit 1 ; }
 }
 } && \

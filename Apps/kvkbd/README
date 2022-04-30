@@ -1,13 +1,13 @@
-The many enhancements include setting key and/or background colours, and displaying level 3 & 4 characters where the xkb/symbols definitions include using the AltGr [ralt] key.
+The many enhancements include setting key and/or background colours, and displaying level 3 & 4 characters where the xkb/symbols definitions include using the AltGr key [include "level3(ralt_switch)"].
 
 Build-time options to be hard-coded into the app are:
 
-[1] Use Win keys
-    a] as modifier keys
+[1] Use each Win key
+    a] as a modifier key
        The default use for the \Zb\Z6LWin\Zn and \Zb\Z6RWin\Zn keys on the \Zb\Z6Kvkbd\Zn keyboard is set as modifier keys to map a number of characters or functions and to 'lock' for the next key click - this is to simulate holding down the key on a physical keyboard.
 
- or b] for characters set with xmodmap.
-       Alternatively, using xmodmap they can map to characters set by a user - this will generate a keycode on a single click.
+ or b] for a character set with xmodmap
+       Alternatively, using xmodmap, each key can map to a character set by a user - this will generate a keycode on a single click.
 
 [2] Alternative text on the num pad keys.
 
@@ -15,10 +15,10 @@ For example:
 |Ho|
 |me| can be replaced with |H←|, which is a better fit on the keys.
 
-[3] Small icons can be shown on the buttons if the keyboard is to be used at the default size.
+[3] Small icons are a better fit on the buttons if the keyboard is to be used at the default size.
 
 [4] Show blank keys where AltGr doesn't produce a character.
 
-3rd and 4th level character sets on a keyboard generally don't cover all keys.
-Select this option to see only those characters which AltGr generates.
+Usually, not all keys have 3rd and 4th level characters assigned.
+Select this option to see only those characters which AltGr or AltGr+Shift generate.
  

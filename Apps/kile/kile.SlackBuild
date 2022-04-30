@@ -37,38 +37,14 @@ untar_fn
 # but only for languages available with this package
 langs=""
 ldocs=""
-[[ $TDEVERSION == 14.0.11 ]] && {
-for Lang in $I18N;do [[ -d translations/$Lang ]] && langs="$langs $Lang" && \
-[[ -d translations/$Lang/doc ]] && ldocs="$ldocs $Lang";done
-sed -i "s|SUBDIRS=.*$|SUBDIRS=$langs|" translations/Makefile.am
-} || {
 for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
-}
 
 listdocs_fn
-
-[[ $TDEVERSION == 14.0.11 ]] && ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
-
-[[ $TDEVERSION == 14.0.11 ]] && {
-
-[[ $GCC_VIS == ON ]] && EN_GCC_VIS="--enable-gcc-hidden-visibility"
-
-CFLAGS="$SLKRCFLAGS" \
-CXXFLAGS="$SLKRCFLAGS" \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   ${EN_GCC_VIS:-} \
-   --disable-rpath \
-   --enable-closure
-
-} || {
 
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -82,8 +58,6 @@ cmake ${G_NINJA:-} \
     -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
     ..
-
-}
 
 make_fn
 

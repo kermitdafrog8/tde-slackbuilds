@@ -43,7 +43,7 @@ chown_fn
 
 cd_builddir_fn
 
-[[ -s /usr/lib$LIBDIRSUFFIX/pkgconfig/xdamage.pc && -s /usr/lib$LIBDIRSUFFIX/pkgconfig/xcomposite.pc ]] && XCOMP="ON"
+pkg-config xdamage && pkg-config xcomposite && XCOMP="ON"
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \

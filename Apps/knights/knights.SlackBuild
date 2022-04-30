@@ -47,6 +47,8 @@ chown_fn
 
 cd_builddir_fn
 
+## BUILD_EXTRA_THEME is a 14.1.0 option and will be ignored for 14.0.n builds
+## See the slack-desc for a URL for additional themes
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
@@ -85,7 +87,7 @@ echo "
 $PRGNAM: A graphical chess interface for the Trinity Desktop Environment
 $PRGNAM:
 $PRGNAM: Download themepack [additional boards and chessman themes] from:
-$PRGNAM:         http://sourceforge.net/project/showfiles.php?group_id=31461
+$PRGNAM:         https://sourceforge.net/project/showfiles.php?group_id=31461
 $PRGNAM:
 $PRGNAM: Needs separate chess engines, for example gnuchess, stockfish, komodo.
 $PRGNAM:

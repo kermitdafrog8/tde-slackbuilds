@@ -25,7 +25,10 @@
 
 PRGNAM=gwenview-i18n
 PKGNAM=$TDEPFX$PRGNAM
-[[ $PRE_DOWNLOAD != yes ]] && [[ $I18N == "" ]] && echo -e "\033[39;1m\nYou have tried to build $PRGNAM without selecting any language(s)\n\033[0m" && exit
+[[ $PRE_DOWNLOAD != yes ]] && [[ $I18N == "" ]] && \
+echo -e "\033[39;1m
+  You have tried to build $PRGNAM without selecting any language(s)
+\033[0m" && exit
 VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}

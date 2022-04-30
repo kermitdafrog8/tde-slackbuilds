@@ -6,8 +6,8 @@ If it is necessary to convert the image to the RGB working space, there are a nu
 
 Example:
 """""""
-in=<path-to>/original.png
-out=<path-to>/converted.png
+in=<path-to>/original.png    # existing
+out=<path-to>/converted.png  # will be created
 profile=<TDE-installation-directory>/share/apps/{chalk,krita}/profiles/srgb_color_space_profile.icm
 convert='gm convert'
 ($convert $in -profile $profile $out)

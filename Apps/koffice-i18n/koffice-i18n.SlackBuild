@@ -24,7 +24,10 @@
 #   SUCH DAMAGE.
 
 PRGNAM=koffice-i18n
-[[ $PRE_DOWNLOAD != yes ]] && [[ $I18N == "" ]] && echo -e "\033[39;1m\nYou have tried to build $PRGNAM without selecting any language(s)\n\033[0m" && exit
+[[ $PRE_DOWNLOAD != yes ]] && [[ $I18N == "" ]] && \
+echo -e "\033[39;1m
+  You have tried to build $PRGNAM without selecting any language(s)
+\033[0m" && exit
 VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -44,7 +47,11 @@ cd $dir
 
 ## revert name 'chalk' to 'krita' if that has been done for koffice
 [[ $(ls $INSTALL_TDE/bin/krita) ]] && {
-echo -e "\n Reverting chalk to krita for $dir .. \n"
+echo -e "\033[39;1m
+
+  Reverting chalk to krita for $dir ..
+  $(printf '%0.s¯' $(seq 1 $[${#dir}+29]))
+\033[0m"
 ## Rename files and contents:
 mv ../template/messages/koffice/chalk.pot ../template/messages/koffice/krita.pot || true
 mv messages/koffice/chalk.po messages/koffice/krita.po

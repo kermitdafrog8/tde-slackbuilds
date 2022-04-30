@@ -24,7 +24,10 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tde-i18n
-[[ $PRE_DOWNLOAD != yes ]] && [[ $I18N == "" ]] && echo -e "\033[39;1m\nYou have tried to build $PRGNAM without selecting any language(s)\n\033[0m" && exit
+[[ $PRE_DOWNLOAD != yes ]] && [[ $I18N == "" ]] && \
+echo -e "\033[39;1m
+  You have tried to build $PRGNAM without selecting any language(s)
+\033[0m" && exit
 VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 
@@ -35,23 +38,23 @@ getsource_fn
 ## extract, build, and remove source for each language package one at a time
 
 cd $TMP_BUILD/tmp-$PRGNAM
-[[ $TDEVERSION == 14.0.11 ]] && {
+[[ $TDEVERSION == 14.0.12 ]] && {
 # extract the template source once only
-echo -e "\033[39;1m"
-echo "Extracting the template source from $(basename $SOURCE) ..."
-echo -e "\033[0m"
+echo -e "\033[39;1m
+  Extracting the template source from $(basename $SOURCE) ...
+\033[0m"
 tar xf $SOURCE $PRGNAM-trinity-$TDEVERSION/template
 # extract the translations source once only
-echo -e "\033[39;1m"
-echo "Extracting the translations source from $(basename $SOURCE) ..."
-echo -e "\033[0m"
+echo -e "\033[39;1m
+  Extracting the translations source from $(basename $SOURCE) ...
+\033[0m"
 tar xf $SOURCE $PRGNAM-trinity-$TDEVERSION/translations
 # extract the cmake source once only
-## it's unlikely that this is being run without the required packages,
+## it's unlikely that this is being run without the 'Required' packages,
 ## in which case the cmake archive will exist
-echo -e "\033[39;1m"
-echo "Extracting the cmake source from $(basename $SRCDIR/cmake-$TDEVERSION.tar.xz) ..."
-echo -e "\033[0m"
+echo -e "\033[39;1m
+  Extracting the cmake source from $(basename $SRCDIR/cmake-$TDEVERSION.tar.xz) ...
+\033[0m"
 (cd $PRGNAM-trinity-$TDEVERSION
 tar xf $SRCDIR/cmake-$TDEVERSION.tar.xz
 mv cmake-trinity-$TDEVERSION cmake)
@@ -64,11 +67,11 @@ cp -a --parents cmake/* $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/)
 
 for lang in $I18N
 do
-[[ $TDEVERSION == 14.0.11 ]] && {
+[[ $TDEVERSION == 14.0.12 ]] && {
 # extract the source for one language at a time for each iteration of the loop
-echo -e "\033[39;1m"
-echo "Extracting the $PRGNAM-$lang source from $(basename $SOURCE) ..."
-echo -e "\033[0m"
+echo -e "\033[39;1m
+  Extracting the $PRGNAM-$lang source from $(basename $SOURCE) ...
+\033[0m"
 tar -xf $SOURCE $PRGNAM-trinity-$TDEVERSION/$PRGNAM-$lang
 cd $PRGNAM-trinity-$TDEVERSION
 ## link cmake into the $PRGNAM-$lang top level
@@ -78,7 +81,9 @@ ln -s ../cmake .)
 true # don't go to cgit if extracting fails
 } || {
 cd $PRGNAM
-echo -e "\n copying $PRGNAM-$lang source files to build area ... \n"
+echo "
+ copying $PRGNAM-$lang source files to build area ...
+"
 (cd $BUILD_TDE_ROOT/src/cgit
 cp -a tdei18n/cgit/tde-i18n/plain/tde-i18n-$lang $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/)
 (cd $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/$PRGNAM-$lang/
@@ -158,7 +163,9 @@ PKG=$PKG1
 
 cd $TMP_BUILD/tmp-$PRGNAM
 # remove any previous builds if option chosen
-[[ $KEEP_BUILD != "yes" ]] && echo -e " removing tde-i18n-$lang build data ..\n" && {
+[[ $KEEP_BUILD != "yes" ]] && echo "
+ removing tde-i18n-$lang build data ..
+" && {
 rm -rf $PKG/*
 rm -rf $PRGNAM*/$PRGNAM-$lang
 }

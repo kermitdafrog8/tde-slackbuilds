@@ -34,7 +34,7 @@ getsource_fn
 untar_fn
 
 ## remove help documentation build instruction from all locales ...
-sed -i '/tde_create_handbook/,+3d' doc/??{,_??}/CMakeLists.txt || true
+sed -i '/tde_create_handbook/,+3d' doc/*/CMakeLists.txt || true
 ## ... and restore for 'en'
 echo "tde_create_handbook( LANG en DESTINATION $PRGNAM )" >> doc/en/CMakeLists.txt
 #
@@ -65,10 +65,10 @@ chown_fn
 cd_builddir_fn
 
 # Check for Jack Audio Connection Kit
-[[ $(ls /var/log/packages/jack-audio-connection-kit-*) ]] && JACK="ON"
+pkg-config jack && JACK="ON"
 
 # Check for DSSI aka "Dizzy"
-[[ $(grep -E "dssi.h" /var/log/packages/*) ]] && DSSI="ON"
+pkg-config dssi && DSSI="ON"
 
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \

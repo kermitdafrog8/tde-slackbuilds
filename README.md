@@ -7,7 +7,7 @@
 See 'Cross compiling for RPi3' for building for arm_hf and aarch64.
 
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input,  
-which will build the release version 14.0.11, or the development versions 14.0.x, 14.1.0.
+which will build the release version 14.0.12, or the development versions 14.0.x, 14.1.0.
 
 [<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png)
 
@@ -18,7 +18,7 @@ Information about dependencies for some packages has been added at the bottom of
 
 Only building the packages is a global option. It therefore can't be used where the build list includes packages which will need to be installed as dependencies for other packages in the build list [for example tdesdk needs tdepim to be installed].
 
-14.0.11 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.x/14.1.0] cloned or updated from trinitydesktop gitea.  
+14.0.12 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.x/14.1.0] cloned or updated from trinitydesktop gitea.  
 Downloading can be done pre-build [useful for an off-line build], or during the build.
 
 If you're curious about what this might involve, [take a look at a sample build set up](https://ray-v.github.io/A_typical_TDE_SlackBuild.html).
@@ -26,7 +26,8 @@ If you're curious about what this might involve, [take a look at a sample build 
 ---
 
 ***Command line options*** that can be used to set some build parameters:
-* TDE_MIRROR= - override the trinitydesktop.org geoIP redirector to use https - example, *https://trinitydesktop.mirrorservice.org/trinity*.  
+* TDE_MIRROR= - override the trinitydesktop.org geoIP redirector to use https.  
+   For example, *TDE_MIRROR=https://trinitydesktop.mirrorservice.org ./BUILD-TDE.sh*  
 URLs for this and other locations are @ https://www.trinitydesktop.org/mirrorstatus.php
 * BUILD= - sets the package build identifier, overriding the SlackBuild default of 1
 * GCC_VIS=0 - override setting gcc visibility if it has been set ON in tdelibs

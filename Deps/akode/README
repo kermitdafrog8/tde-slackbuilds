@@ -11,12 +11,4 @@ Take especially note of the following:
 
   When using direct aKode playback sinks will be autodetected by loading and probing plugins in this order: pulse, jack, alsa, oss
 """
-
----------------------
-Attempting to build FFMPEG_DECODER was abandoned because the akode code is too old.
-
-Example:
-/tmp/build/tmp-akode/akode-trinity-14.0.7/akode/plugins/ffmpeg_decoder/ffmpeg_decoder.cpp:98:17: error: ‘AVCODEC_MAX_AUDIO_FRAME_SIZE’ was not declared in this scope
-
- ... is no longer defined in ffmpeg.
  

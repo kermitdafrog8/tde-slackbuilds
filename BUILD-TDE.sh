@@ -101,7 +101,7 @@ Set the version of TDE to be built.
  
 " \
 13 75 3 \
-"14.0.11" "the R14.0.11 release - source from archives" \
+"14.0.12" "the R14.0.12 release - source from archives" \
 "14.0.x" "next release preview - source from Trinity git" \
 "14.1.0" "R14.1.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
@@ -352,7 +352,7 @@ about_4="Full-screen window/desktop manager"
 status_4=off
 comment_4="\Zb\Z6 Imlib2 is a build time requirement \Zn"
 
-## there is no 14.0.x/11 port for this
+## there is no 14.0.x/12 port for this
 [[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 ]] && {
 app_5="Apps/kplayer"
 about_5="Multimedia player with MPlayer backend"
@@ -724,7 +724,7 @@ See the README for further details ..
 
 [1] Use Win keys
     either as modifier keys,
-        or to print characters set with xmodmap.
+        or to print a character set with xmodmap.
 
 [2] Alternative text on the num pad keys.
 
@@ -801,8 +801,8 @@ Create and/or update the git repositories local copies.
 
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
-[[ $(cat $TMPVARS/TDEVERSION) == 14.0.11 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
-## testing for cgit!=no will allow =yes, or null, which is the 14.0.11 build case
+[[ $(cat $TMPVARS/TDEVERSION) == 14.0.12 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
+## testing for cgit!=no will allow =yes, or null, which is the 14.0.12 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "
@@ -865,13 +865,16 @@ Confirm or change these build options ..
 
 [2] \Z3\Zbno_warn\Zn - don't display any compiler warning messages
 
-[3] \Z3\Zbninja\Zn - use ninja for cmake builds [ignored for automake builds]
+[3] \Z3\Zbninja\Zn - use ninja for cmake builds [ignored for autotools builds]
 
-[4] \Z3\Zbverbose\Zn - show -> command lines during cmake builds; 'make' debugging information; and standard error output.
-Using this is only recommended if fault finding.
+[4] \Z3\Zbverbose\Zn - show:
+              * command lines during cmake builds
+              * 'make' debugging information
+              * standard error output
+    Using this is only recommended if fault finding.
  
 " \
-25 75 4 \
+27 75 4 \
 " install" "install built packages" ${OPT_1:-on} \
 " no_warn" "suppress compiler warnings" ${OPT_2:-off} \
 " ninja" "use ninja for cmake builds" ${OPT_3:-off} \
