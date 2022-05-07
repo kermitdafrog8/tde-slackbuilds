@@ -48,7 +48,7 @@ getsource_fn ()
 #   SUCH DAMAGE.
 
 # Place to build (TMP_BUILD) package (PKG) and output (OUTPUT) the program:
-## ### moved to BUILD-TDE.sh to export variables for ocaml, facile, gdl, and double-conversion builds
+## ### moved to BUILD-TDE.sh to export variables for ocaml, facile, and double-conversion builds
 # ### TMP_BUILD=/tmp/build
 PKG=$TMP_BUILD/package-$PRGNAM
 # ### OUTPUT=/tmp

@@ -58,6 +58,9 @@ sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
 langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
 [[ $langs != "" ]] && TRANS=ON
 
+## delete zero length files
+find data/pixmaps/feta -type f -empty -delete
+
 listdocs_fn
 
 chown_fn
@@ -78,6 +81,7 @@ cmake ${G_NINJA:-} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     -DWANT_SOUND="ON" \

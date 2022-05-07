@@ -33,6 +33,18 @@ getsource_fn
 
 untar_fn
 
+## Re: issue 28
+## work-around for clang build failure - flag applied to kmilo generic build only
+## ...kmilo/generic/generic_monitor.cpp:78:16: error: non-constant-expression cannot be narrowed from type 'int' to 'uint' (aka 'unsigned int') in initializer list [-Wc++11-narrowing]
+##                { "Search", TDEShortcut("XF86Search"), TQT_SLOT(launchSearch()) },
+##                            ^~~~~~~~~~~~~~~~~~~~~~~~~
+[[ $COMPILER_CXX == clang++ ]] && {
+## pending upstream fix
+[[ $(grep 'Search", TDEShortcut("XF86Search"), TQT_SLOT' kmilo/generic/generic_monitor.cpp) ]] && \
+echo '
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++11-narrowing")' >> kmilo/generic/CMakeLists.txt
+}
+
 ## set installation directory for superkaramba.desktop file
 sed -i 's|DESTINATION ${APPS_INSTALL_DIR}/Utilities|DESTINATION ${XDG_APPS_INSTALL_DIR}|' superkaramba/src/CMakeLists.txt
 

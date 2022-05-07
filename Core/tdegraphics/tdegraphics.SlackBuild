@@ -48,6 +48,47 @@ echo $'
 +</includes>
 ' | patch -N -p0 || true
 
+## for poppler-22.03+
+patch -N -p0 << EOF || true
+--- config.h.cmake
++++ config.h.cmake
+@@ -3,2 +3,3 @@
+ // poppler-tqt
++#cmakedefine HAVE_POPPLER_2203
+ #cmakedefine HAVE_POPPLER_2112
+--- tdefile-plugins/dependencies/poppler-tqt/ConfigureChecks.cmake
++++ tdefile-plugins/dependencies/poppler-tqt/ConfigureChecks.cmake
+@@ -27,1 +27,1 @@
+-foreach( _poppler_ver 0.58 0.64 0.70 0.71 0.72 0.76 0.82 0.83 0.86 21.08 21.11 21.12 )
++foreach( _poppler_ver 0.58 0.64 0.70 0.71 0.72 0.76 0.82 0.83 0.86 21.08 21.11 21.12 22.03 )
+--- tdefile-plugins/dependencies/poppler-tqt/poppler-document.cpp
++++ tdefile-plugins/dependencies/poppler-tqt/poppler-document.cpp
+@@ -53,1 +53,5 @@
++# if defined(HAVE_POPPLER_2203)
++  DocumentData *doc = new DocumentData(std::make_unique<GooString>(TQFile::encodeName(filePath)), {});
++# else
+   DocumentData *doc = new DocumentData(new GooString(TQFile::encodeName(filePath)), NULL);
++# endif
+@@ -87,4 +91,9 @@
++#   if defined(HAVE_POPPLER_2203)
++    DocumentData *doc2 = new DocumentData(std::make_unique<GooString>(data->doc.getFileName()),
++                                          GooString(password.data()));
++#   else
+     GooString *filename = new GooString(data->doc.getFileName());
+     GooString *pwd = new GooString(password.data());
+     DocumentData *doc2 = new DocumentData(filename, pwd);
+     delete pwd;
++#   endif
+--- tdefile-plugins/dependencies/poppler-tqt/poppler-private.h
++++ tdefile-plugins/dependencies/poppler-tqt/poppler-private.h
+@@ -107,1 +107,5 @@
++#   if defined(HAVE_POPPLER_2203)
++    DocumentData(std::unique_ptr<GooString> &&filePath, const std::optional<GooString> &password) : doc(std::move(filePath), password), m_fontInfoScanner(0), m_outputDev(0) {}
++#   else
+     DocumentData(GooString *filePath, GooString *password) : doc(filePath,password), m_fontInfoScanner(0), m_outputDev(0) {}
++#   endif
+EOF
+
 listdocs_fn
 
 chown_fn
@@ -55,7 +96,7 @@ chown_fn
 cd_builddir_fn
 
 # If imlib is installed, include Kuickshow:
-[[ -s /usr/include/Imlib.h ]] && KUICKSHOW=ON
+pkg-config imlib && KUICKSHOW=ON
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
@@ -67,7 +108,7 @@ cmake ${G_NINJA:-} \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DWITH_T1LIB="OFF" \
     -DWITH_PAPER="OFF" \
-    -DWITH_TIFF="OFF" \
+    -DWITH_TIFF="ON" \
     -DWITH_OPENEXR="OFF" \
     -DWITH_PDF="ON" \
     -DBUILD_DOC="ON" \
@@ -75,7 +116,7 @@ cmake ${G_NINJA:-} \
     -DBUILD_KUICKSHOW=${KUICKSHOW:-OFF} \
     -DBUILD_KPDF="ON" \
     -DBUILD_KAMERA="OFF" \
-    -DBUILD_KSVG="OFF" \
+    -DBUILD_KSVG="ON" \
     -DBUILD_LIBKSCAN="OFF" \
     -DBUILD_KOOKA="OFF" \
     -DBUILD_KCOLOREDIT="ON" \

@@ -33,14 +33,15 @@ source ../../get-source.sh
 ## klamav needs clamav as a build time requirement
 [[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 # ### clamav  - start
-clamav_installed_fn () { ldconfig -p|grep libclamav 1>/dev/null ;}
+clamav_installed_fn () { pkg-config libclamav ;}
 ## If it's already installed, go to end
 clamav_installed_fn || {
 ## otherwise, if the source archive is in 'src' ..
 [[ -s $BUILD_TDE_ROOT/src/clamav-0.103.3.tar.gz ]] && {
 ## .. build, package, and install it
 (
-echo -e "\n building clamav \n"
+echo "
+ building clamav"
 
 getsource_fn # to set SLKCFLAGS
 
@@ -70,10 +71,12 @@ sed -i '96iendif()' docs/CMakeLists.txt
 mkdir build/docs
 cp -a docs/html build/docs/
 
+[[ $GCC_VIS == 0 ]] && unset GCC_VIS # needs to be unset for parameter expansion for CMAKE_CXX_FLAGS
 cd build/
 # LIBDIRSUFFIX not required - any suffix is included in CMAKE_INSTALL_LIBDIR
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKCFLAGS ${GCC_VIS:+-fvisibility=hidden -fvisibility-inlines-hidden}" \
     -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_SYSTEMD_DEFAULT="OFF" \
     -Wno-dev \
@@ -91,13 +94,26 @@ cd $TMP_BUILD/package-clamav
 makepkg -l y -c n $OUTPUT/clamav-0.103.3-$ARCH-$BUILD.txz
 installpkg $OUTPUT/clamav-0.103.3-$ARCH-$BUILD.txz
 )
-echo -e "\n now building klamav \n"
-clamav_installed_fn || { echo -e "\033[39;1m"" ## installation of clamav failed ##\n""\033[0m" ; exit 1 ; }
+clamav_installed_fn && echo "
+ now building klamav" || { echo -e "\033[39;1m
+ ## installation of clamav failed ##
+ \033[0m" ; exit 1 ; }
 } || { ## .. but if the source archive isn't in 'src', display message ..
-echo -e "\n ############ \n\n\033[39;1m clamav is not installed and is required for this build \n
- Download \033[0m [including user-agent, otherwise '403 Forbidden' is returned]:
-\n \033[39;1m wget -O $BUILD_TDE_ROOT/src/clamav-0.103.3.tar.gz --user-agent='Mozilla' https://www.clamav.net/downloads/production/clamav-0.103.3.tar.gz \033[0m
-\n and re-run this script .. \n\n ############ \n" ; exit 1 ; }
+echo -e "
+ ############
+
+ clamav is required for klamav
+ It's not installed nor is the source archive in the 'src' directory
+
+ Download [including user-agent, otherwise '403 Forbidden' is returned]:
+             \033[39;1m
+( cd $BUILD_TDE_ROOT/src
+ wget --user-agent='Mozilla' https://www.clamav.net/downloads/production/clamav-0.103.3.tar.gz )
+             \033[0m
+ and re-run this script ..
+
+ ############
+" ; exit 1 ; }
 }
 # ### clamav - end
 }

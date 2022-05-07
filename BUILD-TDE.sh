@@ -82,7 +82,7 @@ TMP=${TMP:-/tmp}
 export BUILD_TDE_ROOT=$(pwd)
 
 # Place to build (TMP_BUILD), package (PKG), and output (OUTPUT) the program:
-## ### moved from get-source.sh to export variables for ocaml, facile, gdl, and double-conversion builds
+## ### moved from get-source.sh to export variables for ocaml, facile, and double-conversion builds
 export TMP_BUILD=$TMP/build
 #export PKG=$TMP_BUILD/package-$PRGNAM
 export OUTPUT=$TMP

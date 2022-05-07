@@ -31,6 +31,22 @@ TAG=${TAG:-_tde}
 source ../../get-source.sh
 getsource_fn
 
+## run getsource_fn for the theme-pack ... in a shell so that the variables don't leak into the build
+(ARCHIVE_TYPE="tar.gz"
+PRGNAM=knights-themepack
+VERSION=0.5.9
+SRCURL="https://downloads.sourceforge.net/project/knights/knights-themepack/0.5.9/$PRGNAM-$VERSION.$ARCHIVE_TYPE"
+getsource_fn
+)
+[[ -s $SRCDIR/knights-themepack-0.5.9.tar.gz ]] || \
+echo '
+ ##########
+
+ The build will continue without additional boards and chessman themes
+ being added to the package.
+
+ ##########'
+
 untar_fn
 
 # there is a Spanish language file in the source, but it has no translations in it ..
@@ -48,7 +64,6 @@ chown_fn
 cd_builddir_fn
 
 ## BUILD_EXTRA_THEME is a 14.1.0 option and will be ignored for 14.0.n builds
-## See the slack-desc for a URL for additional themes
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
@@ -66,6 +81,10 @@ cmake ${G_NINJA:-} \
 
 make_fn
 
+## if the theme-pack exists, install the themes
+[[ -s $SRCDIR/knights-themepack-0.5.9.tar.gz ]] && \
+tar xf $SRCDIR/knights-themepack-0.5.9.tar.gz --exclude=??????? -C $PKG$INSTALL_TDE/share/apps/knights/themes --strip-components=1
+
 installdocs_fn
 
 mangzip_fn
@@ -76,6 +95,8 @@ mkdir_install_fn
 
 doinst_sh_fn
 
+[[ -s $PKG$INSTALL_TDE/share/apps/knights/themes/KBBrushed_Liquid.tar.gz ]] && \
+ADDL_THEMES="Includes additional boards and chessman themes"
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -86,8 +107,8 @@ echo "
        |-----handy-ruler------------------------------------------------------|
 $PRGNAM: A graphical chess interface for the Trinity Desktop Environment
 $PRGNAM:
-$PRGNAM: Download themepack [additional boards and chessman themes] from:
-$PRGNAM:         https://sourceforge.net/project/showfiles.php?group_id=31461
+$PRGNAM: ${ADDL_THEMES:-"A themepack is available for additional boards and chessman themes"}
+$PRGNAM:
 $PRGNAM:
 $PRGNAM: Needs separate chess engines, for example gnuchess, stockfish, komodo.
 $PRGNAM:
