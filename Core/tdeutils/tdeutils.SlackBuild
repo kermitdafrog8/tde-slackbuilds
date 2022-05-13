@@ -33,17 +33,18 @@ getsource_fn
 
 untar_fn
 
-## Re: issue 28
-## work-around for clang build failure - flag applied to kmilo generic build only
+## clang build failure
 ## ...kmilo/generic/generic_monitor.cpp:78:16: error: non-constant-expression cannot be narrowed from type 'int' to 'uint' (aka 'unsigned int') in initializer list [-Wc++11-narrowing]
 ##                { "Search", TDEShortcut("XF86Search"), TQT_SLOT(launchSearch()) },
 ##                            ^~~~~~~~~~~~~~~~~~~~~~~~~
-[[ $COMPILER_CXX == clang++ ]] && {
-## pending upstream fix
-[[ $(grep 'Search", TDEShortcut("XF86Search"), TQT_SLOT' kmilo/generic/generic_monitor.cpp) ]] && \
-echo '
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++11-narrowing")' >> kmilo/generic/CMakeLists.txt
-}
+## commit 4046d4e - fixes issue 28
+patch -p0 -N << EOF || true
+--- kmilo/generic/generic_monitor.h
++++ kmilo/generic/generic_monitor.h
+@@ -42,1 +42,1 @@ namespace KMilo {
+-	uint symbol;
++	int symbol;
+EOF
 
 ## set installation directory for superkaramba.desktop file
 sed -i 's|DESTINATION ${APPS_INSTALL_DIR}/Utilities|DESTINATION ${XDG_APPS_INSTALL_DIR}|' superkaramba/src/CMakeLists.txt
@@ -69,11 +70,11 @@ cmake ${G_NINJA:-} \
     -DWITH_XSCREENSAVER="OFF" \
     -DWITH_SENSORS="ON" \
     -DWITH_SNMP="OFF" \
-    -DWITH_ASUS="OFF" \
+    -DWITH_ASUS="ON" \
     -DWITH_POWERBOOK="OFF" \
     -DWITH_POWERBOOK2="OFF" \
-    -DWITH_VAIO="OFF" \
-    -DWITH_THINKPAD="OFF" \
+    -DWITH_VAIO="ON" \
+    -DWITH_THINKPAD="ON" \
     -DWITH_I8K="OFF" \
     -DWITH_XMMS="OFF" \
     -DWITH_TDENEWSTUFF="OFF" \

@@ -33,6 +33,45 @@ getsource_fn
 
 untar_fn
 
+## clang build
+## ../chalk/plugins/filters/colorsfilters/kis_brightness_contrast_filter.cpp:243:40: error: non-constant-expression cannot be narrowed from type 'int' to 'TQ_UINT8' (aka 'unsigned char') in initializer list [-Wc++11-narrowing]
+## commit 7994981
+patch -p0 -N << EOF || true
+--- chalk/plugins/filters/colorsfilters/kis_brightness_contrast_filter.cpp
++++ chalk/plugins/filters/colorsfilters/kis_brightness_contrast_filter.cpp
+@@ -243,1 +243,1 @@
+-                TQ_UINT8 weights[2] = {MAX_SELECTED - selectedness, selectedness};
++                TQ_UINT8 weights[2] = {(TQ_UINT8)(MAX_SELECTED - selectedness), selectedness};
+--- chalk/plugins/filters/colorsfilters/colorsfilters.cpp
++++ chalk/plugins/filters/colorsfilters/colorsfilters.cpp
+@@ -212,1 +212,1 @@
+-                TQ_UINT8 weights[2] = {MAX_SELECTED - selectedness, selectedness};
++                TQ_UINT8 weights[2] = {(TQ_UINT8)(MAX_SELECTED - selectedness), selectedness};
+@@ -306,1 +306,1 @@
+-                TQ_UINT8 weights[2] = {MAX_SELECTED - selectedness, selectedness};
++                TQ_UINT8 weights[2] = {(TQ_UINT8)(MAX_SELECTED - selectedness), selectedness};
+--- chalk/plugins/filters/colorsfilters/kis_perchannel_filter.cpp
++++ chalk/plugins/filters/colorsfilters/kis_perchannel_filter.cpp
+@@ -257,1 +257,1 @@
+-                TQ_UINT8 weights[2] = {MAX_SELECTED - selectedness, selectedness};
++                TQ_UINT8 weights[2] = {(TQ_UINT8)(MAX_SELECTED - selectedness), selectedness};
+--- chalk/plugins/filters/levelfilter/kis_level_filter.cpp
++++ chalk/plugins/filters/levelfilter/kis_level_filter.cpp
+@@ -198,1 +198,1 @@
+-                TQ_UINT8 weights[2] = {MAX_SELECTED - selectedness, selectedness};
++                TQ_UINT8 weights[2] = {(TQ_UINT8)(MAX_SELECTED - selectedness), selectedness};
+--- filters/kspread/excel/sidewinder/cell.cpp
++++ filters/kspread/excel/sidewinder/cell.cpp
+@@ -120,1 +120,1 @@
+-        char buf[3] = { 'A'+(d/26), 'A'+(d%26), 0};
++        char buf[3] = { (char)('A'+(d / 26)), (char)('A'+(d % 26)), 0};
+--- filters/kword/rtf/import/rtfimport.cpp
++++ filters/kword/rtf/import/rtfimport.cpp
+@@ -1270,1 +1270,1 @@
+-    char tmpch[2] = {token.value, '\0'};
++    char tmpch[2] = {(char)(token.value), '\0'};
+EOF
+
 ## Workaround to prevent chalk/krita crashing when loading PNGs it has saved
 ## Awaiting fix for koffice issue 20
 patch -p0 << EOF

@@ -74,6 +74,14 @@ patch -N -p0 << EOF || true
 +    switch( static_cast<unsigned int>( code ) ) {
 EOF
 
+## clang build errors:
+## invalid suffix on literal; C++11 requires a space between literal and identifier
+sed -i 's|"LIBMPV42_STRINGIFY|" LIBMPV42_STRINGIFY|' src/mp4util.h
+#
+## ../src/mp4.cpp:873:20: error: cannot initialize return object of type 'mp4v2_ismacrypParams *' (aka 'mp4v2_ismacryp_session_params *') with an rvalue of type 'MP4TrackId' (aka 'unsigned int')
+## thanks to github.com/palmerc/mp4v2.git, commit 16eb774806e9a0c87162b9e24a633c34c90c0732
+sed -i '873s|return.*$|return NULL;|' src/mp4.cpp
+
 ## Fix man pages being installed with no content
 sed -i 's|doc/man|@srcdir@/&|' GNUmakefile.in
 

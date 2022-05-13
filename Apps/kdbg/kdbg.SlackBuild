@@ -33,6 +33,64 @@ getsource_fn
 
 untar_fn
 
+## for clang, commit 2fa7734
+patch -p0 -N << EOF || true
+--- kdbg/dbgdriver.cpp
++++ kdbg/dbgdriver.cpp
+@@ -133,2 +133 @@
+-	    TRACE(TQString().sprintf("interrupted the command %d",
+-		  (m_activeCmd ? m_activeCmd->m_cmd : -1)));
++	    TRACE(TQString("interrupted the command %1").arg((m_activeCmd ? m_activeCmd->m_cmd : -1)));
+--- kdbg/debugger.cpp
++++ kdbg/debugger.cpp
+@@ -2178,2 +2178 @@
+-    TRACE(TQString().sprintf("Changing %s to ",
+-			    wnd->name()) + text);
++    TRACE(TQString("Changing %1 to ").arg(wnd->name()) + text);
+--- kdbg/gdbdriver.cpp
++++ kdbg/gdbdriver.cpp
+@@ -905 +905 @@
+-	    TRACE(TQString().sprintf("parse error: = not found after %s", name));
++	    TRACE(TQString("parse error: = not found after %1").arg(name));
+@@ -944 +944 @@
+-	TRACE(TQString().sprintf("parse error: mismatching %c%c at %-20.20s", opening, closing, s));
++	TRACE(TQString("parse error: mismatching %1%2 at %3").arg(opening).arg(closing).arg(s));
+@@ -987 +987 @@
+-	TRACE(TQString().sprintf("parse error: mismatching <> at %-20.20s", s));
++	TRACE(TQString("parse error: mismatching <> at %1").arg(s));
+@@ -1103 +1103 @@
+-	TRACE(TQString().sprintf("parse error: mismatching %c%c at %-20.20s", opening, closing, s));
++	TRACE(TQString("parse error: mismatching %1%2 at %3").arg(opening).arg(closing).arg(s));
+@@ -1135 +1135 @@
+-	    TRACE(TQString().sprintf("parse error: not a name %-20.20s", s));
++	    TRACE(TQString("parse error: not a name %1").arg(s));
+@@ -1148 +1148 @@
+-		TRACE(TQString().sprintf("parse error: not a name after static %-20.20s", s));
++		TRACE(TQString("parse error: not a name after static %1").arg(s));
+@@ -1480 +1480 @@
+-	    TRACE(TQString().sprintf("found <repeats %d times> in array", l));
++	    TRACE(TQString("found <repeats %1 times> in array").arg(l));
+--- kdbg/sourcewnd.cpp
++++ kdbg/sourcewnd.cpp
+@@ -254 +254 @@
+-	    TRACE(TQString().sprintf("checking for bp at %d", line));
++	    TRACE(TQString("checking for bp at %1").arg(line));
+@@ -278 +278 @@
+-	    TRACE(TQString().sprintf("updating %s:%d", bp->fileName, bp->lineNo));
++	    TRACE(TQString("updating %1:%2").arg(bp->fileName).arg(bp->lineNo));
+@@ -373 +373 @@
+-	TRACE(TQString().sprintf("left-clicked line %d", line));
++	TRACE(TQString("left-clicked line %1").arg(line));
+@@ -378 +378 @@
+-	TRACE(TQString().sprintf("mid-clicked row %d", line));
++	TRACE(TQString("mid-clicked row %1").arg(line));
+--- kdbg/typetable.cpp
++++ kdbg/typetable.cpp
+@@ -185 +185 @@
+-    TRACE(type + TQString().sprintf(": %d exprs", info->m_numExprs));
++    TRACE(type + TQString(": %1 exprs").arg(info->m_numExprs));
+EOF
+
 ## edit man page
 sed -i "s|/opt/trinity/share/doc/|$INSTALL_TDE/share/doc/|" doc/man/kdbg.1
 

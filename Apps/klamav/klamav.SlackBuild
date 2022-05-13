@@ -41,7 +41,8 @@ clamav_installed_fn || {
 ## .. build, package, and install it
 (
 echo "
- building clamav"
+ building clamav
+"
 
 getsource_fn # to set SLKCFLAGS
 
@@ -62,14 +63,23 @@ sed -i 's|set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")|set(CMAKE_INSTA
 ## install man pages as per Slackware default
 sed -i 's|/share/man/|/man/|' docs/CMakeLists.txt
 
-mkdir build
+mkdir -p build/docs
 
 ## install html documentation
 sed -i 's|OPTIONAL||' docs/CMakeLists.txt
 sed -i '100s|endif()||' docs/CMakeLists.txt
 sed -i '96iendif()' docs/CMakeLists.txt
-mkdir build/docs
 cp -a docs/html build/docs/
+
+## clang build error:
+#/tmp/build/clamav-0.103.3/clamonacc/clamonacc.c:335:96: error: use of undeclared identifier 'O_LARGEFILE'
+#    ctx->fan_fd = fanotify_init(FAN_CLASS_CONTENT | FAN_UNLIMITED_QUEUE | FAN_UNLIMITED_MARKS, O_LARGEFILE | O_RDONLY);
+#                                                                                               ^
+[[ $COMPILER == clang ]] && \
+echo '
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DO_LARGEFILE")' >> clamonacc/CMakeLists.txt
+
+[[ -s /usr/lib64/libmilter.a ]] && MILTER="ON"
 
 [[ $GCC_VIS == 0 ]] && unset GCC_VIS # needs to be unset for parameter expansion for CMAKE_CXX_FLAGS
 cd build/
@@ -77,8 +87,11 @@ cd build/
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKCFLAGS ${GCC_VIS:+-fvisibility=hidden -fvisibility-inlines-hidden}" \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
-    -DENABLE_SYSTEMD_DEFAULT="OFF" \
+    -DENABLE_SYSTEMD="OFF" \
+    -DENABLE_MILTER=${MILTER:-"OFF"} \
     -Wno-dev \
     ..
 

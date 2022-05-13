@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=inkscape
-VERSION=1.1.1
+VERSION=1.1.2
 BUILD=${BUILD:-1}
 
 ARCHIVE_TYPE="tar.xz"
@@ -34,7 +34,7 @@ source ../../get-source.sh
 ## need this here for CXX_FLAGS for double-conversion
 getsource_fn
 
-## inkscape v1.1.1 needs double-conversion
+## inkscape v1.1.x needs double-conversion
 [[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 # ### double-conversion  - start
 {
@@ -53,7 +53,11 @@ cd double-conversion-3.1.5/
 
 cd cmake/
 # LIBDIRSUFFIX not required - builds to lib64 where appropriate ..
-cmake ${G_NINJA:-} ../ -DBUILD_SHARED_LIBS=ON -DCMAKE_CXX_FLAGS="$SLKCFLAGS"
+cmake ${G_NINJA:-} \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    ..
 
 PKG=$TMP_BUILD/package-double-conversion
 make_fn
@@ -75,19 +79,80 @@ echo -e "\n ############ \n\n\033[39;1m double-conversion is not installed and i
 
 untar_fn
 
-## patch for poppler 21.11
-## https://gitlab.com/inkscape/inkscape/-/commit/5724c21b9cb7b6176a7b36ca24068b148c817e82.diff
-echo $'--- src/extension/internal/pdfinput/pdf-parser.cpp
-+++ src/extension/internal/pdfinput/pdf-parser.cpp
-@@ -2171,3 +2171,7 @@
-     printf("  font: tag=%s name='\''%s'\'' %g\n",
-+#if POPPLER_CHECK_VERSION(21,11,0)
-+	   font->getTag().c_str(),
+## patch for poppler 22.03+
+## inkscape commit a18c57ffff313fd08bc8a44f6b6bf0b01d7e9b75
+patch -p0 << EOF
+--- src/extension/internal/pdfinput/pdf-input.cpp
++++ src/extension/internal/pdfinput/pdf-input.cpp
+@@ -671,2 +671,1 @@ PdfInput::open(::Inkscape::Extension::Input * /*mod*/, const gchar * uri) {
+-    GooString *filename_goo = new GooString(uri);
+-    pdf_doc = std::make_shared<PDFDoc>(filename_goo, nullptr, nullptr, nullptr);   // TODO: Could ask for password
++    pdf_doc = _POPPLER_MAKE_SHARED_PDFDOC(uri); // TODO: Could ask for password
+--- src/extension/internal/pdfinput/poppler-transition-api.h
++++ src/extension/internal/pdfinput/poppler-transition-api.h
+@@ -17,0 +17,6 @@
++#if POPPLER_CHECK_VERSION(22, 3, 0)
++#define _POPPLER_MAKE_SHARED_PDFDOC(uri) std::make_shared<PDFDoc>(std::make_unique<GooString>(uri))
 +#else
- 	   font->getTag()->getCString(),
++#define _POPPLER_MAKE_SHARED_PDFDOC(uri) std::make_shared<PDFDoc>(new GooString(uri), nullptr, nullptr, nullptr)
 +#endif
- 	   font->getName() ? font->getName()->getCString() : "???",
-' | patch -p0
++
+EOF
+
+## patch for poppler 22.04+
+## inkscape commit d989cdf1059c78bc3bb6414330242073768d640b
+patch -p0 << EOF
+--- src/extension/internal/pdfinput/pdf-parser.cpp
++++ src/extension/internal/pdfinput/pdf-parser.cpp
+@@ -33,0 +33,1 @@
++#include "poppler-transition-api.h"
+@@ -2161,1 +2162,1 @@
+-  GfxFont *font = res->lookupFont(args[0].getName());
++  auto font = res->lookupFont(args[0].getName());
+@@ -2182,1 +2183,3 @@
++#if !POPPLER_CHECK_VERSION(22, 4, 0)
+   font->incRefCnt();
++#endif
+@@ -2376,1 +2379,0 @@
+-  GfxFont *font;
+@@ -2395,1 +2397,1 @@
+-  font = state->getFont();
++  auto font = state->getFont();
+@@ -2448,4 +2450,4 @@
+-        _POPPLER_CALL_ARGS(charProc, ((Gfx8BitFont *)font)->getCharProc, code);
+-	if ((resDict = ((Gfx8BitFont *)font)->getResources())) {
++        _POPPLER_CALL_ARGS(charProc, _POPPLER_FONTPTR_TO_GFX8(font)->getCharProc, code);
++    if (resDict = _POPPLER_FONTPTR_TO_GFX8(font)->getResources()) {
+ 	  pushResources(resDict);
+-	}
++    }
+--- src/extension/internal/pdfinput/poppler-transition-api.h
++++ src/extension/internal/pdfinput/poppler-transition-api.h
+@@ -17,0 +17,6 @@
++#if POPPLER_CHECK_VERSION(22, 4, 0)
++#define _POPPLER_FONTPTR_TO_GFX8(font_ptr) ((Gfx8BitFont *)font_ptr.get())
++#else
++#define _POPPLER_FONTPTR_TO_GFX8(font_ptr) ((Gfx8BitFont *)font_ptr)
++#endif
++
+--- src/extension/internal/pdfinput/svg-builder.cpp
++++ src/extension/internal/pdfinput/svg-builder.cpp
+@@ -111,1 +111,0 @@
+-    _current_font = nullptr;
+@@ -1024,5 +1023,2 @@
+-    if (_font_style) {
+-        //sp_repr_css_attr_unref(_font_style);
+-    }
+     _font_style = sp_repr_css_attr_new();
+-    GfxFont *font = state->getFont();
++    auto font = state->getFont();
+@@ -1174,1 +1170,0 @@
+-    _current_font = font;
+--- src/extension/internal/pdfinput/svg-builder.h
++++ src/extension/internal/pdfinput/svg-builder.h
+@@ -206,1 +206,0 @@
+-    GfxFont *_current_font;
+EOF
 
 ## set internal 2geom lib paths to lib$LIBDIRSUFFIX
 sed -i "s|CMAKE_INSTALL_PREFIX}/lib|&$LIBDIRSUFFIX|" src/3rdparty/2geom/CMakeLists.txt
