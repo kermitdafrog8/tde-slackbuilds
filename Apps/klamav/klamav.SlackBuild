@@ -33,11 +33,12 @@ source ../../get-source.sh
 ## klamav needs clamav as a build time requirement
 [[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 # ### clamav  - start
+clamav_VERS=0.104.3
 clamav_installed_fn () { pkg-config libclamav ;}
 ## If it's already installed, go to end
 clamav_installed_fn || {
 ## otherwise, if the source archive is in 'src' ..
-[[ -s $BUILD_TDE_ROOT/src/clamav-0.103.3.tar.gz ]] && {
+[[ -s $BUILD_TDE_ROOT/src/clamav-$clamav_VERS.tar.gz ]] && {
 ## .. build, package, and install it
 (
 echo "
@@ -48,48 +49,28 @@ getsource_fn # to set SLKCFLAGS
 
 cd $TMP_BUILD
 rm -rf *clamav*
-tar xf $BUILD_TDE_ROOT/src/clamav-0.103.3.tar.gz
+tar xf $BUILD_TDE_ROOT/src/clamav-$clamav_VERS.tar.gz
 
-cd clamav-0.103.3/
+cd clamav-$clamav_VERS/
 
-## rpaths are to /.../lib & GNUInstallDirs determines the correct lib directory == CMAKE_INSTALL_LIBDIR
-## -> delete the existing GNUInstallDirs which is too late in CMakeLists.txt to apply here for rpaths
-sed -i '/GNUInstallDirs/d' CMakeLists.txt
-## -> insert include(GNUInstallDirs) to set CMAKE_INSTALL_LIBDIR
-sed -i '108iinclude(GNUInstallDirs)' CMakeLists.txt
-## -> set RPATH relative to ORIGIN
-sed -i 's|set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")|set(CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")|' CMakeLists.txt
-
-## install man pages as per Slackware default
-sed -i 's|/share/man/|/man/|' docs/CMakeLists.txt
-
-mkdir -p build/docs
-
-## install html documentation
-sed -i 's|OPTIONAL||' docs/CMakeLists.txt
-sed -i '100s|endif()||' docs/CMakeLists.txt
-sed -i '96iendif()' docs/CMakeLists.txt
-cp -a docs/html build/docs/
-
-## clang build error:
-#/tmp/build/clamav-0.103.3/clamonacc/clamonacc.c:335:96: error: use of undeclared identifier 'O_LARGEFILE'
-#    ctx->fan_fd = fanotify_init(FAN_CLASS_CONTENT | FAN_UNLIMITED_QUEUE | FAN_UNLIMITED_MARKS, O_LARGEFILE | O_RDONLY);
-#                                                                                               ^
-[[ $COMPILER == clang ]] && \
-echo '
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DO_LARGEFILE")' >> clamonacc/CMakeLists.txt
+## set RPATH relative to ORIGIN always
+sed -i 's|CMAKE_INSTALL_RPATH.*$|CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")|' CMakeLists.txt
 
 [[ -s /usr/lib64/libmilter.a ]] && MILTER="ON"
 
 [[ $GCC_VIS == 0 ]] && unset GCC_VIS # needs to be unset for parameter expansion for CMAKE_CXX_FLAGS
+
+mkdir build
 cd build/
-# LIBDIRSUFFIX not required - any suffix is included in CMAKE_INSTALL_LIBDIR
+# LIBDIRSUFFIX not required - any suffix is included in CMAKE_INSTALL_LIBDIR which is set by GNUInstallDirs
 cmake ${G_NINJA:-} \
     -DCMAKE_C_FLAGS="$SLKCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKCFLAGS ${GCC_VIS:+-fvisibility=hidden -fvisibility-inlines-hidden}" \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
+    -DENABLE_MAN_PAGES="ON" \
+    -DCMAKE_INSTALL_MANDIR=/usr/local/man \
     -DENABLE_SYSTEMD="OFF" \
     -DENABLE_MILTER=${MILTER:-"OFF"} \
     -Wno-dev \
@@ -104,8 +85,8 @@ mangzip_fn
 strip_fn
 
 cd $TMP_BUILD/package-clamav
-makepkg -l y -c n $OUTPUT/clamav-0.103.3-$ARCH-$BUILD.txz
-installpkg $OUTPUT/clamav-0.103.3-$ARCH-$BUILD.txz
+makepkg -l y -c n $OUTPUT/clamav-$clamav_VERS-$ARCH-$BUILD.txz
+installpkg $OUTPUT/clamav-$clamav_VERS-$ARCH-$BUILD.txz
 )
 clamav_installed_fn && echo "
  now building klamav" || { echo -e "\033[39;1m
@@ -115,13 +96,12 @@ clamav_installed_fn && echo "
 echo -e "
  ############
 
- clamav is required for klamav
- It's not installed nor is the source archive in the 'src' directory
+ clamav is required for building klamav
 
  Download [including user-agent, otherwise '403 Forbidden' is returned]:
              \033[39;1m
 ( cd $BUILD_TDE_ROOT/src
- wget --user-agent='Mozilla' https://www.clamav.net/downloads/production/clamav-0.103.3.tar.gz )
+  wget --user-agent='Mozilla' https://www.clamav.net/downloads/production/clamav-$clamav_VERS.tar.gz )
              \033[0m
  and re-run this script ..
 

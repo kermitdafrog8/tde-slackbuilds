@@ -35,8 +35,6 @@ untar_fn
 
 ## clang build failure
 ## ...kmilo/generic/generic_monitor.cpp:78:16: error: non-constant-expression cannot be narrowed from type 'int' to 'uint' (aka 'unsigned int') in initializer list [-Wc++11-narrowing]
-##                { "Search", TDEShortcut("XF86Search"), TQT_SLOT(launchSearch()) },
-##                            ^~~~~~~~~~~~~~~~~~~~~~~~~
 ## commit 4046d4e - fixes issue 28
 patch -p0 -N << EOF || true
 --- kmilo/generic/generic_monitor.h

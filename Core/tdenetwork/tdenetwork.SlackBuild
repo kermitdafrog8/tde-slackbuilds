@@ -33,13 +33,21 @@ getsource_fn
 
 untar_fn
 
-## commit 4fa7deb, TDE issue 44
+## r14.0.x branch commit 3e7a60bf
+## libvncserver: remove unnecessary re-definition of true/false boolean values.
 patch -p0 -N << EOF || true
 --- krfb/libvncserver/main.cpp
 +++ krfb/libvncserver/main.cpp
-@@ -21,1 +21,1 @@
+@@ -19,5 +19,0 @@
+-	#ifndef false
+-	#define false 0
 -	#define true -1
-+	#define true 1
+-	#endif
+-	
+@@ -830,1 +825,1 @@
+-#include "main.moc"
+\ No newline at end of file
++#include "main.moc"
 EOF
 
 listdocs_fn

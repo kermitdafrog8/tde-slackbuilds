@@ -443,7 +443,7 @@ ${app_2:-} ${about_2:-} ${status_2:-} ${comment_2:-} \
 "Apps/knetstats" "A network monitor that shows rx/tx LEDs" off "\Zb\Z6   \Zn" \
 "Apps/knights" "A graphical chess interface" off "\Zb\Z6   \Zn" \
 "Apps/knmap" "A graphical nmap interface" off "\Zb\Z6 Might need tdesudo \Zn" \
-" Misc/GraphicsMagick" "Swiss army knife of image processing" off "\Zb\Z6 Buildtime option for chalk[krita] in koffice \Zn" \
+" Misc/GraphicsMagick" "Swiss army knife of image processing" off "\Zb\Z6 Buildtime option for chalk[krita] in koffice, and inkscape \Zn" \
 "Apps/koffice" "Office Suite" off "\Zb\Z6 Optional build-time dependency - GraphicsMagick \Zn" \
 "Apps/koffice-i18n" "Internationalization files for koffice" off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for koffice \Zn" \
 ${app_3:-} ${about_3:-} ${status_3:-} ${comment_3:-} \
@@ -633,7 +633,7 @@ There are two options that can be set for building the imaging app.
 [1] It is called \Zb\Z3chalk\Zn in TDE but was originally \Zb\Z3krita\Zn.
 
 [2] GraphicsMagick will enable an extended range of image formats to be loaded and saved. ImageMagick should be an alternative, but building fails with that, so without GM, the range of supported image formats will be limited.
-  Choosing \Zb\Z3useGM\Zn here will add it to the build list if not already selected or installed.
+  Choosing \Zb\Z3useGM\Zn here will add it to the build list if not already selected or installed, and it will be installed for the koffice build.
  " \
 21 75 2 \
 " krita" "Set the app name to krita" on "\Zb\Z6 otherwise will be \Zb\Z3chalk\Zn" \
@@ -1091,6 +1091,9 @@ ${EXIT_FAIL:-":"}
 }
 ## install packages - any 'Cannot install /tmp/....txz: file not found' error message caused by build failure deliberately not suppressed.
 [[ $INST == 1 ]] && [[ $package != tde-i18n* ]] && upgradepkg --install-new --reinstall $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz
+## If GraphicsMagick has been selected as a dependency for koffice, install it even if the build has been set to 'build only'
+[[ $INST == 0 ]] && [[ $(cat $TMPVARS/Krita_OPTS) == *useGM* && $package == GraphicsMagick ]] && \
+upgradepkg --install-new --reinstall $TMP/$TDE_PFX$package-$(eval echo $version)-*-$build*.txz
 }
 
   # back to original directory

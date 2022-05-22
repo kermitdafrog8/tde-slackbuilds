@@ -41,14 +41,14 @@ getsource_fn
 ## If it is already installed, go to end
 ldconfig -p|grep libdouble-conversion 1>/dev/null || {
 ## otherwise, if the source archive is in 'src' ..
-[[ -s $BUILD_TDE_ROOT/src/double-conversion-3.1.5.tar.gz ]] && {
+[[ -s $BUILD_TDE_ROOT/src/v3.1.5.tar.gz ]] && {
 ## .. build, package, and install ..
 (
 echo -e "\n building double-conversion \n"
 
 cd /$TMP_BUILD
 rm -rf *double-conversion*
-tar xf $BUILD_TDE_ROOT/src/double-conversion-3.1.5.tar.gz
+tar xf $BUILD_TDE_ROOT/src/v3.1.5.tar.gz
 cd double-conversion-3.1.5/
 
 cd cmake/
@@ -68,10 +68,20 @@ installpkg $OUTPUT/double-conversion-3.1.5-$ARCH-$BUILD.txz
 )
 echo -e "\n now building inkscape \n"
 } || { ## .. but if the source archive isn't in 'src', display download URL ..
-echo -e "\n ############ \n\n\033[39;1m double-conversion is not installed and is required for this build \n \033[34;1m
+echo -e "
+ ############
+
+ double-conversion is required for building inkscape
+
  Download:
-\n wget -O $BUILD_TDE_ROOT/src/double-conversion-3.1.5.tar.gz https://github.com/google/double-conversion/archive/v3.1.5.tar.gz
-\n and re-run this script .. \n\n \033[0m ############ \n" ; exit 1 ; }
+             \033[39;1m
+( cd $BUILD_TDE_ROOT/src
+  wget https://github.com/google/double-conversion/archive/v3.1.5.tar.gz )
+             \033[0m
+ and re-run this script ..
+
+  ############
+" ; exit 1 ; }
 }
 }
 # ### double-conversion - end

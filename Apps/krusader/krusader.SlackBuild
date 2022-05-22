@@ -63,10 +63,7 @@ patch -p0 -N << EOF || true
 ' | while read line
 EOF
 #
-## clang build
 ## ../../../../krusader/DiskUsage/radialMap/map.cpp:329:26: error: non-constant-expression cannot be narrowed from type 'uint' (aka 'unsigned int') to 'int' in initializer list [-Wc++11-narrowing]
-##             int a[3] = { (*it)->start(), (*it)->length(), 0 };
-##                          ^~~~~~~~~~~~~~
 ## commit 57f84ff
 patch -p0 -N << EOF || true
 --- krusader/DiskUsage/radialMap/map.cpp

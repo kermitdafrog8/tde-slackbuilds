@@ -33,8 +33,9 @@ getsource_fn
 
 untar_fn
 
-## for ffmpeg-5, branch 14.0.x, commit 9e2710c
-patch -p0 -N << EOF || true
+[[ $TDEVERSION == 14.0.12 ]] && {
+## all versons ffmpeg support, ported from upstream commits
+patch -p0 << EOF
 --- akode/plugins/ffmpeg_decoder/ffmpeg_decoder.cpp
 +++ akode/plugins/ffmpeg_decoder/ffmpeg_decoder.cpp
 @@ -40 +40 @@
@@ -159,7 +160,7 @@ patch -p0 -N << EOF || true
 @@ -339 +380,23 @@
 -    int len = avcodec_decode_audio4( d->ic->streams[d->audioStream]->codec,
 +
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 12, 100)
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 106, 100)
 +    int len = avcodec_receive_frame(d->audioStream_ctx, decodeFrame);
 +    if (len == 0) {
 +        decoded = 1;
@@ -205,6 +206,7 @@ patch -p0 -N << EOF || true
 @@ -400,0 +466 @@
 +    d->packet = NULL;
 EOF
+}
 
 chown_fn
 

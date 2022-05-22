@@ -139,15 +139,9 @@ echo $'--- lib/sigclient.cpp
 ## work-around for gcc11+ - see https://gcc.gnu.org/gcc-11/porting_to.html
 [[ $(gcc --version) == *1[1-9]* ]] && CXXFLAGS_="-std=gnu++14"
 
-
-## clang build
-## comhttpsocket.cpp:25:44: error: invalid suffix on literal; C++11 requires a space between literal and identifier [-Wreserved-user-defined-literal]
-## const char* g_strCOMVer = "libmusicbrainz/"VERSION;
-##                                            ^
-[[ $COMPILER_CXX == clang++ ]] && {
+## clang build - C++11 requires a space between literal and identifier
 sed -i 's|"VERSION|" VERSION|' lib/comhttpsocket.cpp
 sed -i 's|"VERSION|" VERSION|' lib/musicbrainz.cpp
-}
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS ${CXXFLAGS_:-}" \
@@ -173,9 +167,9 @@ MUSICBRAINZ="ON"
 
 untar_fn
 
-## Re: commit 1f4a3ab
-## Make s_codecFeatures a "const char *" to remove ISO C++ warning
-patch -N -p0 << EOF || true
+[[ $TDEVERSION == 14.0.12 ]] && {
+## Re: commit 1f4a3ab - Make s_codecFeatures a "const char *" to remove ISO C++ warning
+patch -p0 << EOF
 --- libk3b/jobs/k3bvideodvdtitletranscodingjob.cpp
 +++ libk3b/jobs/k3bvideodvdtitletranscodingjob.cpp
 @@ -564,1 +564,1 @@
@@ -186,9 +180,8 @@ patch -N -p0 << EOF || true
 +  static const char* s_codecFeatures[] = { "lame", "ac3", "ac3" };
 EOF
 
-## Re: 14.0.x, commits fad8c63 & ea1dbe7
-## Enable ffmpeg 5.0 compatibility
-patch -N -p0 << EOF || true
+## all versons ffmpeg support, ported from upstream commits
+patch -p0 << EOF
 --- plugins/decoder/ffmpeg/k3bffmpegwrapper.cpp
 +++ plugins/decoder/ffmpeg/k3bffmpegwrapper.cpp
 @@ -36,4 +36,2 @@
@@ -255,7 +248,7 @@ patch -N -p0 << EOF || true
 +  if (::avcodec_open2(d->audio_stream_ctx, d->codec, NULL) < 0) {
 @@ -210,2 +235,6 @@
 -    ::avcodec_close(FFMPEG_CODEC(d->audio_stream));
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 63, 100)
++#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(57, 33, 100)
 +    ::avcodec_free_context(&d->audio_stream_ctx);
 +#else
 +    ::avcodec_close(d->audio_stream_ctx);
@@ -281,7 +274,7 @@ patch -N -p0 << EOF || true
 @@ -327,10 +361,37 @@
 -    int len = ::avcodec_decode_audio4(FFMPEG_CODEC(d->audio_stream), d->frame,
 -                                      &gotFrame, &d->packet);
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 12, 100)
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 106, 100)
 +    int len = avcodec_receive_frame(d->audio_stream_ctx, d->frame);
 +    if (len == 0) {
 +      gotFrame = 1;
@@ -328,6 +321,7 @@ patch -N -p0 << EOF || true
 +#endif
 +}
 EOF
+}
 
 ## using cmake common rules
 find doc -name CMakeLists.txt | xargs rm

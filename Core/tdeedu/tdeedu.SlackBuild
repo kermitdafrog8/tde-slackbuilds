@@ -50,8 +50,6 @@ cd ocaml-4.05.0/
 
 ## patch for error caused by glibc-2.34:
 ## signals_asm.c:197:13: error: variably modified ‘sig_alt_stack’ at file scope
-##  197 | static char sig_alt_stack[SIGSTKSZ];
-##      |             ^~~~~~~~~~~~~
 ## Refs: https://github.com/ocaml/ocaml/{issues/10250,pull/10266}
 ##       https://github.com/dra27/ocaml/[pull/56]
 ##         └ 0d2c1fd77b4715c70d0ffc4348f1bc2d3eaacbf7 refs/remotes/origin/alt-signal-stack-4.05
@@ -166,13 +164,9 @@ patch -p0 << EOF
 +#endif
 EOF
 
-## clang build error:
+## clang build errors:
 #amd64.S:728:9: error: changed section flags for .rodata.cst8, expected: 0x12
-#        .section .rodata.cst8,"a",@progbits
-#        ^
 #amd64.S:728:9: error: changed section entsize for .rodata.cst8, expected: 8
-#        .section .rodata.cst8,"a",@progbits
-#        ^
 ## backport from ocaml commit 8a46d76bf9359b5cc505b3f2f9c81eb624c631fa
 patch -p0 << EOF
 --- asmcomp/amd64/emit.mlp
