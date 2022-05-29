@@ -52,7 +52,7 @@ sed -i "s|/opt/trinity|$INSTALL_TDE|" ../doc/man/*/*.1
 ## which defaults to $INSTALL_TDE/lib
 ## TDEFileReplace has been moved to tdeutils for R14.1.0
 [[ $TDEVERSION != 14.1.0 ]] && TDEFileReplace="-DBUILD_TDEFILEREPLACE=ON"
-cmake ${G_NINJA:-} \
+cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

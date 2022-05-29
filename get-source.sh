@@ -307,6 +307,10 @@ echo # if this fails, SlackBuild will fail from [3]
 ## [3] finally, cd into source directory
 #
 cd $PRGNAM*
+
+## For cmake builds - the path to the TDE cmake modules
+## Added for 14.0.x[aka 14.0.13+] & 14.1.0 which assume a cmake-trinity package is installed to the CMake system directories
+export CMAKE_OPTS=-DCMAKE_MODULE_PATH=$PWD/cmake/modules
 }
 
 listdocs_fn ()

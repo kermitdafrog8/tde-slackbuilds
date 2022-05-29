@@ -39,7 +39,7 @@ chown_fn
 
 cd_builddir_fn
 
-cmake ${G_NINJA:-} \
+cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \

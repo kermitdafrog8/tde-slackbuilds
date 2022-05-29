@@ -64,7 +64,7 @@ chown_fn
 cd_builddir_fn
 
 ## BUILD_EXTRA_THEME is a 14.1.0 option and will be ignored for 14.0.n builds
-cmake ${G_NINJA:-} \
+cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

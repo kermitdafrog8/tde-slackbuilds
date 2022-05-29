@@ -273,14 +273,14 @@ EXVAL=$?
 "
 \Zb\Z2PgDn/PgUp to scroll\Zn
 
-$(xzless Core/tde-i18n/langcodes.xz | tr "\n" X | sed 's|X|\\n|g;s|Latn\t|Latn|g')
+$(xzless Core/tde-i18n/langcodes.xz | sed 's| \t|\t|')
 " \
 26 75
 [[ $EXVAL == 0 ]] && dialog --cr-wrap --no-shadow --colors --no-collapse --ok-label "Return" --msgbox \
 "
 \Zb\Z2PgDn/PgUp to scroll\Zn
 
-$(xzless Core/tde-i18n/langcodes.xz |sed 's|\t\+|\t|g'|cut -f 1,3-| tr "\n" X | sed 's|X|\\n|g;s|\t|\t\t|g;s|cyrillic\t|cyrillic|g;s|Latn\t|Latn|g')
+$(xzless Core/tde-i18n/langcodes.xz | sed 's| \t|\t|' | colrm 17 40 )
 " \
 26 75
 done

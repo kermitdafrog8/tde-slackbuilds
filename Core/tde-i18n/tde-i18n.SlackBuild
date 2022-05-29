@@ -99,7 +99,10 @@ chown_fn
 mkdir -p $PRGNAM-$lang/build
 cd $PRGNAM-$lang/build
 
-cmake ${G_NINJA:-} \
+## The path to the TDE cmake modules is added for 14.0.x[aka 14.0.13+] & 14.1.0 which assume a cmake-trinity package is installed to the CMake system directories
+CMAKE_OPTS=-DCMAKE_MODULE_PATH=$PWD/../cmake/modules
+
+cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
@@ -120,10 +123,8 @@ make_fn
 
 mkdir_install_fn
 
-# extract the name of the language from the source text - a bit messy but there is no standard format
-Lang=$(grep Language-Team: $TMP_BUILD/tmp-$PRGNAM/$PRGNAM*/tde-i18n-$lang/messages/tdebase/*.po|sort -k2 | sed -e 's|Team: |\n|' -e 's| <|\n|' -e 's|akh\\n"|akh|' -e 's|an S|#|' | grep "[A-Z][a-z][a-z]*$"|head -n 1)
-[[ "$lang" == "pt" ]] && Lang="Portuguese"
-[[ "$lang" == "fy" ]] && Lang="Frisian"
+Lang=$(xzgrep ^"$lang " $SB_SRCDIR/langcodes.xz |colrm 1 16|cut -f1)
+Lang_en=$(xzgrep ^"$lang " $SB_SRCDIR/langcodes.xz |colrm 1 40)
 
 doinst_sh_fn
 
@@ -137,7 +138,7 @@ echo "
              |-----handy-ruler------------------------------------------------------|
 $PRGNAM-$lang: tde-i18n-$lang
 $PRGNAM-$lang:
-$PRGNAM-$lang: Language support for TDE: $Lang
+$PRGNAM-$lang: Language support for TDE: $Lang [$Lang_en]
 $PRGNAM-$lang:
 $PRGNAM-$lang:
 $PRGNAM-$lang:

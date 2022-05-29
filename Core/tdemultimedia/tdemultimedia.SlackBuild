@@ -42,7 +42,7 @@ cd_builddir_fn
 ## akode is required for ARTS_AKODE plugin & JUK
 [[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && aRts_AKODE=ON && JUK=ON
 
-cmake ${G_NINJA:-} \
+cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

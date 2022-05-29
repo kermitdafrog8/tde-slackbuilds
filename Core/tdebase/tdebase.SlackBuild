@@ -132,7 +132,10 @@ chown_fn
 
 cd_builddir_fn
 
-cmake ${G_NINJA:-} \
+## Add man pages for development builds
+[[ $TDEVERSION != 14.0.12 ]] && MAN_PAGES=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
+
+cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
@@ -142,6 +145,7 @@ cmake ${G_NINJA:-} \
     -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+    ${MAN_PAGES:-} \
     -DWITH_ARTS="ON" \
     -DWITH_ELFICON="OFF" \
     -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
@@ -231,6 +235,8 @@ cmake ${G_NINJA:-} \
 make_fn
 
 installdocs_fn
+
+[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
 
 strip_fn
 

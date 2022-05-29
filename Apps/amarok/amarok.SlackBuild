@@ -69,7 +69,7 @@ cd_builddir_fn
 ## Build aKode-engine?
 [[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && AKODE="ON"
 
-cmake ${G_NINJA:-} \
+cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

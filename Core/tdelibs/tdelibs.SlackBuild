@@ -165,7 +165,7 @@ sed -i 's|tde_message_fatal( "Spell checker|message( "Spell checker|' ../CMakeLi
 are 14.1.0 options and will be ignored by 14.0.n builds
 comment
 
-cmake ${G_NINJA:-} \
+cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

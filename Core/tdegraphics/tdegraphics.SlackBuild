@@ -97,7 +97,7 @@ cd_builddir_fn
 
 # If imlib is installed, include Kuickshow:
 pkg-config imlib && KUICKSHOW=ON
-cmake ${G_NINJA:-} \
+cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \
