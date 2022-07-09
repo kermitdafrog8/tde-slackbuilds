@@ -33,7 +33,7 @@ getsource_fn
 
 untar_fn
 
-## override hard coded trinity references - PLUGIN_INSTALL_DIR is derived from SYS_CNF_DIR,
+## override hard coded trinity references - PLUGIN_INSTALL_DIR is derived from TDE_CNF_DIR,
 ## and is relative to the TDE libraries directory
 sed -i "s|FileName=trinity|FileName=$PLUGIN_INSTALL_DIR|" quanta/data/config/plugins.rc
 sed -i "s|/opt/trinity|$INSTALL_TDE|" */*.tdevelop

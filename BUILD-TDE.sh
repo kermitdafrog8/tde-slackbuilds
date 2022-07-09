@@ -122,24 +122,8 @@ Any other option will have to be edited into BUILD-TDE.sh
 2> $TMPVARS/INSTALL_TDE
 
 
-rm -f $TMPVARS/SYS_CNF_DIR
-dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE System Configuration " --menu \
-"
-Select the directory that the TDE System Configuration files
-should be installed in.
-
-Selecting '/etc/tde' will also:
-* set TDEHOME=~/.tde and TDEROOTHOME=/root/.tde
-    \Z0\Zbotherwise defaults to
-    TDEHOME=~/.trinity and TDEROOTHOME=/root/.trinity\Zn
-* install plugins in $(cat $TMPVARS/INSTALL_TDE)/lib$LIBDIRSUFFIX/tde
-    \Z0\Zbotherwise defaults to $(cat $TMPVARS/INSTALL_TDE)/lib$LIBDIRSUFFIX/trinity\Zn
- 
-" \
-20 75 2 \
-"/etc/tde" "" \
-"/etc/trinity" "" \
-2> $TMPVARS/SYS_CNF_DIR
+rm -f $TMPVARS/TDE_CNF_DIR
+echo "$(cat $TMPVARS/INSTALL_TDE)/share/config" > $TMPVARS/TDE_CNF_DIR
 
 
 rm -f $TMPVARS/COMPILER
@@ -665,6 +649,9 @@ status_k=off
 comment_k="\Zb\Z6 Needs filters and servicetypes \Zn"
 }
 #
+[[ $(cat $TMPVARS/TDEVERSION) != 14.0.12 ]] && MAN_PAGES=' including man pages'
+DOCS="Application handbooks${MAN_PAGES:-}"
+#
  ### for the record, --separate-output generates output without quotes
 dialog --cr-wrap --nocancel --separate-output --no-shadow --colors --title " KOffice applications " --item-help --checklist \
 "
@@ -675,7 +662,7 @@ Filters and servicetypes are required for most apps.
 " ALL" "Build all applications" off "\Zb\Z6 Overrides any off/on selections below \Zn" \
 " autocorrect" "Autocorrection for US English" off "\Zb\Z6  \Zn" \
 ${app_c:-} ${about_c:-} ${status_c:-} ${comment_c:-} \
-" doc" "Application handbooks" off "\Zb\Z6  \Zn" \
+" doc" "$DOCS" off "\Zb\Z6  \Zn" \
 " example" "KOffice Example Application" off "\Zb\Z6  \Zn" \
 " filters" "Import/export filters" on "\Zb\Z6  \Zn" \
 " karbon" "A scalable graphics editor" off "\Zb\Z6 Needs filters and servicetypes \Zn" \
@@ -891,7 +878,7 @@ Confirm or change these build options ..
 
 export TDEVERSION=$(cat $TMPVARS/TDEVERSION)
 export INSTALL_TDE=$(cat $TMPVARS/INSTALL_TDE)
-export SYS_CNF_DIR=$(cat $TMPVARS/SYS_CNF_DIR)
+export TDE_CNF_DIR=$(cat $TMPVARS/TDE_CNF_DIR)
 export COMPILER=$(cat $TMPVARS/COMPILER)
 [[ $COMPILER == gcc ]] && export COMPILER_CXX="g++" || export COMPILER_CXX="clang++"
 export SET_march=$(cat $TMPVARS/SET_MARCH)
@@ -925,8 +912,8 @@ export ARM_FABI=$(readelf -Ah $(which bash)|grep -oE "soft|hard")
 ## override hard coded trinity plugins directory - used for:
 ## autotools: get-source.sh|ltoolupdate_fn
 ## cmake: -DPLUGIN_INSTALL_DIR=
-export PLUGIN_INSTALL_DIR=$(cat $TMPVARS/SYS_CNF_DIR | cut -d/ -f3)
-
+export PLUGIN_INSTALL_DIR=$(cat $TMPVARS/TDE_CNF_DIR | grep -o [a-z]*/share | cut -d/ -f1)
+[[ $PLUGIN_INSTALL_DIR != tde ]] && PLUGIN_INSTALL_DIR=trinity
 ### set up variables for the summary list:
 ## New build
 [[ $(cat $TMPVARS/build-new) != no ]] && NEW_BUILD=yes || NEW_BUILD='no - re-using existing'
@@ -990,7 +977,7 @@ TDE version                             \Zb\Z6$TDEVERSION\Zn
 Clone/update cgit local repositories    \Zb\Z6${CLONE:-\Z0\Zbn/a}\Zn
 Only download sources                   \Zb\Z6${PRE_DOWNLOAD:-\Z0\Zbn/a}\Zn
 TDE installation directory              \Zb\Z6$INSTALL_TDE\Zn
-TDE system configuration directory      \Zb\Z6$SYS_CNF_DIR\Zn
+TDE system configuration directory      \Zb\Z6$TDE_CNF_DIR\Zn
 Compiler                                \Zb\Z6$COMPILER\Zn
 gcc cpu optimization                    \Zb\Z6$SET_march\Zn
 Number of parallel jobs                 \Zb\Z6$(echo $NUMJOBS|sed 's|-j||')\Zn

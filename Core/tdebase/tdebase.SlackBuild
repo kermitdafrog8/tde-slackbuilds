@@ -95,9 +95,10 @@ echo $'
 +X-TDE-BrowserView-Built-Into=konqueror
 ' | patch -N -p0 || true
 
-## allow for configuration files directory == /etc/tde
+## allow for configuration files directory == *tde*
 ## and plugins in $INSTALL_TDE/lib$LIBDIRSUFFIX/tde
 sed -i "s|trinity|$PLUGIN_INSTALL_DIR|g" tdm/config.def || true
+sed -i "s|/etc/trinity|$INSTALL_TDE/share/config|" tdm/kfrontend/gentdmconf.c || true
 sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" tdm/kfrontend/gentdmconf.c || true
 sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" kcontrol/hwmanager/devicepropsdlg.cpp || true
 sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" tdeioslave/trash/testtrash.cpp || true
@@ -132,8 +133,30 @@ chown_fn
 
 cd_builddir_fn
 
+[[ $TDEVERSION != 14.0.12 ]] && {
 ## Add man pages for development builds
-[[ $TDEVERSION != 14.0.12 ]] && MAN_PAGES=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
+MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
+sed -i "s|/etc/trinity|$INSTALL_TDE/share/config|" ../doc/man/{gentdmconf,tdm}.1
+[[ $TDE_CNF_DIR == *tde* ]] && \
+sed -i 's|trinity,kde,kde2,kde1|tde|' ../doc/man/*.1 && \
+sed -i 's|trinity|tde|g' ../doc/man/*.1 || \
+sed -i 's|trinity,kde,kde2,kde1|trinity|' ../doc/man/*.1
+sed -i "s|http://bugs.*desktop.org|https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM/issues|" ../doc/man/*.1
+
+## kfrontend/CMakeLists.txt runs gentdmconf to set up the tdm configuration files
+## - after that, add the TDM configuration README
+echo '
+if( BUILD_TDM )
+install(
+    FILES ../README
+    RENAME README-config
+    DESTINATION ${CONFIG_INSTALL_DIR}/tdm
+)
+endif( )
+' >> ../tdm/kfrontend/CMakeLists.txt
+#
+sed -i "s|/opt/.*/share/doc/tdm/README.gz|$INSTALL_TDE/share/config/tdm/README-config|" ../doc/man/tdm{,ctl}.1
+}
 
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -142,10 +165,9 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    ${MAN_PAGES:-} \
+    ${MANDIR:-} \
     -DWITH_ARTS="ON" \
     -DWITH_ELFICON="OFF" \
     -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
@@ -290,11 +312,11 @@ echo '#!'"/bin/sh
 export TDEDIR=$INSTALL_TDE
 
 # upgradepkg runs installpkg twice, so test for the second run:
-[[ \"\$XDG_CONFIG_DIRS\" != *$SYS_CNF_DIR/xdg* ]] && {
+[[ \"\$XDG_CONFIG_DIRS\" != *$INSTALL_TDE/etc/xdg* ]] && {
 if [ ! \"\$XDG_CONFIG_DIRS\" = \"\" ]; then
-  export XDG_CONFIG_DIRS=\$XDG_CONFIG_DIRS:$SYS_CNF_DIR/xdg
+  export XDG_CONFIG_DIRS=\$XDG_CONFIG_DIRS:$INSTALL_TDE/etc/xdg
 else
-  export XDG_CONFIG_DIRS=/etc/xdg:$SYS_CNF_DIR/xdg
+  export XDG_CONFIG_DIRS=/etc/xdg:$INSTALL_TDE/etc/xdg
 fi
 }
 
@@ -314,9 +336,9 @@ if ( ! \$?TDEDIR ) then
 endif
 
 if ( \$?XDG_CONFIG_DIRS ) then
-    setenv XDG_CONFIG_DIRS \$XDG_CONFIG_DIRS:$SYS_CNF_DIR/xdg
+    setenv XDG_CONFIG_DIRS \$XDG_CONFIG_DIRS:$INSTALL_TDE/etc/xdg
 else
-    setenv XDG_CONFIG_DIRS /etc/xdg:$SYS_CNF_DIR/xdg
+    setenv XDG_CONFIG_DIRS /etc/xdg:$INSTALL_TDE/etc/xdg
 endif
 
 setenv XDG_DATA_DIRS /usr/local/share:/usr/share:$INSTALL_TDE/share
@@ -333,24 +355,13 @@ fi
 
 #################################  TDM stuff #################################
 
-# Add some configuration files / scripts needed by TDE.
-mkdir -p $PKG$SYS_CNF_DIR
-mv $PKG$INSTALL_TDE/share/config/tdm $PKG$SYS_CNF_DIR/tdm
-( cd $PKG$INSTALL_TDE/share/config ; ln -sf $SYS_CNF_DIR/tdm tdm )
-
-# Setup config files for TDM:
-$PKG$INSTALL_TDE/bin/gentdmconf --no-old --no-old-scripts --no-backup --in $PKG$SYS_CNF_DIR/tdm
-
-## set correct paths for config files
-sed -i "s|$INSTALL_TDE/share/config/tdm/|$SYS_CNF_DIR/tdm/|" $PKG$SYS_CNF_DIR/tdm/tdmrc
-
 # Allow root to login
-sed 's|AllowRootLogin=false|AllowRootLogin=true|' $PKG$SYS_CNF_DIR/tdm/tdmrc > $PKG$SYS_CNF_DIR/tdm/tdmrc.new
+sed 's|AllowRootLogin=false|AllowRootLogin=true|' $PKG$INSTALL_TDE/share/config/tdm/tdmrc > $PKG$INSTALL_TDE/share/config/tdm/tdmrc.new
 
 ## Remove tdmrc which has AllowRootLogin=false set and would be used for a new installation
-## The installed tdmrc will be created by doinst.sh from tdmrc.new if it doesn't exist
-rm $PKG$SYS_CNF_DIR/tdm/tdmrc
-mv $PKG$SYS_CNF_DIR/tdm/Xsession $PKG$SYS_CNF_DIR/tdm/Xsession.orig
+## If it doesn't exist, tdmrc will be created by doinst.sh from tdmrc.new
+rm $PKG$INSTALL_TDE/share/config/tdm/tdmrc
+mv $PKG$INSTALL_TDE/share/config/tdm/Xsession $PKG$INSTALL_TDE/share/config/tdm/Xsession.orig
 #
 ## new Xsession:
 echo '#!'' /bin/sh
@@ -364,8 +375,8 @@ session=$1
 # This section is borrowed from the old X11 Xsession file:
 userresources=$HOME/.Xresources
 usermodmap=$HOME/.Xmodmap
-sysresources=/usr/lib/X11/xinit/.Xresources
-sysmodmap=/usr/lib/X11/xinit/.Xmodmap
+sysresources=/etc/X11/xinit/.Xresources
+sysmodmap=/etc/X11/xinit/.Xmodmap
 # merge in defaults and keymaps
 if [ -r $sysresources ]; then
         /usr/bin/xrdb -merge $sysresources
@@ -440,7 +451,7 @@ case $session in
     ;;
 esac
 exec xmessage -center -buttons OK:0 -default OK "Sorry, cannot execute $session. Check $DESKTOP_SESSION.desktop."
-' > $PKG$SYS_CNF_DIR/tdm/Xsession
+' > $PKG$INSTALL_TDE/share/config/tdm/Xsession
 
 # Add rc.4.local to give TDM priority over rc.4 X11 session manager options
 # Assumes that rc.4.new from sysvinit-scripts still has the rc.4.local option
@@ -457,9 +468,7 @@ fi
 " > $PKG/etc/rc.d/rc.4.local.tdm
 chmod 755 $PKG/etc/rc.d/rc.4.local.tdm
 
-mv $PKG$SYS_CNF_DIR/tdm/backgroundrc $PKG$SYS_CNF_DIR/tdm/backgroundrc.new
-[[ -r $PKG$SYS_CNF_DIR/tdm/README ]] && \
-sed -i "s|$TMP_BUILD/package-tdebase$SYS_CNF_DIR/tdm|$SYS_CNF_DIR/tdm|" $PKG$SYS_CNF_DIR/tdm/README
+mv $PKG$INSTALL_TDE/share/config/tdm/backgroundrc $PKG$INSTALL_TDE/share/config/tdm/backgroundrc.new
 
 ##############################################################################
 
@@ -467,20 +476,7 @@ mkdir_install_fn
 
 ##############################################################################
 ## create doinst.sh:
-
 echo '# Save old config files:
-if [ ! -L etc/X11/tdm ]; then
-  if [ -d etc/X11/tdm ]; then
-  mkdir -p .'"$SYS_CNF_DIR"'/tdm
-  cp -a etc/X11/tdm/* .'"$SYS_CNF_DIR"'/tdm
-  rm -rf etc/X11/tdm
-  ( cd etc/X11 ; ln -sf ../..'"$SYS_CNF_DIR"'/tdm tdm )
-    elif [ ! -e etc/X11/tdm ]; then
-    mkdir -p etc/X11
-    ( cd etc/X11 ; ln -sf ../..'"$SYS_CNF_DIR"'/tdm tdm )
-  fi
-fi
-
 config() {
   NEW="$1"
   OLD="$(dirname $NEW)/$(basename $NEW .new)"
@@ -492,8 +488,8 @@ config() {
   fi
   # Otherwise, we leave the .new copy for the admin to consider...
 }
-config .'"$SYS_CNF_DIR"'/tdm/tdmrc.new
-config .'"$SYS_CNF_DIR"'/tdm/backgroundrc.new
+config .'"$INSTALL_TDE"'/share/config/tdm/tdmrc.new
+config .'"$INSTALL_TDE"'/share/config/tdm/backgroundrc.new
 
 # update PATH
 # upgradepkg runs installpkg twice, so even though '"$TQTDIR"'/bin might be
@@ -521,7 +517,7 @@ sed -i '\''s|source /etc/profile.d/mc.sh|#source /etc/profile.d/mc.sh|'\'' $HOME
 ' > $PKG/install/doinst.sh
 
 ## set TDEHOME and TDEROOTHOME variables - defaults ~/.trinity and /root/.trinity
-[[ $SYS_CNF_DIR == /etc/tde ]] && {
+[[ $TDE_CNF_DIR == *tde* ]] && {
 echo "# upgradepkg runs installpkg twice, so firstly remove any previous TDE*HOME entries
 sed -i '/TDE.*HOME/d' /etc/profile
 echo 'export TDEHOME=~/.tde' >> /etc/profile

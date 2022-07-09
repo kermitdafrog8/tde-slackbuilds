@@ -1,15 +1,16 @@
-[<img src="https://ray-v.github.io/TDE-aarch64-gui.png">](https://ray-v.github.io/TDE-aarch64-gui.png)
+[<img src="https://ray-v.github.io/TDE-aarch64-gui.png">](https://ray-v.github.io/TDE-aarch64-gui.png "TDE desktop")  
 ... a TDE desktop, cross compiled for aarch64, running on a RPi3.
 
 ---
 ***Build TDE [Trinity Desktop Environment]***  
 .. for Slackware [x86_64/i586+/arm], and [Slarm64](http://slarm64.org/download.html) [aarch64].  
-See 'Cross compiling for RPi3' for building for arm_hf and aarch64.
+See [*Cross compiling for RPi3*](#xcompiling) for building for arm_hf and aarch64.
 
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input,  
 which will build the release version 14.0.12, or the development versions 14.0.x, 14.1.0.
 
-[<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png)
+[<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png "TDE version")  
+... select TDE version
 
 The Required packages will need to be installed as they are built, because they provide dependencies for other TDE packages.
 
@@ -99,8 +100,7 @@ Once any git repository has been cloned, further downloads are updates only[2], 
 The git repositories are cloned to 'src/cgit'
 
 ---
-
-***Cross compiling for RPi3***
+<a id="xcompiling"></a>***Cross compiling for RPi3***
 
 Cross compiling a number of packages for the Raspberry Pi3 based on these scripts is detailed in the html page in the gh-pages branch:
 ```
@@ -131,6 +131,8 @@ Includes:
 [3] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.
 
 [4] The README for a [native build for Raspberry Pi3](./README-Raspberry-Pi3.md) is out-of-date and cross compiling is a better option.
+
+[5] The speex build for version 1.2.0 has been retained, but speex v1.2.1 is available as a Slackware 15.0 package and should be used for tdenetwork and amarok builds.
 
 ---
 

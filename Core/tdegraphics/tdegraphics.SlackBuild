@@ -48,6 +48,7 @@ echo $'
 +</includes>
 ' | patch -N -p0 || true
 
+[[ $TDEVERSION == 14.0.12 ]] && {
 ## for poppler-22.03+
 patch -N -p0 << EOF || true
 --- config.h.cmake
@@ -88,6 +89,7 @@ patch -N -p0 << EOF || true
      DocumentData(GooString *filePath, GooString *password) : doc(filePath,password), m_fontInfoScanner(0), m_outputDev(0) {}
 +#   endif
 EOF
+}
 
 listdocs_fn
 
@@ -95,8 +97,15 @@ chown_fn
 
 cd_builddir_fn
 
+## Add man pages for development builds
+[[ $TDEVERSION != 14.0.12 ]] && {
+MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
+sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM/issues|" ../doc/man/*/*.1
+}
+
 # If imlib is installed, include Kuickshow:
 pkg-config imlib && KUICKSHOW=ON
+
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
@@ -106,6 +115,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+    ${MANDIR:-} \
     -DWITH_T1LIB="OFF" \
     -DWITH_PAPER="OFF" \
     -DWITH_TIFF="ON" \
@@ -117,8 +127,8 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DBUILD_KPDF="ON" \
     -DBUILD_KAMERA="OFF" \
     -DBUILD_KSVG="ON" \
-    -DBUILD_LIBKSCAN="OFF" \
-    -DBUILD_KOOKA="OFF" \
+    -DBUILD_LIBKSCAN="ON" \
+    -DBUILD_KOOKA="ON" \
     -DBUILD_KCOLOREDIT="ON" \
     -DBUILD_KDVI="ON" \
     -DBUILD_KFAX="ON" \
@@ -139,6 +149,8 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
 make_fn
 
 installdocs_fn
+
+[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
 
 strip_fn
 

@@ -48,7 +48,7 @@ echo $'--- tdecmshell/main.cpp
 +        kdError(780) << "Could not find \'" << path << "\'." << endl;
 ' | patch -N -p0 || true
 
-## allow for configuration files directory == /etc/tde
+## allow for configuration files directory == *tde*
 ## and plugins in $INSTALL_TDE/lib$LIBDIRSUFFIX/tde
 for file in \
 tdecore/kstandarddirs.cpp \
@@ -115,6 +115,7 @@ patch -N -p0 << EOF || true
 +  text-align: left;
 EOF
 
+[[ $TDEVERSION == 14.0.12 ]] && {
 ## for jasper-3.0.0+
 patch -N -p0 << EOF || true
 --- kimgio/jp2.cpp
@@ -137,6 +138,13 @@ patch -N -p0 << EOF || true
  	jas_image_destroy( ji );
  	jas_stream_close( stream );
 EOF
+
+## Backport for markdown syntax highlighting in kate
+sed -i 's|mandoc.xml|& markdown.xml|' kate/data/CMakeLists.txt
+sed -i 's|mandoc.xml.*$|&\n<Definition name="Markdown" url="http://git.trinitydesktop.org/cgit/tdelibs/plain/kate/data/markdown.xml" version="1.3"/>|' kate/data/update-files.xml
+}
+## and add modified markdown.xml for all TDE versions
+cp $SB_SRCDIR/markdown.xml kate/data/
 
 listdocs_fn
 
@@ -162,7 +170,7 @@ sed -i 's|tde_message_fatal( "Spell checker|message( "Spell checker|' ../CMakeLi
     WITH_PCSC
     WITH_PKCS
     WITH_UDEVIL
-are 14.1.0 options and will be ignored by 14.0.n builds
+are 14.1.0 options and will be ignored by 14.0.? builds
 comment
 
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
@@ -172,7 +180,6 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DSYSCONF_INSTALL_DIR=$SYS_CNF_DIR \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DDEFAULT_SPELL_CHECKER=${DEF_SP_CHKR:-"ASPELL"} \

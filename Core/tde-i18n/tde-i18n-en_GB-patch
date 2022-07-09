@@ -88,3 +88,43 @@
 +
 +msgid "&Enable user color profile support"
 +msgstr "Enable &user colour profile support"
+
+--- tde-i18n-en_GB/messages/tdebase/kcmlayout.po
++++ tde-i18n-en_GB/messages/tdebase/kcmlayout.po
+@@ -1239,3 +1239,3 @@
+ msgid "Use &theme colors"
+-msgstr ""
++msgstr "Use &theme colours"
+ 
+@@ -1244,3 +1244,3 @@
+ msgid "Use c&ustom colors"
+-msgstr ""
++msgstr "Use c&ustom colours"
+ 
+@@ -1249,3 +1249,3 @@
+ msgid "Background color:"
+-msgstr ""
++msgstr "Background colour:"
+ 
+@@ -1256,4 +1256,4 @@
+ "was set to display a flag."
+-msgstr ""
+-
++msgstr "This colour will be used as the indicator's background unless the indicator "
++"was set to display a flag."
+ #: kcmlayoutwidget.ui:617
+@@ -1261,3 +1261,3 @@
+ msgid "Text color:"
+-msgstr ""
++msgstr "Text colour:"
+ 
+@@ -1266,3 +1266,3 @@
+ msgid "This color will be used to draw the language label on the indicator."
+-msgstr ""
++msgstr "This colour will be used to draw the language label on the indicator."
+ 
+@@ -1307,3 +1307,3 @@
+ msgid "The drop shadow behind the language label will be of this color."
+-msgstr ""
++msgstr "The drop shadow behind the language label will be of this colour."
+ 

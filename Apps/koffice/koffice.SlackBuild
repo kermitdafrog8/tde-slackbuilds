@@ -121,6 +121,10 @@ sed -i 's|KFORMULA$COMPILE_FILTER_KUGAR|&$COMPILE_FILTER_KRITA$COMPILE_FILTER_KI
 
 [[ $(cat $TMPVARS/DO_NOT_COMPILE) == *kross* ]] && SCRIPTING=--disable-scripting
 
+## Add man pages for development builds
+[[ $TDEVERSION != 14.0.12 ]] && \
+MANDIR=--mandir=$INSTALL_TDE/man
+
 listdocs_fn
 
 ltoolupdate_fn
@@ -136,6 +140,7 @@ CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
+   ${MANDIR:-} \
    --disable-rpath \
    ${SCRIPTING:-} \
    --enable-closure
@@ -143,6 +148,8 @@ CXX=$COMPILER_CXX \
 make_fn
 
 installdocs_fn
+
+[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
 
 strip_fn
 
