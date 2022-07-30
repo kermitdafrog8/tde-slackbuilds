@@ -39,6 +39,12 @@ chown_fn
 
 cd_builddir_fn
 
+## Add man pages for development builds
+[[ $TDEVERSION != 14.0.12 ]] && {
+MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
+sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM/issues|" ../doc/man/*/*.1
+}
+
 ## akode is required for ARTS_AKODE plugin & JUK
 [[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && aRts_AKODE=ON && JUK=ON
 
@@ -51,6 +57,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+    ${MANDIR:-} \
     -DWITH_ALSA="ON" \
     -DWITH_ARTS_AKODE="${aRts_AKODE:-OFF}" \
     -DWITH_ARTS_AUDIOFILE="ON" \
@@ -86,6 +93,8 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
 make_fn
 
 installdocs_fn
+
+[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
 
 strip_fn
 

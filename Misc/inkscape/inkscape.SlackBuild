@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=inkscape
-VERSION=1.1.2
+VERSION=1.2.1
 BUILD=${BUILD:-1}
 
 ARCHIVE_TYPE="tar.xz"
@@ -34,27 +34,28 @@ source ../../get-source.sh
 ## need this here for CXX_FLAGS for double-conversion
 getsource_fn
 
-## inkscape v1.1.x needs double-conversion
+## inkscape needs double-conversion
 [[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 # ### double-conversion  - start
 {
 ## If it is already installed, go to end
 ldconfig -p|grep libdouble-conversion 1>/dev/null || {
 ## otherwise, if the source archive is in 'src' ..
-[[ -s $BUILD_TDE_ROOT/src/v3.1.5.tar.gz ]] && {
+[[ -s $BUILD_TDE_ROOT/src/v3.2.0.tar.gz ]] && {
 ## .. build, package, and install ..
 (
 echo -e "\n building double-conversion \n"
 
 cd /$TMP_BUILD
 rm -rf *double-conversion*
-tar xf $BUILD_TDE_ROOT/src/v3.1.5.tar.gz
-cd double-conversion-3.1.5/
+tar xf $BUILD_TDE_ROOT/src/v3.2.0.tar.gz
+cd double-conversion-3.2.0/
 
 cd cmake/
 # LIBDIRSUFFIX not required - builds to lib64 where appropriate ..
 cmake ${G_NINJA:-} \
     -DBUILD_SHARED_LIBS=ON \
+    -DBUILD_TESTING=OFF \
     -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     ..
@@ -63,8 +64,8 @@ PKG=$TMP_BUILD/package-double-conversion
 make_fn
 
 cd $TMP_BUILD/package-double-conversion
-makepkg -l y -c n $OUTPUT/double-conversion-3.1.5-$ARCH-$BUILD.txz
-installpkg $OUTPUT/double-conversion-3.1.5-$ARCH-$BUILD.txz
+makepkg -l y -c n $OUTPUT/double-conversion-3.2.0-$ARCH-$BUILD.txz
+installpkg $OUTPUT/double-conversion-3.2.0-$ARCH-$BUILD.txz
 )
 echo -e "\n now building inkscape \n"
 } || { ## .. but if the source archive isn't in 'src', display download URL ..
@@ -76,7 +77,7 @@ echo -e "
  Download:
              \033[39;1m
 ( cd $BUILD_TDE_ROOT/src
-  wget https://github.com/google/double-conversion/archive/v3.1.5.tar.gz )
+  wget https://github.com/google/double-conversion/archive/v3.2.0.tar.gz )
              \033[0m
  and re-run this script ..
 
@@ -89,84 +90,8 @@ echo -e "
 
 untar_fn
 
-## patch for poppler 22.03+
-## inkscape commit a18c57ffff313fd08bc8a44f6b6bf0b01d7e9b75
-patch -p0 << EOF
---- src/extension/internal/pdfinput/pdf-input.cpp
-+++ src/extension/internal/pdfinput/pdf-input.cpp
-@@ -671,2 +671,1 @@ PdfInput::open(::Inkscape::Extension::Input * /*mod*/, const gchar * uri) {
--    GooString *filename_goo = new GooString(uri);
--    pdf_doc = std::make_shared<PDFDoc>(filename_goo, nullptr, nullptr, nullptr);   // TODO: Could ask for password
-+    pdf_doc = _POPPLER_MAKE_SHARED_PDFDOC(uri); // TODO: Could ask for password
---- src/extension/internal/pdfinput/poppler-transition-api.h
-+++ src/extension/internal/pdfinput/poppler-transition-api.h
-@@ -17,0 +17,6 @@
-+#if POPPLER_CHECK_VERSION(22, 3, 0)
-+#define _POPPLER_MAKE_SHARED_PDFDOC(uri) std::make_shared<PDFDoc>(std::make_unique<GooString>(uri))
-+#else
-+#define _POPPLER_MAKE_SHARED_PDFDOC(uri) std::make_shared<PDFDoc>(new GooString(uri), nullptr, nullptr, nullptr)
-+#endif
-+
-EOF
-
-## patch for poppler 22.04+
-## inkscape commit d989cdf1059c78bc3bb6414330242073768d640b
-patch -p0 << EOF
---- src/extension/internal/pdfinput/pdf-parser.cpp
-+++ src/extension/internal/pdfinput/pdf-parser.cpp
-@@ -33,0 +33,1 @@
-+#include "poppler-transition-api.h"
-@@ -2161,1 +2162,1 @@
--  GfxFont *font = res->lookupFont(args[0].getName());
-+  auto font = res->lookupFont(args[0].getName());
-@@ -2182,1 +2183,3 @@
-+#if !POPPLER_CHECK_VERSION(22, 4, 0)
-   font->incRefCnt();
-+#endif
-@@ -2376,1 +2379,0 @@
--  GfxFont *font;
-@@ -2395,1 +2397,1 @@
--  font = state->getFont();
-+  auto font = state->getFont();
-@@ -2448,4 +2450,4 @@
--        _POPPLER_CALL_ARGS(charProc, ((Gfx8BitFont *)font)->getCharProc, code);
--	if ((resDict = ((Gfx8BitFont *)font)->getResources())) {
-+        _POPPLER_CALL_ARGS(charProc, _POPPLER_FONTPTR_TO_GFX8(font)->getCharProc, code);
-+    if (resDict = _POPPLER_FONTPTR_TO_GFX8(font)->getResources()) {
- 	  pushResources(resDict);
--	}
-+    }
---- src/extension/internal/pdfinput/poppler-transition-api.h
-+++ src/extension/internal/pdfinput/poppler-transition-api.h
-@@ -17,0 +17,6 @@
-+#if POPPLER_CHECK_VERSION(22, 4, 0)
-+#define _POPPLER_FONTPTR_TO_GFX8(font_ptr) ((Gfx8BitFont *)font_ptr.get())
-+#else
-+#define _POPPLER_FONTPTR_TO_GFX8(font_ptr) ((Gfx8BitFont *)font_ptr)
-+#endif
-+
---- src/extension/internal/pdfinput/svg-builder.cpp
-+++ src/extension/internal/pdfinput/svg-builder.cpp
-@@ -111,1 +111,0 @@
--    _current_font = nullptr;
-@@ -1024,5 +1023,2 @@
--    if (_font_style) {
--        //sp_repr_css_attr_unref(_font_style);
--    }
-     _font_style = sp_repr_css_attr_new();
--    GfxFont *font = state->getFont();
-+    auto font = state->getFont();
-@@ -1174,1 +1170,0 @@
--    _current_font = font;
---- src/extension/internal/pdfinput/svg-builder.h
-+++ src/extension/internal/pdfinput/svg-builder.h
-@@ -206,1 +206,0 @@
--    GfxFont *_current_font;
-EOF
-
 ## set internal 2geom lib paths to lib$LIBDIRSUFFIX
-sed -i "s|CMAKE_INSTALL_PREFIX}/lib|&$LIBDIRSUFFIX|" src/3rdparty/2geom/CMakeLists.txt
-sed -i "s|DESTINATION lib|&$LIBDIRSUFFIX|" src/3rdparty/2geom/CMakeLists.txt
+sed -i 's|set(CMAKE_INSTALL_RPATH.*$|set(CMAKE_INSTALL_RPATH $ORIGIN)|' src/3rdparty/2geom/CMakeLists.txt
 sed -i "s|libdir=.*$|&$LIBDIRSUFFIX|" src/3rdparty/2geom/2geom.pc.in
 
 ## only build for required locales
@@ -242,13 +167,13 @@ cmake ${G_NINJA:-} \
     -DENABLE_POPPLER="ON" \
     -DENABLE_POPPLER_CAIRO="ON" \
     -DWITH_ASAN="OFF" \
-    -DWITH_DBUS="OFF" \
     -DWITH_FUZZ="OFF" \
     -DWITH_GNU_READLINE="ON" \
     -DWITH_GRAPHICS_MAGICK="ON" \
     -DWITH_GSPELL="OFF" \
     -DWITH_IMAGE_MAGICK="ON" \
     -DWITH_INTERNAL_2GEOM="ON" \
+    -DWITH_INTERNAL_CAIRO="OFF" \
     -DWITH_JEMALLOC="OFF" \
     -DWITH_LIBCDR="ON" \
     -DWITH_LIBVISIO="OFF" \
@@ -260,6 +185,8 @@ cmake ${G_NINJA:-} \
     -DWITH_OPENMP="ON" \
     -DWITH_PROFILING="OFF" \
     -DWITH_SVG2="ON" \
+    -DWITH_X11="ON" \
+    -DENABLE_BINRELOC="OFF" \
     -Wno-dev \
     ..
 
