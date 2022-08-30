@@ -33,6 +33,7 @@ getsource_fn
 
 untar_fn
 
+[[ $TDEVERSION == 14.0.12 ]] && {
 ## remove help documentation build instruction from all locales ...
 sed -i '/tde_create_handbook/,+3d' doc/*/CMakeLists.txt || true
 ## ... and restore for 'en'
@@ -55,8 +56,12 @@ ldocs="$ldocs $Lang"
 done
 #
 sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
-langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
-[[ $langs != "" ]] && TRANS=ON
+[[ $langs != "" ]] && TRANS=ON && langs=" $(echo $langs|sed "s|/$PRGNAM.po||g")"
+} || {
+## for slack-desc and to set TRANS=ON until 14.0.12 build removed
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang" && TRANS=ON;done
+ldocs="";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
+}
 
 ## delete zero length files
 find data/pixmaps/feta -type f -empty -delete
@@ -73,6 +78,13 @@ pkg-config jack && JACK="ON"
 # Check for DSSI aka "Dizzy"
 pkg-config dssi && DSSI="ON"
 
+## Add man page for development builds
+[[ $TDEVERSION != 14.0.12 ]] && {
+MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
+## for cmake version 3.21.x?
+sed -i 's|PROJECT(ROSEGARDEN)|project(rosegarden)|' ../CMakeLists.txt
+}
+
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
@@ -82,6 +94,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
+    ${MANDIR:-} \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     -DWANT_SOUND="ON" \
@@ -98,6 +111,8 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
 make_fn
 
 installdocs_fn
+
+[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
 
 strip_fn
 
@@ -116,7 +131,7 @@ echo "
 $PRGNAM: Rosegarden is a MIDI and audio sequencer and musical notation editor.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en $langs
+$PRGNAM: en$langs
 $PRGNAM:
 $PRGNAM: With help documentation for:
 $PRGNAM: en$ldocs

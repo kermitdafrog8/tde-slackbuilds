@@ -323,6 +323,7 @@ patch -p0 << EOF
 EOF
 }
 
+[[ $TDEVERSION == 14.0.12 ]] && {
 ## using cmake common rules
 find doc -name CMakeLists.txt | xargs rm
 
@@ -337,15 +338,21 @@ tde_conditional_add_project_docs( BUILD_DOC )|' CMakeLists.txt
 mv doc/tdeioslave doc/en
 mv doc/en/en doc/en/tdeioslave
 mv doc/*.* doc/en/
-
+}
 mkdir doc/misc
 mv FAQ doc/misc/
+
 
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
+
+## Add man page for development builds
+[[ $TDEVERSION != 14.0.12 ]] && {
+MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
+}
 
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -356,6 +363,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+    ${MANDIR:-} \
     -DWITH_LIBDVDREAD="ON" \
     -DWITH_MUSICBRAINZ=${MUSICBRAINZ:-"OFF"} \
     -DWITH_SYSTEM_LIBSAMPLERATE="ON" \
@@ -380,6 +388,8 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
 make_fn
 
 installdocs_fn
+
+[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
 
 strip_fn
 

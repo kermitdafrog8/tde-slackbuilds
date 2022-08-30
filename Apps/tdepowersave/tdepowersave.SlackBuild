@@ -33,6 +33,7 @@ getsource_fn
 
 untar_fn
 
+[[ $TDEVERSION == 14.0.12 ]] && {
 ## remove help documentation build instruction from all [non-en] locales ...
 sed -i '/tde_create_handbook/,+3d' doc/??{,_??}/CMakeLists.txt || true
 # .. restore for en always
@@ -60,6 +61,11 @@ done
 ## this GLOB overrides "LANG auto" in po/CMakeLists.txt:
 sed -i "s| \*.po| $lpos|" cmake/modules/TDEMacros.cmake
 [[ $lpos != "" ]] && TRANS=ON
+} || {
+## for slack-desc and to set TRANS=ON until 14.0.12 build removed
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang" && TRANS=ON;done
+ldocs="";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
+}
 
 listdocs_fn
 

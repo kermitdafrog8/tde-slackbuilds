@@ -39,6 +39,14 @@ chown_fn
 
 cd_builddir_fn
 
+## Add man pages for development builds
+[[ $TDEVERSION != 14.0.12 ]] && {
+MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
+BUILDDOC=-DBUILD_DOC="ON"
+sed -i 's|^KDE|TDE|' ../README.md
+for i in ../doc/man/*.1 ; do mv $i ${i%%-trinity.1}.1 ; done
+}
+
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
@@ -47,6 +55,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    ${MANDIR:-} \
     -DWITH_ALSA="ON" \
     -DWITH_AUDIOFILE="ON" \
     -DWITH_ESOUND="OFF" \
@@ -55,12 +64,15 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DWITH_MAD="ON" \
     -DWITH_SNDIO="OFF" \
     -DWITH_VORBIS="ON" \
+    ${BUILDDOC:-} \
     -Wno-dev \
     ..
 
 make_fn
 
 installdocs_fn
+
+[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
 
 strip_fn
 

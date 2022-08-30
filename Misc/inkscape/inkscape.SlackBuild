@@ -39,7 +39,7 @@ getsource_fn
 # ### double-conversion  - start
 {
 ## If it is already installed, go to end
-ldconfig -p|grep libdouble-conversion 1>/dev/null || {
+pkg-config double-conversion || ldconfig -p|grep libdouble-conversion 1>/dev/null || { # ldconfig if no .pc file
 ## otherwise, if the source archive is in 'src' ..
 [[ -s $BUILD_TDE_ROOT/src/v3.2.0.tar.gz ]] && {
 ## .. build, package, and install ..
@@ -50,6 +50,31 @@ cd /$TMP_BUILD
 rm -rf *double-conversion*
 tar xf $BUILD_TDE_ROOT/src/v3.2.0.tar.gz
 cd double-conversion-3.2.0/
+
+## add a pkg-config .pc file
+echo 'prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: Double conversion
+Description: Provides binary-decimal and decimal-binary routines for IEEE doubles
+Version: @PROJECT_VERSION@
+
+Requires:
+Libs: -L${libdir} -l@PROJECT_NAME@
+Cflags: -I${includedir}/@PROJECT_NAME@
+' > double-conversion.pc.in
+#
+patch -p0 << EOF
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -118,0 +119,4 @@
++
++configure_file( \${CMAKE_CURRENT_SOURCE_DIR}/\${PROJECT_NAME}.pc.in
++                \${CMAKE_CURRENT_BINARY_DIR}/\${PROJECT_NAME}.pc @ONLY IMMEDIATE )
++install(FILES "\${CMAKE_CURRENT_BINARY_DIR}/\${PROJECT_NAME}.pc" DESTINATION \${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+EOF
 
 cd cmake/
 # LIBDIRSUFFIX not required - builds to lib64 where appropriate ..

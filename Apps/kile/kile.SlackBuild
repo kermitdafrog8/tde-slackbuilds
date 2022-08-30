@@ -46,6 +46,12 @@ chown_fn
 
 cd_builddir_fn
 
+## Add man page for development builds
+[[ $TDEVERSION != 14.0.12 ]] && {
+MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
+sed -i '/If the TDE/,+2d' ../doc/man/kile.1
+}
+
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
@@ -54,6 +60,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
+    ${MANDIR:-} \
     -DBUILD_DOC="ON" \
     -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
@@ -62,6 +69,8 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
 make_fn
 
 installdocs_fn
+
+[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
 
 strip_fn
 

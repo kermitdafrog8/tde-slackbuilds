@@ -33,12 +33,19 @@ getsource_fn
 
 untar_fn
 
+[[ $TDEVERSION == 14.0.12 ]] && {
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang/$PRGNAM.po";done
 sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
-langs=$(echo $langs|sed "s|/$PRGNAM.po||g")
-[[ $langs != "" ]] && TRANS=ON
+[[ $langs != "" ]] && TRANS=ON && langs=" $(echo $langs|sed "s|/$PRGNAM.po||g")"
+} || {
+## for slack-desc and to set TRANS=ON until 14.0.12 build removed
+langs=""
+for Lang in $I18N
+do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang" && TRANS=ON
+done
+}
 
 listdocs_fn
 
@@ -79,7 +86,7 @@ echo "
 $PRGNAM: tdeio-locate is a TDE I/O Slave for the locate command.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en $langs
+$PRGNAM: en$langs
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

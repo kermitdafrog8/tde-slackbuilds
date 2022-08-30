@@ -33,18 +33,22 @@ getsource_fn
 
 untar_fn
 
+[[ $TDEVERSION == 14.0.12 ]] && {
 ## install theme engine to lib$LIBDIRSUFFIX
 sed -i 's|/lib/|/lib$(LIBDIRSUFFIX)/|' tdegtk/Makefile.am
 ## remove redundant KDE_INCLUDES which is null if installing to /usr and causes a '/tde not found' error
 sed -i 's| $(KDE_INCLUDES)/tde||' {tdegtk,tests}/Makefile.am
+}
 
 listdocs_fn
 
-ltoolupdate_fn
+[[ $TDEVERSION == 14.0.12 ]] && ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
+
+[[ $TDEVERSION == 14.0.12 ]] && {
 
 CFLAGS="$SLKRCFLAGS" \
 CXXFLAGS="$SLKRCFLAGS" \
@@ -54,6 +58,23 @@ CXX=$COMPILER_CXX \
    --prefix=$INSTALL_TDE \
    --disable-rpath \
    --enable-closure
+
+} || {
+
+cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
+    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
+    -DBUILD_TESTS="OFF" \
+    -Wno-dev \
+    ..
+
+}
 
 make_fn
 

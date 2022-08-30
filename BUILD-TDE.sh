@@ -793,7 +793,7 @@ Create and/or update the git repositories local copies.
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "
-This would be useful for running the build off-line.
+This is useful for running the build off-line.
 
 \Z1Y\Zb\Z0es\Zn
  Download the sources for the build list without building packages.
