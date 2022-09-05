@@ -33,7 +33,8 @@ URLs for this and other locations are @ https://www.trinitydesktop.org/mirrorsta
 * BUILD= - sets the package build identifier, overriding the SlackBuild default of 1
 * GCC_VIS=0 - override setting gcc visibility if it has been set ON in tdelibs
 * FEAT= - for development builds - see get-source.sh
-* GVZ_DOCS=1 - see graphviz.SlackBuild
+* GVZ_DOCS=1 - for graphviz, include pdf and html documentation - see SlackBuild
+* build_regextester= - build the regex tester from the tqt3 example - see the tqt3 README
 
 ---
 

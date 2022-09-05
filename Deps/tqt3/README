@@ -1,0 +1,29 @@
+There is an option to build the regex tester included in the tqt3/examples/regexptester directory.
+
+The patch is to expand the 'Match' row vertically to enable multiline matches to be viewed.
+
+Use the command line option 'build_regextester' to include the regextester build:
+
+build_regextester=y ./BUILD-TDE.sh	to build unpatched
+build_regextester=p ./BUILD-TDE.sh	to build with the patch
+
+It will be installed to the TDE binary directory as 'regextester'.
+
+   "A Small Application for Testing Regular Expressions
+
+    Regular expressions can sometimes be tricky to get right,
+    especially those that use the * quantifier. This application lets
+    you type in a regexp (without doubling the backslashes) and some
+    test text, and to execute the regexp and see the results. If you
+    click the Copy button the regexp will be copied to the clipboard
+    (with the backslashes doubled, ready for you to paste into your
+    program). Previous regexps and test texts are remembered
+    throughout the session and can be accessed by dropping down the
+    comboboxes."
+
+For an introduction to regex, from a konsole:
+ 'khelpcenter help:/kate/regular-expressions.html'
+
+Guidance on what the tqt regex engine supports is given in ntqregexp.html which will be installed to:
+ '<TDE-installation-directory>/doc/tqt3-<tde-version>/ntqregexp.html'
+ 

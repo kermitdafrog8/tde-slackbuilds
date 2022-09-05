@@ -466,7 +466,7 @@ sed -i 's|$| |;s|" M|M|g;s|"||g;s| ||g' $TMPVARS/TDEbuilds
 
 ## this dialog will only run if any of the selected packages has a README
 rm -f $TMPVARS/READMEs
-## generate list of READMEs ..
+## generate list of READMEs .. except for tdebase & kvkbd which are viewable from their dialog screens ..
 RM_LIST=$(find [ACDLM][a-z]* -name "README" | grep -vE "tdebase|kvkbd")
 for package in $(cat $TMPVARS/TDEbuilds)
 do
@@ -488,7 +488,9 @@ Do you want to read them?
 10 75
 [[ $? == 0 ]] && dialog --no-collapse --cr-wrap --no-shadow --colors --ok-label "Close" --msgbox \
 "
-$(cat $TMPVARS/READMEs|sed "s|<TDE-installation-directory>|$(cat $TMPVARS/INSTALL_TDE)|")" \
+$(cat $TMPVARS/READMEs|sed "s|<TDE-installation-directory>|$(cat $TMPVARS/INSTALL_TDE)|;\
+s|<tde-version>|$(cat $TMPVARS/TDEVERSION)|;\
+s|=y|=\\\Zb\\\Z2y\\\Zn|;s|=p|=\\\Zb\\\Z2p\\\Zn|")" \
 30 75
 }
 
@@ -499,9 +501,11 @@ rm -f $TMPVARS/PKG_CONFIG_PATH_MOD
 [[ $(grep -o tqt3 $TMPVARS/TDEbuilds) ]] && {
 dialog --cr-wrap --nocancel --no-shadow --colors --title " TQt options " --item-help --checklist \
 "
-A minimal packaging of tqt3 will install only the run-time library required for TDE, and the headers and binaries required to build most of TDE.
+A minimal packaging of tqt3 will install only the run-time library
+required for TDE, and the headers and binaries required to build
+most\Zb\Z2*\Zn of TDE.
 
-But tdepim, ksquirrel, tdevelop, and ktorrent need additional libraries.
+\Zb\Z2*\Zn tdepim, ksquirrel, tdevelop, and ktorrent need additional libraries.
 If you select minimal packaging and intend to build any of those at any time, select keeping their required libs now.
 
 TQt html documentation is ~21M, and can be excluded from the package.
@@ -509,7 +513,7 @@ TQt html documentation is ~21M, and can be excluded from the package.
 The only mkspecs required is the one for linux-g++
  
 " \
-25 75 6 \
+26 75 6 \
 " minimal" "Minimal packaging" off "\Zb\Z6 Exclude libs and binaries not required for TDE \Zn" \
 " pim_ksq" " ├─ Keep lib for tdepim and/or ksquirrel" off "\Zb\Z6 Only required if minimal packaging selected \Zn" \
 " tdevel" " ├─ Keep libs for tdevelop" off "\Zb\Z6 Only required if minimal packaging selected \Zn" \
