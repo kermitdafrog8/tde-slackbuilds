@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=tidy-html5
-VERSION=5.6.0
+VERSION=5.8.0
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
@@ -43,7 +43,7 @@ I18N=$(echo $I18N | tr '[:upper:]' '[:lower:]')
 for lang in $I18N
 do
 [[ $(ls -1 src/language_*.h|grep _$lang) != "" ]] && {
-langs="${langs:-}$lang "
+langs="${langs:-} $lang"
 sed -i "s|\"locale.h\"|&\n#include \"language_$lang.h\"|" src/language.c
 sed -i "s|        \&language_en,|& \&language_$lang,|" src/language.c
 }
@@ -55,6 +55,9 @@ DOCS=$(ls README.md localize/README.md README/*)
 
 chown_fn
 
+## don't build static library
+sed -i '396,423d' CMakeLists.txt
+
 cd build
 
 cmake ${G_NINJA:-} \
@@ -62,21 +65,26 @@ cmake ${G_NINJA:-} \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr/local \
-    -DMAN_INSTALL_DIR=/usr/man \
+    -DMAN_INSTALL_DIR=/usr/local/man \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DBUILD_SHARED_LIB="ON" \
     -DTIDY_CONSOLE_SHARED="ON" \
     -DBUILD_TAB2SPACE="ON" \
     -DBUILD_SAMPLE_CODE="OFF" \
+    -DTIDY_COMPAT_HEADERS="OFF" \
     -DSUPPORT_LOCALIZATIONS="OFF" \
+    -DSUPPORT_CONSOLE_APP="ON" \
+    -DENABLE_DEBUG_LOG="OFF" \
+    -DENABLE_ALLOC_DEBUG="OFF" \
+    -DENABLE_MEMORY_DEBUG="OFF" \
     -Wno-dev \
     ..
 
 make_fn
 
+INSTALL_TDE=/usr/local
 installdocs_fn
 
-INSTALL_TDE=/usr
 mangzip_fn
 
 strip_fn
@@ -96,7 +104,7 @@ $PRGNAM: errors and upgrading legacy code to modern standards.
 $PRGNAM: Optional with Quanta+
 $PRGNAM:
 $PRGNAM: For languages:
-$PRGNAM: en ${langs:-}
+$PRGNAM: en${langs:-}
 $PRGNAM:
 $PRGNAM: https://github.com/htacg
 $PRGNAM:

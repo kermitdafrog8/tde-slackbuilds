@@ -21,11 +21,11 @@
 #   SUCH DAMAGE.
 
 PRGNAM=imlib2
-VERSION=1.7.1
+VERSION=1.9.1
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-ARCHIVE_TYPE="tar.bz2"
+ARCHIVE_TYPE="tar.xz"
 SRCURL="https://sourceforge.net/projects/enlightenment/files/$PRGNAM-src/$VERSION/$PRGNAM-$VERSION.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
@@ -43,21 +43,20 @@ cd_builddir_fn
 CFLAGS="$SLKCFLAGS" \
 CC=$COMPILER \
 ../configure \
-  --prefix=/usr \
-  --libdir=/usr/lib$LIBDIRSUFFIX \
+  --prefix=/usr/local \
+  --libdir=/usr/local/lib$LIBDIRSUFFIX \
+  --enable-doc-build \
   --disable-static
 
 make_fn
 
+INSTALL_TDE=/usr/local
 installdocs_fn
-cp ../doc/{*.html,*.gif} $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
-sed -i 's|BGCOLOR="#6a7a8a"|BGCOLOR="#edeaff"|' $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION/index.html
+## index.html should be created during the build
+[[ -s doc/html/index.html ]] && cp doc/html/{index.html,imlib2_logo.png} $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
 
-#INSTALL_TDE=/usr
-#mangzip_fn
-
-rm -rf $PKG/$INSTALL_TDE/lib${LIBDIRSUFFIX}/*.la
-rm -rf $PKG/$INSTALL_TDE/lib${LIBDIRSUFFIX}/*/*/*.la
+rm -f $PKG/$INSTALL_TDE/lib${LIBDIRSUFFIX}/*.la
+rm -f $PKG/$INSTALL_TDE/lib${LIBDIRSUFFIX}/*/*/*.la
 strip_fn
 
 mkdir_install_fn
@@ -80,7 +79,7 @@ $PRGNAM: * Apply filters to images
 $PRGNAM: * Scale images
 $PRGNAM: * Apply color correction .. and more
 $PRGNAM:
-$PRGNAM: See /usr/doc/$PRGNAM-$VERSION/index.html for the full list.
+$PRGNAM: See /usr/local/doc/$PRGNAM-$VERSION/index.html for the full list.
 $PRGNAM:
 " > $PKG/install/slack-desc
 

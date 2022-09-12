@@ -26,7 +26,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=graphviz
-VERSION=2.50.0
+VERSION=5.0.1
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
@@ -42,7 +42,7 @@ untar_fn
 patch -p0 << EOF
 --- plugin/gs/gvloadimage_gs.c
 +++ plugin/gs/gvloadimage_gs.c
-@@ -74,11 +74,11 @@
+@@ -77,11 +77,11 @@
  
      assert (err < 0);
  
@@ -73,17 +73,22 @@ patch -p0 << EOF
 EOF
 
 ## The primary purpose of this build is for 'dot' for kscope, tdeedu, ...
-## To include the pdf and html documentation, build with 'GVZ_DOCS=1 ./BUILD-TDE.sh'
-[[ ! ${GVZ_DOCS:-} ]] && {
+## To include the pdf and html documentation, build with 'GVZ_DOCS=y ./BUILD-TDE.sh'
+[[ ${GVZ_DOCS:-} != [yY1] ]] && {
 patch -p0 << EOF
 --- Makefile.in
 +++ Makefile.in
-@@ -623 +623 @@
--SUBDIRS = \$(subdirs) lib plugin cmd tclpkg doc contrib share graphs rtest tests
-+SUBDIRS = \$(subdirs) lib plugin cmd tclpkg contrib share graphs rtest tests
+@@ -614 +614 @@
+-SUBDIRS = \$(subdirs) lib plugin cmd tclpkg doc contrib share graphs tests
++SUBDIRS = \$(subdirs) lib plugin cmd tclpkg contrib share graphs tests
 EOF
 sed -i '/tcldot.html/d' tclpkg/tcldot/Makefile.in
 }
+## relevant if including docs, but not installed otherwise
+sed -i 's|../doc/||;28,54s|../pdf/|../../../man/man1/|;58,71s|../pdf/|../../../man/man3/|;28,71s|\.pdf|\.gz|' doc/index.html
+sed -i '56,62d;s|pages (PDF)|pages|' doc/index.html
+sed -i '/dotty/d;/lefty/d;/circo/d;/fdp/d;/gv2gxl/d;/neato\.1/d;/twopi/d;/\/graph/d' doc/index.html
+sed -i 's|libguide.*$|&\n  <li><a href="Agraph.pdf">cgraph tutorial</a>|' doc/index.html
 
 listdocs_fn
 
@@ -99,6 +104,7 @@ CXX=$COMPILER_CXX \
   --prefix=/usr \
   --libdir=/usr/lib$LIBDIRSUFFIX \
   --mandir=/usr/man \
+  --enable-man-pdfs=no \
   --enable-ocaml=no
 
 make_fn

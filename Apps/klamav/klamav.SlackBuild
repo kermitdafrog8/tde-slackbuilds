@@ -33,7 +33,7 @@ source ../../get-source.sh
 ## klamav needs clamav as a build time requirement
 [[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 # ### clamav  - start
-clamav_VERS=0.104.3
+clamav_VERS=0.105.1
 clamav_installed_fn () { pkg-config libclamav ;}
 ## If it's already installed, go to end
 clamav_installed_fn || {
@@ -69,10 +69,18 @@ cmake ${G_NINJA:-} \
     -DCMAKE_C_COMPILER=$COMPILER \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DCMAKE_BUILD_TYPE=Release \
-    -DENABLE_MAN_PAGES="ON" \
-    -DCMAKE_INSTALL_MANDIR=/usr/local/man \
-    -DENABLE_SYSTEMD="OFF" \
+    -DMAINTAINER_MODE="OFF" \
+    -DENABLE_APP="ON" \
     -DENABLE_MILTER=${MILTER:-"OFF"} \
+    -DENABLE_CLAMONACC="ON" \
+    -DENABLE_EXAMPLES="OFF" \
+    -DENABLE_TESTS="ON" \
+    -DENABLE_MAN_PAGES="ON" \
+    -DENABLE_DOXYGEN="OFF" \
+    -DENABLE_UNRAR="ON" \
+    -DENABLE_SYSTEMD="OFF" \
+    -DENABLE_JSON_SHARED="ON" \
+    -DCMAKE_INSTALL_MANDIR=/usr/local/man \
     -Wno-dev \
     ..
 
@@ -98,10 +106,10 @@ echo -e "
 
  clamav is required for building klamav
 
- Download [including user-agent, otherwise '403 Forbidden' is returned]:
+ Download:
              \033[39;1m
 ( cd $BUILD_TDE_ROOT/src
-  wget --user-agent='Mozilla' https://www.clamav.net/downloads/production/clamav-$clamav_VERS.tar.gz )
+  wget https://www.clamav.net/downloads/production/clamav-$clamav_VERS.tar.gz )
              \033[0m
  and re-run this script ..
 

@@ -24,27 +24,24 @@
 #   SUCH DAMAGE.
 
 PRGNAM=mp4v2
-VERSION=2.0.0
+VERSION=2.1.1
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
-ARCHIVE_TYPE="tar.bz2"
-SRCURL="https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${PRGNAM}/${PRGNAM}-${VERSION}.$ARCHIVE_TYPE"
+ARCHIVE_TYPE="tar.gz"
+SRCURL="https://github.com/enzo1982/$PRGNAM/archive/v$VERSION.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
 getsource_fn
 
 untar_fn
 
-## patch for gcc7 ../src/rtphint.cpp:342:35: error: ISO C++ forbids comparison between pointer and integer [-fpermissive]
-sed -i "s|(pSlash != '|(*pSlash != '|" src/rtphint.cpp
-
 ## patch for gcc10 - error: narrowing conversion of ‘mp4v2::util::SubtitleUtility::LC_LIST’ from ‘unsigned int’ to ‘int’, etc..
 ## thanks to https://bugs.gentoo.org/723098
 patch -N -p0 << EOF || true
 --- libutil/Utility.cpp
 +++ libutil/Utility.cpp
-@@ -496,1 +496,1 @@
+@@ -492,1 +492,1 @@
 -        switch( code ) {
 +        switch( static_cast<unsigned int>( code ) ) {
 --- util/mp4art.cpp
@@ -54,7 +51,7 @@ patch -N -p0 << EOF || true
 +    switch( static_cast<unsigned int> ( code ) ) {
 --- util/mp4chaps.cpp
 +++ util/mp4chaps.cpp
-@@ -635,1 +635,1 @@
+@@ -678,1 +678,1 @@
 -    switch( code ) {
 +    switch( static_cast<unsigned int> ( code ) ) {
 --- util/mp4file.cpp
@@ -69,42 +66,28 @@ patch -N -p0 << EOF || true
 +    switch( static_cast<unsigned int>( code ) ) {
 --- util/mp4track.cpp
 +++ util/mp4track.cpp
-@@ -791,1 +791,1 @@
+@@ -775,1 +775,1 @@
 -    switch( code ) {
 +    switch( static_cast<unsigned int>( code ) ) {
 EOF
 
-## clang build errors:
-## invalid suffix on literal; C++11 requires a space between literal and identifier
-sed -i 's|"LIBMPV42_STRINGIFY|" LIBMPV42_STRINGIFY|' src/mp4util.h
-#
-## ../src/mp4.cpp:873:20: error: cannot initialize return object of type 'mp4v2_ismacrypParams *' (aka 'mp4v2_ismacryp_session_params *') with an rvalue of type 'MP4TrackId' (aka 'unsigned int')
-## thanks to github.com/palmerc/mp4v2.git, commit 16eb774806e9a0c87162b9e24a633c34c90c0732
-sed -i '873s|return.*$|return NULL;|' src/mp4.cpp
-
-## Fix man pages being installed with no content
-sed -i 's|doc/man|@srcdir@/&|' GNUmakefile.in
-
 listdocs_fn
 
-chown_fn
+## create mp4v2.pc.in after the installation libs and include directories have been set
+sed -i '/^configure_pkg_config_file/d' CMakeLists.txt
+sed -i 's|install.*mp4v2.pc.*$|configure_pkg_config_file(mp4v2.pc.in)\n&|' CMakeLists.txt
 
-cd_builddir_fn
-
-CXXFLAGS="$SLKCFLAGS" \
-CXX=$COMPILER_CXX \
-../configure \
-  --prefix=/usr \
-  --libdir=/usr/lib$LIBDIRSUFFIX \
-  --mandir=/usr/man \
-  --disable-static
+## cmake build needs to be in top level directory for created project.h file installation
+cmake ${G_NINJA:-} \
+    -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DBUILD_SHARED="ON" \
+    -DBUILD_UTILS="ON" \
+    .
 
 make_fn
 
 installdocs_fn
-
-INSTALL_TDE=/usr
-mangzip_fn
 
 strip_fn
 

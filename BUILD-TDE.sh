@@ -377,7 +377,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Core/tdeaccessibility" "Accessibility programs" off "\Zb\Z6 Optional build-time dependencies -> akode + tdemultimedia \Zn" \
 "Core/tdeadmin" "System admin packages" off "\Zb\Z6  \Zn" \
 "Core/tdeartwork" "Extra artwork/themes/wallpapers for TDE" off "\Zb\Z6   \Zn" \
-" Misc/graphviz" "Graph Visualization" off "\Zb\Z6 Runtime option for kscope. pdf/html docs not built by default  \Zn" \
+" Misc/graphviz" "Graph Visualization" off "\Zb\Z6 Runtime option for kscope. pdf/html docs not installed by default  \Zn" \
 "Core/tdeedu" "Educational software" off "\Zb\Z6 Build-time option -> dot [graphviz] \Zn" \
 "Core/tdegames" "Games for TDE - atlantik, kasteroids, katomic, etc." off "\Zb\Z6   \Zn" \
 " Misc/imlib" "An image loading and rendering library" off "\Zb\Z6 Build-time option for tdegraphics - needed for kuickshow \Zn" \
@@ -981,7 +981,6 @@ TDE version                             \Zb\Z6$TDEVERSION\Zn
 Clone/update cgit local repositories    \Zb\Z6${CLONE:-\Z0\Zbn/a}\Zn
 Only download sources                   \Zb\Z6${PRE_DOWNLOAD:-\Z0\Zbn/a}\Zn
 TDE installation directory              \Zb\Z6$INSTALL_TDE\Zn
-TDE system configuration directory      \Zb\Z6$TDE_CNF_DIR\Zn
 Compiler                                \Zb\Z6$COMPILER\Zn
 gcc cpu optimization                    \Zb\Z6$SET_march\Zn
 Number of parallel jobs                 \Zb\Z6$(echo $NUMJOBS|sed 's|-j||')\Zn

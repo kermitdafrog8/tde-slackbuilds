@@ -3,7 +3,7 @@ Inkscape v1 requires the non-Slackware package double-conversion.
 The source will need to be pre-downloaded and placed in the 'src' directory and will then be built, packaged, and installed during the inkscape build.
 
 Download from:
-https://github.com/google/double-conversion/archive/v3.2.0.tar.gz
+https://github.com/google/double-conversion/archive/v3.2.1.tar.gz
 
 The URL will be displayed when running the SlackBuild if the installation or source isn't found.
  

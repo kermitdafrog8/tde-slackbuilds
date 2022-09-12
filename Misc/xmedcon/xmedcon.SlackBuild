@@ -25,7 +25,7 @@
 #
 # 
 PRGNAM=xmedcon
-VERSION=0.16.2
+VERSION=0.22.0
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
@@ -67,7 +67,7 @@ strip_fn
 mkdir_install_fn
 
 mv $PKG/usr/etc $PKG/
-mv $PKG/etc/xmedconrc $PKG/etc/xmedconrc.new
+mv $PKG/etc/xmedcon.css $PKG/etc/xmedcon.css.new
 
 mkdir -p $PKG/usr/share/pixmaps
 cp -a $DOCDIR/etc/xmedcon.png $PKG/usr/share/pixmaps
@@ -77,8 +77,8 @@ echo "[Desktop Entry]
 Encoding=UTF-8
 Type=Application
 Name=(X)MedCon
-GenericName=Medical Image Conversion 
-Comment=Medical Image Conversion 
+GenericName=Medical Image Conversion
+Comment=Medical Image Conversion
 Exec=xmedcon
 Icon=xmedcon.png
 Categories=Graphics;Utility;" > $PKG/usr/share/applications/xmedcon.desktop
@@ -98,7 +98,7 @@ echo $'config() {
   # Otherwise, we leave the .new copy for the admin to consider...
 }
 
-config etc/xmedconrc.new
+config etc/xmedcon.css.new
 ' >> $PKG/install/doinst.sh
 
 echo "
@@ -114,7 +114,7 @@ $PRGNAM:
 $PRGNAM: A medical image conversion utility & library; hereby hoping to lower
 $PRGNAM: at least one barrier in medical research projects.
 $PRGNAM:
-$PRGNAM: http://xmedcon.sourceforge.net/
+$PRGNAM: xmedcon.sourceforge.net
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

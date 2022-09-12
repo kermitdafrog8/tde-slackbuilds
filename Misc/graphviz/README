@@ -11,6 +11,6 @@ gts is an optional dependency.
 
 ------------------------------
 
-pdf and html documentation is not built by default.
-To build it, use the GVZ_DOCS=1 command line option as detailed in the SlackBuild.
+pdf and html documentation is not installed by default.
+To install it, use the GVZ_DOCS=y command line option as detailed in the SlackBuild.
  

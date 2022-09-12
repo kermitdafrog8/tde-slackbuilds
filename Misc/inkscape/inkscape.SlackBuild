@@ -41,15 +41,15 @@ getsource_fn
 ## If it is already installed, go to end
 pkg-config double-conversion || ldconfig -p|grep libdouble-conversion 1>/dev/null || { # ldconfig if no .pc file
 ## otherwise, if the source archive is in 'src' ..
-[[ -s $BUILD_TDE_ROOT/src/v3.2.0.tar.gz ]] && {
+[[ -s $BUILD_TDE_ROOT/src/v3.2.1.tar.gz ]] && {
 ## .. build, package, and install ..
 (
 echo -e "\n building double-conversion \n"
 
 cd /$TMP_BUILD
 rm -rf *double-conversion*
-tar xf $BUILD_TDE_ROOT/src/v3.2.0.tar.gz
-cd double-conversion-3.2.0/
+tar xf $BUILD_TDE_ROOT/src/v3.2.1.tar.gz
+cd double-conversion-3.2.1/
 
 ## add a pkg-config .pc file
 echo 'prefix=@CMAKE_INSTALL_PREFIX@
@@ -66,15 +66,13 @@ Libs: -L${libdir} -l@PROJECT_NAME@
 Cflags: -I${includedir}/@PROJECT_NAME@
 ' > double-conversion.pc.in
 #
-patch -p0 << EOF
---- CMakeLists.txt
-+++ CMakeLists.txt
-@@ -118,0 +119,4 @@
-+
-+configure_file( \${CMAKE_CURRENT_SOURCE_DIR}/\${PROJECT_NAME}.pc.in
-+                \${CMAKE_CURRENT_BINARY_DIR}/\${PROJECT_NAME}.pc @ONLY IMMEDIATE )
-+install(FILES "\${CMAKE_CURRENT_BINARY_DIR}/\${PROJECT_NAME}.pc" DESTINATION \${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-EOF
+echo '
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
+                ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc @ONLY )
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+' >> CMakeLists.txt
+
+sed -i 's|VERSION 3.2.0|VERSION 3.2.1|' CMakeLists.txt
 
 cd cmake/
 # LIBDIRSUFFIX not required - builds to lib64 where appropriate ..
@@ -89,8 +87,8 @@ PKG=$TMP_BUILD/package-double-conversion
 make_fn
 
 cd $TMP_BUILD/package-double-conversion
-makepkg -l y -c n $OUTPUT/double-conversion-3.2.0-$ARCH-$BUILD.txz
-installpkg $OUTPUT/double-conversion-3.2.0-$ARCH-$BUILD.txz
+makepkg -l y -c n $OUTPUT/double-conversion-3.2.1-$ARCH-$BUILD.txz
+installpkg $OUTPUT/double-conversion-3.2.1-$ARCH-$BUILD.txz
 )
 echo -e "\n now building inkscape \n"
 } || { ## .. but if the source archive isn't in 'src', display download URL ..
@@ -102,7 +100,7 @@ echo -e "
  Download:
              \033[39;1m
 ( cd $BUILD_TDE_ROOT/src
-  wget https://github.com/google/double-conversion/archive/v3.2.0.tar.gz )
+  wget https://github.com/google/double-conversion/archive/v3.2.1.tar.gz )
              \033[0m
  and re-run this script ..
 
@@ -119,54 +117,36 @@ untar_fn
 sed -i 's|set(CMAKE_INSTALL_RPATH.*$|set(CMAKE_INSTALL_RPATH $ORIGIN)|' src/3rdparty/2geom/CMakeLists.txt
 sed -i "s|libdir=.*$|&$LIBDIRSUFFIX|" src/3rdparty/2geom/2geom.pc.in
 
-## only build for required locales
-{
-## set up a directory to store the required locale files temporarily
-TEMP_DIR=$TMP_BUILD/tmp-$PRGNAM/loc_tmp
-mkdir $TEMP_DIR
-
-## .. for po/LINGUAS
-LOCALES=$(cat po/LINGUAS)
-rm po/LINGUAS
-for locale in $I18N
- do
- [[ $LOCALES == *$locale* ]] && \
- echo $locale >> po/LINGUAS
- done
-## .. for translations
-locas="" ## for slack-desc
-for locale in $I18N
- do
- mv po/$locale.po $TEMP_DIR && locas="$locas $locale"
- done
-rm -rf po/*.po
-mv $TEMP_DIR/* po/
-
+ ### only build for required locales
+## .. for translations and slack-desc
+locas=""
 ## .. for tutorials
-for locale in $I18N
- do
- mv share/tutorials/*.$locale.* $TEMP_DIR
- done
-rm share/tutorials/*.*.*
-mv $TEMP_DIR/* share/tutorials/
-} || true # because the existence of the files hasn't been tested
-
-## only package man pages for required locales
-for file in man/ink*.*.pod.in
-do
- [[ $I18N != *$(echo $file | cut -d"." -f2)* ]] && rm $file
-done
-## and install them to $prefix, as per most other Slackware packages
-sed -i 's|MANFILE_DEST "${SHARE_INSTALL}|MANFILE_DEST "${CMAKE_INSTALL_PREFIX}|' CMakeScripts/Pod2man.cmake
-
-## only package welcome screen text for required locales
+tuts="tutorial-tracing.svg tutorial-tracing-pixelart.svg tutorial-tips.svg tutorial-shapes.svg tutorial-interpolate.svg tutorial-elements.svg tutorial-calligraphy.svg tutorial-basic.svg tutorial-advanced.svg tux.png potrace.png pixelart-dialog.png oldguitar.jpg making_markers.svg edge3d.svg"
+## .. for man pages
+pods="inkscape.pod.in inkview.pod.in"
+## .. for welcome screen text
 I18N_SVG="about.svg start-welcome-text.svg"
 #
-for Loc in $I18N
-do
- [[ -s share/screens/start-welcome-text.$Loc.svg ]] && I18N_SVG="$I18N_SVG start-welcome-text.$Loc.svg" && COUNT_TEXT=$[${COUNT_TEXT:-}+1]
+for locale in $I18N
+ do
+ locas="$locas $locale"
+ tuts="$tuts $(ls share/tutorials/*.$locale.*)" || true
+ pods="$pods $(ls man/*.$locale.pod.in)" || true
+ [[ -s share/screens/start-welcome-text.$locale.svg ]] && I18N_SVG="$I18N_SVG start-welcome-text.$locale.svg" && COUNT_TEXT=$[${COUNT_TEXT:-}+1]
 COUNT_I18N=$[${COUNT_I18N:-}+1]
-done
+ done
+#
+pos=$(echo $locas | sed 's| |.po |g;s|$|.po|')
+sed -i "s|*.po|$pos|" po/CMakeLists.txt
+#
+tuts=$(echo $tuts|sed 's|share/tutorials/||g')
+sed -i "s|GLOB.*$|GLOB _FILES README $tuts)|" share/tutorials/CMakeLists.txt
+#
+pods=$(echo $pods|sed 's|man/||g')
+sed -i "s|*.pod.in|$pods|" man/CMakeLists.txt
+## and install man pages to $prefix, as per most other Slackware packages
+sed -i 's|MANFILE_DEST "${CMAKE_INSTALL_FULL_MANDIR}|MANFILE_DEST "${CMAKE_INSTALL_PREFIX}/man|' CMakeScripts/Pod2man.cmake
+#
 ## Add the TRANSLATING file if any of the locales has no start-welcome-text.$I18N.svg
 [[ ${COUNT_I18N:-} != ${COUNT_TEXT:-} ]] && I18N_SVG="TRANSLATING $I18N_SVG"
 sed -i "s|\"\*.svg\"|$I18N_SVG|" share/screens/CMakeLists.txt

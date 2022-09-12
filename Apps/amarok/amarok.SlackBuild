@@ -57,7 +57,7 @@ chown_fn
 cd_builddir_fn
 
 # If mp4v2 is installed, use mp4 metadata sources in build, otherwise m4a is used ..
-[[ -s /usr/include/mp4v2/mp4v2.h ]] && MP4V2="ON"
+pkg-config mp4v2 && MP4V2="ON"
 
 ## Build xine-engine?
 [[ -s /usr/include/xine.h ]] && XINE="ON"
