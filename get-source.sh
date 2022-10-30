@@ -71,14 +71,14 @@ SRCDIR=$BUILD_TDE_ROOT/src
 SB_SRCDIR=$(cd $(dirname $0); pwd)
 
 ## for 14.0.11 onwards, check for cmake archive ..
-[[ $TDEVERSION == 14.0.12 && ! -s $SRCDIR/cmake-$TDEVERSION.tar.xz ]] && (
+[[ $TDEVERSION == 14.0.13 && ! -s $SRCDIR/cmake-$TDEVERSION.tar.xz ]] && (
     echo -e "\nDownloading to $SRCDIR"
     wget -T 20 -O $SRCDIR/cmake-$TDEVERSION.tar.xz $TDE_MIRROR/releases/R$TDEVERSION/main/common/cmake-trinity-$TDEVERSION.tar.xz
     echo -e "----\n"
 )
 
-## if 14.0.12 or misc, download archive:
-[[ $TDEVERSION == 14.0.12 || $TDEMIR_SUBDIR == misc ]] && {
+## if 14.0.13 or misc, download archive:
+[[ $TDEVERSION == 14.0.13 || $TDEMIR_SUBDIR == misc ]] && {
 ## check for and remove any zero byte archive files
 [[ ! -s $SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} ]] && \
 rm $SRCDIR/$PRGNAM-$VERSION.${ARCHIVE_TYPE:-"tar.xz"} 2>/dev/null || true
@@ -114,7 +114,7 @@ if [ "$P1" == "--download" ]; then
   exit 0
 fi
 } || {
-## otherwise, not R14.0.12 or misc, and we are creating/updating git,
+## otherwise, not R14.0.13 or misc, and we are creating/updating git,
 ## so [1] start with admin/cmake:
 [[ $(cat $TMPVARS/DL_CGIT) == yes ]] && {
 cd $BUILD_TDE_ROOT/src/cgit
@@ -171,7 +171,7 @@ git fetch origin r14.0.x:r14.0.x)
 git clone https://mirror.git.trinitydesktop.org/gitea/TDE/libltdl
 }
 
-## if tdenetwork, need libtdevnc, but not yet for 14.0.x or 14.0.12 which use krfb/libvncserver
+## if tdenetwork, need libtdevnc, but not yet for 14.0.x or 14.0.13 which use krfb/libvncserver
 [[ " tdenetwork " == *$PRGNAM* ]] && {
 [[ -d libtdevnc ]] && \
 (echo "Updating libtdevnc ..."
@@ -246,7 +246,7 @@ cd $TMP_BUILD/tmp-$PRGNAM
 ##
 ## [1] firstly test for R14 or misc ..
 ##
-[[ $TDEVERSION == 14.0.12 || $TDEMIR_SUBDIR == misc ]] && {
+[[ $TDEVERSION == 14.0.13 || $TDEMIR_SUBDIR == misc ]] && {
 ## unpack R14 or misc
 echo -e "\n unpacking $(basename $SOURCE) ... \n"
 tar -xf $SOURCE
@@ -260,7 +260,7 @@ mv cmake-trinity-$TDEVERSION cmake
 
 } || {
 
-## [2] not 14.0.12 nor misc, so must be git ..
+## [2] not 14.0.13 nor misc, so must be git ..
 [[ $TDEVERSION == 14.1.0 ]] && DEV_BRANCH=master || DEV_BRANCH=r14.0.x
 
 ## copy git content to build area:
@@ -309,7 +309,7 @@ echo # if this fails, SlackBuild will fail from [3]
 cd $PRGNAM*
 
 ## For cmake builds - the path to the TDE cmake modules
-## Added for 14.0.x[aka 14.0.13+] & 14.1.0 which assume a cmake-trinity package is installed to the CMake system directories
+## Added for 14.0.11+ & 14.1.0 which assume a cmake-trinity package is installed to the CMake system directories
 export CMAKE_OPTS=-DCMAKE_MODULE_PATH=$PWD/cmake/modules
 }
 

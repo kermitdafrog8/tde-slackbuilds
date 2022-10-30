@@ -33,7 +33,7 @@ getsource_fn
 
 untar_fn
 
-# add English help documentation
+# add English help documentation, overwriting placeholder
 tar xf $SB_SRCDIR/ksquirrel-en-docs.tar.xz
 cp doc/ru/*png doc/en
 

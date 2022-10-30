@@ -33,10 +33,6 @@ getsource_fn
 
 untar_fn
 
-## error: /usr/bin/ld: cannot find -ltqt-mt
-sed -i '18ilink_directories( ${TQT_LIBRARY_DIRS} )' lib/interfaces/external/CMakeLists.txt
-sed -i '18ilink_directories( ${TQT_LIBRARY_DIRS} )' src/newui/CMakeLists.txt
-
 listdocs_fn
 
 chown_fn

@@ -34,7 +34,8 @@ getsource_fn
 untar_fn
 
 ## for slack-desc
-langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+#langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+langs="en"
 
 listdocs_fn
 
@@ -42,6 +43,7 @@ chown_fn
 
 cd_builddir_fn
 
+## The BUILD_TRANSLATIONS option is set in CMakeLists.txt but there are none available yet
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
@@ -50,6 +52,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
+    -DBUILD_TRANSLATIONS="OFF" \
     -Wno-dev \
     ..
 

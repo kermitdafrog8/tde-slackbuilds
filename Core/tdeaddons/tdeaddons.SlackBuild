@@ -40,10 +40,7 @@ echo $'
 @@ -347 +347 @@
 -    if ( !TDEStandardDirs::findExe( "ar" ).isNull() && m_conf->readBoolEntry( "UseAr", false ) )
 +    if ( !TDEStandardDirs::findExe( "ar" ).isNull() && m_conf->readBoolEntry( "UseAr", true ) )
-' | while read line
-do
-patch -N -p0
-done || true
+' | patch -N -p0 || true
 
 listdocs_fn
 
@@ -60,12 +57,8 @@ chown_fn
 
 cd_builddir_fn
 
-## Add man pages for development builds
-[[ $TDEVERSION != 14.0.12 ]] && {
-MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
 sed -i 's|\\fI/opt/trinity/share/doc/ksig/README.Debian\\fP|the Ksig Handbook|' ../doc/man/ksig/ksig.1
 sed -i 's|^done|& - in konqueror enter \\fI'\''help:/ksig'\''\\f  - or on the command line run \\fI'\''khelpcenter help:/ksig'\''\\f|' ../doc/man/ksig/ksig.1
-}
 
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -76,7 +69,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    ${MANDIR:-} \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_ARTS="ON" \
     -DWITH_SDL="ON" \
     -DWITH_BERKELEY_DB="ON" \
@@ -102,7 +95,7 @@ make_fn
 
 installdocs_fn
 
-[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
+mangzip_fn
 
 strip_fn
 

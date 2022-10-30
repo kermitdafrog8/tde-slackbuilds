@@ -33,35 +33,9 @@ getsource_fn
 
 untar_fn
 
-[[ $TDEVERSION == 14.0.12 ]] && {
-## remove help documentation build instruction from all locales ...
-sed -i '/tde_create_handbook/,+3d' doc/*/CMakeLists.txt || true
-## ... and restore for 'en'
-echo "tde_create_handbook( LANG en DESTINATION $PRGNAM )" >> doc/en/CMakeLists.txt
-#
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-langs="" # the *.po file list
-ldocs="" # the help docs
-for Lang in $I18N
-do
-[[ -d po/$Lang ]] && {
-langs="$langs $Lang/$PRGNAM.po"
-## ... and restore help documentation for the selected and available locales
-[[ -e doc/$Lang/CMakeLists.txt ]] && {
-echo "tde_create_handbook( LANG $Lang DESTINATION $PRGNAM )" >> doc/$Lang/CMakeLists.txt
-ldocs="$ldocs $Lang"
-}
-}
-done
-#
-sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
-[[ $langs != "" ]] && TRANS=ON && langs=" $(echo $langs|sed "s|/$PRGNAM.po||g")"
-} || {
-## for slack-desc and to set TRANS=ON until 14.0.12 build removed
-langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang" && TRANS=ON;done
+## for slack-desc
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 ldocs="";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
-}
 
 ## delete zero length files
 find data/pixmaps/feta -type f -empty -delete
@@ -78,12 +52,8 @@ pkg-config jack && JACK="ON"
 # Check for DSSI aka "Dizzy"
 pkg-config dssi && DSSI="ON"
 
-## Add man page for development builds
-[[ $TDEVERSION != 14.0.12 ]] && {
-MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
 ## for cmake version 3.21.x?
 sed -i 's|PROJECT(ROSEGARDEN)|project(rosegarden)|' ../CMakeLists.txt
-}
 
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -94,9 +64,9 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
-    ${MANDIR:-} \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DBUILD_TRANSLATIONS="ON" \
     -DWANT_SOUND="ON" \
     -DWANT_DEBUG="OFF" \
     -DWANT_FULLDBG="OFF" \
@@ -112,7 +82,7 @@ make_fn
 
 installdocs_fn
 
-[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
+mangzip_fn
 
 strip_fn
 

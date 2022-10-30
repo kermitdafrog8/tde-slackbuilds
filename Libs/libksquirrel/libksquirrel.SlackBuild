@@ -44,6 +44,9 @@ chown_fn
 
 #cd_builddir_fn - don't use
 
+## don't include man pages, they're a waste of space
+sed -i 's|SUBDIRS =.*$|SUBDIRS =. html sources|' doc/Makefile.in
+
 CFLAGS="$SLKRCFLAGS" \
 CXXFLAGS="$SLKRCFLAGS" \
 CC=$COMPILER \

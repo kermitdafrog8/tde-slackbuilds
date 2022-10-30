@@ -63,27 +63,26 @@ sed -i -e 's/chalk/krita/g;s/Chalk/Krita/g' configure.in
 find docs/koffice -type f -exec sed -i -e 's/chalk/krita/g;s/Chalk/Krita/g' {} \; || true
 }
 
-ltoolupdate_fn
-
 chown_fn
 
 cd_builddir_fn
 
-CFLAGS="$SLKRCFLAGS" \
-CXXFLAGS="$SLKRCFLAGS" \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --disable-rpath
+cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
+    -DCMAKE_C_COMPILER=$COMPILER \
+    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
+    -DBUILD_DOC="ON" \
+    -DBUILD_DATA="ON" \
+    -DBUILD_MESSAGES="ON" \
+    -Wno-dev \
+    ..
 
 make_fn
 
 cd ../../
 done
 langs=$(echo $langdir | sed 's|koffice-i18n-||g')
-
-installdocs_fn
 
 mkdir_install_fn
 

@@ -49,10 +49,9 @@ echo '
 
 untar_fn
 
-# there is a Spanish language file in the source, but it has no translations in it ..
-# the included es.po file is a Google translation - if you don't want to use it,
-# then comment out the following line:
-cp $SB_SRCDIR/es.po translations/messages/
+# there is a Spanish language file in the source which has a limited number of translations in it ..
+# the included es.po file is a Google translation - if you want to use it, uncomment the following line:
+#cp $SB_SRCDIR/es.po translations/messages/
 
 # for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done

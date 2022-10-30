@@ -106,17 +106,17 @@ sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" tdeioslave/trash/testtrash.cpp || true
 patch -N -p0 << EOF || true
 --- translations/desktop_files/kcontrol-desktops/en_GB.po
 +++ translations/desktop_files/kcontrol-desktops/en_GB.po
-@@ -1355,3 +1355,3 @@
+@@ -1338,3 +1338,3 @@
  msgid "Configure display ICC color profile"
 -msgstr ""
 +msgstr "Configure display ICC colour profile"
  
-@@ -1360,3 +1360,3 @@
+@@ -1343,3 +1343,3 @@
  msgid "ICC;display;color;profile;"
 -msgstr ""
 +msgstr "ICC;display;colour;profile;"
  
-@@ -1365,3 +1365,3 @@
+@@ -1348,3 +1348,3 @@
  msgid "Color Profile"
 -msgstr ""
 +msgstr "Colour Profile"
@@ -133,9 +133,6 @@ chown_fn
 
 cd_builddir_fn
 
-[[ $TDEVERSION != 14.0.12 ]] && {
-## Add man pages for development builds
-MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
 sed -i "s|/etc/trinity|$INSTALL_TDE/share/config|" ../doc/man/{gentdmconf,tdm}.1
 [[ $TDE_CNF_DIR == *tde* ]] && \
 sed -i 's|trinity,kde,kde2,kde1|tde|' ../doc/man/*.1 && \
@@ -156,7 +153,6 @@ endif( )
 ' >> ../tdm/kfrontend/CMakeLists.txt
 #
 sed -i "s|/opt/.*/share/doc/tdm/README.gz|$INSTALL_TDE/share/config/tdm/README-config|" ../doc/man/tdm{,ctl}.1
-}
 
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -167,7 +163,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    ${MANDIR:-} \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_ARTS="ON" \
     -DWITH_ELFICON="OFF" \
     -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
@@ -258,7 +254,7 @@ make_fn
 
 installdocs_fn
 
-[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
+mangzip_fn
 
 strip_fn
 

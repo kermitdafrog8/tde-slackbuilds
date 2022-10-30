@@ -65,7 +65,7 @@ langs="$langs $Lang/messages/gwenview.po"
 ## ... and restore help documentation for the selected and available locales
 [[ -e $Lang/CMakeLists.txt ]] && {
 echo 'tde_conditional_add_subdirectory( BUILD_DOC doc )' > $Lang/CMakeLists.txt
-ldocs="$ldocs $Lang"
+ldocs="${ldocs:+"${ldocs} "}$Lang"
 }
 }
 done

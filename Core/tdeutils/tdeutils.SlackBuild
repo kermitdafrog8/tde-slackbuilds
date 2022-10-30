@@ -33,31 +33,13 @@ getsource_fn
 
 untar_fn
 
-## clang build failure
-## ...kmilo/generic/generic_monitor.cpp:78:16: error: non-constant-expression cannot be narrowed from type 'int' to 'uint' (aka 'unsigned int') in initializer list [-Wc++11-narrowing]
-## commit 4046d4e - fixes issue 28
-patch -p0 -N << EOF || true
---- kmilo/generic/generic_monitor.h
-+++ kmilo/generic/generic_monitor.h
-@@ -42,1 +42,1 @@ namespace KMilo {
--	uint symbol;
-+	int symbol;
-EOF
-
-## set installation directory for superkaramba.desktop file
-sed -i 's|DESTINATION ${APPS_INSTALL_DIR}/Utilities|DESTINATION ${XDG_APPS_INSTALL_DIR}|' superkaramba/src/CMakeLists.txt
-
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
 
-## Add man pages for development builds
-[[ $TDEVERSION != 14.0.12 ]] && {
-MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
 sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM/issues|" ../doc/man/*/*.1
-}
 
 ## TDEFileReplace has been moved from tdewebdev for R14.1.0
 [[ $TDEVERSION == 14.1.0 ]] && TDEFileReplace="-DBUILD_TDEFILEREPLACE=ON"
@@ -70,7 +52,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    ${MANDIR:-} \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_DPMS="ON" \
     -DWITH_XSCREENSAVER="OFF" \
     -DWITH_SENSORS="ON" \
@@ -111,7 +93,7 @@ make_fn
 
 installdocs_fn
 
-[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
+mangzip_fn
 
 strip_fn
 

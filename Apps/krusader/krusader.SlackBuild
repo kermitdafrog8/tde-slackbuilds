@@ -62,21 +62,6 @@ patch -p0 -N << EOF || true
 -  static TQPixmap getIcon(vfile *vf);
 ' | while read line
 EOF
-#
-## ../../../../krusader/DiskUsage/radialMap/map.cpp:329:26: error: non-constant-expression cannot be narrowed from type 'uint' (aka 'unsigned int') to 'int' in initializer list [-Wc++11-narrowing]
-## commit 57f84ff
-patch -p0 -N << EOF || true
---- krusader/DiskUsage/radialMap/map.cpp
-+++ krusader/DiskUsage/radialMap/map.cpp
-@@ -329,1 +329,1 @@
--            int a[3] = { (*it)->start(), (*it)->length(), 0 };
-+            uint a[3] = { (*it)->start(), (*it)->length(), 0 };
---- krusader/UserAction/useraction.cpp
-+++ krusader/UserAction/useraction.cpp
-@@ -113,1 +113,1 @@
--        	i18n( "The actionfile's root-element isn't called "ACTION_ROOT", using %1").arg( filename ),
-+        	i18n( "The actionfile's root-element isn't called " ACTION_ROOT ", using %1").arg( filename ),
-EOF
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package

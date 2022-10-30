@@ -115,36 +115,26 @@ patch -N -p0 << EOF || true
 +  text-align: left;
 EOF
 
-[[ $TDEVERSION == 14.0.12 ]] && {
-## for jasper-3.0.0+
+## Restore diff.xml +/- colours
 patch -N -p0 << EOF || true
---- kimgio/jp2.cpp
-+++ kimgio/jp2.cpp
-@@ -279,7 +279,16 @@ kimgio_jp2_write( TQImageIO* io )
- 	TQTextStream ts( &rate, IO_WriteOnly );
- 	ts << "rate="
- 		<< ( (io->quality() < 0) ? DEFAULT_RATE : io->quality() / 100.0F );
-+#	if defined(JAS_VERSION_MAJOR) && (JAS_VERSION_MAJOR >= 3)
-+	const jas_image_fmtinfo_t *jp2_fmtinfo = jas_image_lookupfmtbyname("jp2");
-+	int i = -1;
-+	if (jp2_fmtinfo)
-+	{
-+		i = jas_image_encode(ji, stream, jp2_fmtinfo->id, rate.utf8().data());
-+	}
-+#	else
- 	int i = jp2_encode( ji, stream, rate.utf8().data() );
-+#	endif
- 
- 	jas_image_destroy( ji );
- 	jas_stream_close( stream );
+--- kate/data/diff.xml
++++ kate/data/diff.xml
+@@ -111,2 +111,2 @@
+-      <itemData name="Removed line"  defStyleNum="dsString" backgroundColor="#ffeef0"/>
+-      <itemData name="Added line"  defStyleNum="dsOthers" backgroundColor="#e6ffed"/>
++      <itemData name="Removed line"  defStyleNum="dsString" color="#FF0000"/>
++      <itemData name="Added line"  defStyleNum="dsOthers" color="#0000FF"/>
 EOF
-
-## Backport for markdown syntax highlighting in kate
-sed -i 's|mandoc.xml|& markdown.xml|' kate/data/CMakeLists.txt
-sed -i 's|mandoc.xml.*$|&\n<Definition name="Markdown" url="http://git.trinitydesktop.org/cgit/tdelibs/plain/kate/data/markdown.xml" version="1.3"/>|' kate/data/update-files.xml
-}
-## and add modified markdown.xml for all TDE versions
-cp $SB_SRCDIR/markdown.xml kate/data/
+## Match markdown.xml diff display to diff.xml
+patch -N -p0 << EOF || true
+--- kate/data/markdown.xml
++++ kate/data/markdown.xml
+@@ -149,2 +149,2 @@
+-			<itemData name="difflineremove" defStyleNum="dsString" backgroundColor="#ffeef0" />
+-			<itemData name="difflineadd" defStyleNum="dsOthers" backgroundColor="#e6ffed" />
++			<itemData name="difflineremove" defStyleNum="dsNormal" backgroundColor="#eeeeee" color="#FF0000" />
++			<itemData name="difflineadd" defStyleNum="dsNormal" backgroundColor="#eeeeee" color="#0000FF" />
+EOF
 
 listdocs_fn
 
@@ -170,7 +160,7 @@ sed -i 's|tde_message_fatal( "Spell checker|message( "Spell checker|' ../CMakeLi
     WITH_PCSC
     WITH_PKCS
     WITH_UDEVIL
-are 14.1.0 options and will be ignored by 14.0.? builds
+are 14.1.0 options and will be ignored by 14.0.* builds
 comment
 
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \

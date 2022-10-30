@@ -10,5 +10,15 @@ in=<path-to>/original.png    # existing
 out=<path-to>/converted.png  # will be created
 profile=<TDE-installation-directory>/share/apps/{chalk,krita}/profiles/srgb_color_space_profile.icm
 convert='gm convert'
+
 ($convert $in -profile $profile $out)
+
+-------------
+
+kword/mailmerge requires kspread/libkspreadcommon so if kword is chosen to be built, the SlackBuild will add kspread to the build list if not already selected.
+
+Or, to build kword without mailmerge and the kspread dependency, run:
+
+mailmerge=n ./BUILD-TDE.sh
+ 
  

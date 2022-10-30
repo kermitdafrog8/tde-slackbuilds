@@ -484,10 +484,7 @@ echo $'--- Imlib/load.c
 +\t\t\t      if (colptr + ls < sizeof(col))
 @@ -1560,0 +1583 @@
 +      free(line);
-' | while read line
-do
-patch -p0
-done
+' | patch -p0
 
 listdocs_fn
 

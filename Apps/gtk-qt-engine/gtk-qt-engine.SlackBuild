@@ -33,33 +33,17 @@ getsource_fn
 
 untar_fn
 
-[[ $TDEVERSION == 14.0.12 ]] && {
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang/gtkqtengine.po";done
-sed -i "s|\${po_files}|$langs|" po/CMakeLists.txt
-[[ $langs ]] && langs=" $(echo $langs|sed "s|/gtkqtengine.po||g")"
-## There is no BUILD_TRANSLATIONS option for this build
-## [[ $langs != "" ]] && TRANS=ON
-} || {
 ## for slack-desc
 langs=""
 for Lang in $I18N
 do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang"
 done
-}
 
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
-
-## Add [empty]docs & translations for development builds
-[[ $TDEVERSION != 14.0.12 ]] && {
-BUILDDOC=-DBUILD_DOC="ON"
-TRANS=-DBUILD_TRANSLATIONS="ON"
-}
 
 ## BONOBO will be included in the build if installed
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
@@ -71,8 +55,9 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    ${BUILDDOC:-} \
-    ${TRANS:-} \
+    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
+    -DBUILD_DOC="ON" \
+    -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
     ..
 

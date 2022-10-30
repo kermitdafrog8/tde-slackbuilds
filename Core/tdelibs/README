@@ -6,6 +6,6 @@ Some formatting for help pages has been changed by a patch in the SlackBuild - i
 
 ---
 
-Markdown syntax highlighting for kate has been backported for 14.0.12, with some personal preferences.
-The original file is @ https://mirror.git.trinitydesktop.org/gitea/TDE/tdelibs/raw/branch/master/kate/data/markdown.xml
+Markdown syntax highlighting for kate has been added for 14.0.13.
+There is a patch in the SlackBuild to revert the diff highlighting - comment out if not required.
  

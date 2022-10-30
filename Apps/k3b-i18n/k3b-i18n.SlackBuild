@@ -38,27 +38,9 @@ getsource_fn
 
 untar_fn
 
-## remove help documentation build instruction from all locales ...
-sed -i '/BUILD_DOC/d' */CMakeLists.txt
-#
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-langs="" # the *.po file list
-locas="" # the locale codes
-ldocs="" # the help docs
-for Lang in $I18N
-do
-[[ -d $Lang ]] && {
-langs="$langs $Lang/messages/k3b.po $Lang/messages/k3bsetup.po $Lang/messages/libk3b.po $Lang/messages/libk3bdevice.po"
-locas="$locas $Lang"
-## ... and restore help documentation for the selected and available locales
-[[ -e $Lang/CMakeLists.txt ]] && {
-echo 'tde_conditional_add_subdirectory( BUILD_DOC doc )' > $Lang/CMakeLists.txt
-ldocs="$ldocs $Lang"
-}
-}
-done
-sed -i "s|\${po_files}|$langs|" CMakeLists.txt
+## for slack-desc
+langs="";for Lang in $I18N;do [[ -d $Lang/messages ]] && langs="${langs:+"${langs} "}$Lang";done
+ldocs="";for Lang in $I18N;do [[ -d $Lang/doc ]] && ldocs="${ldocs:+"${ldocs} "}$Lang";done
 
 listdocs_fn
 
@@ -96,7 +78,7 @@ echo "
 $PRGNAM: tdek3b-i18n (internationalization files for the CD Creator).
 $PRGNAM:
 $PRGNAM: For languages:
-$PRGNAM: $locas
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM: With help documentation for:
 $PRGNAM: $ldocs

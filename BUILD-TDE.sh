@@ -101,7 +101,7 @@ Set the version of TDE to be built.
  
 " \
 13 75 3 \
-"14.0.12" "the R14.0.12 release - source from archives" \
+"14.0.13" "the R14.0.13 release - source from archives" \
 "14.0.x" "next release preview - source from Trinity git" \
 "14.1.0" "R14.1.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
@@ -641,7 +641,7 @@ rm -f $TMPVARS/Koffice_OPTS
 echo "autocorrect ${CHALK:-chalk} doc example filters karbon kchart kdgantt kexi kformula kivio koshell kounavail kplato kpresenter kross kspread kugar kword mimetypes pics plugins servicetypes templates tools" > $TMPVARS/DO_NOT_COMPILE
 #
 [[ $CHALK != krita ]] && {
-# Using non-breaking space - U00a0 - in strings
+# Using non-breaking space - U00a0 - in strings so that dialog sees a character, not a space
 app_c=" chalk"
 about_c="Image creation and editing"
 status_c=off
@@ -653,9 +653,6 @@ status_k=off
 comment_k="\Zb\Z6 Needs filters and servicetypes \Zn"
 }
 #
-[[ $(cat $TMPVARS/TDEVERSION) != 14.0.12 ]] && MAN_PAGES=' including man pages'
-DOCS="Application handbooks${MAN_PAGES:-}"
-#
  ### for the record, --separate-output generates output without quotes
 dialog --cr-wrap --nocancel --separate-output --no-shadow --colors --title " KOffice applications " --item-help --checklist \
 "
@@ -666,7 +663,7 @@ Filters and servicetypes are required for most apps.
 " ALL" "Build all applications" off "\Zb\Z6 Overrides any off/on selections below \Zn" \
 " autocorrect" "Autocorrection for US English" off "\Zb\Z6  \Zn" \
 ${app_c:-} ${about_c:-} ${status_c:-} ${comment_c:-} \
-" doc" "$DOCS" off "\Zb\Z6  \Zn" \
+" doc" "Application handbooks including man pages" off "\Zb\Z6  \Zn" \
 " example" "KOffice Example Application" off "\Zb\Z6  \Zn" \
 " filters" "Import/export filters" on "\Zb\Z6  \Zn" \
 " karbon" "A scalable graphics editor" off "\Zb\Z6 Needs filters and servicetypes \Zn" \
@@ -792,8 +789,8 @@ Create and/or update the git repositories local copies.
 
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
-[[ $(cat $TMPVARS/TDEVERSION) == 14.0.12 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
-## testing for cgit!=no will allow =yes, or null, which is the 14.0.12 build case
+[[ $(cat $TMPVARS/TDEVERSION) == 14.0.13 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
+## testing for cgit!=no will allow =yes, or null, which is the 14.0.13 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "
@@ -878,7 +875,6 @@ Confirm or change these build options ..
 }
 
 ######################
-# there should be no need to make any changes below
 
 export TDEVERSION=$(cat $TMPVARS/TDEVERSION)
 export INSTALL_TDE=$(cat $TMPVARS/INSTALL_TDE)

@@ -33,39 +33,9 @@ getsource_fn
 
 untar_fn
 
-[[ $TDEVERSION == 14.0.12 ]] && {
-## remove help documentation build instruction from all [non-en] locales ...
-sed -i '/tde_create_handbook/,+3d' doc/??{,_??}/CMakeLists.txt || true
-# .. restore for en always
-echo 'tde_create_handbook( LANG en DESTINATION tdepowersave )' >> doc/en/CMakeLists.txt
-#
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-lpos="" # the *.po files list
-langs="" # the languages
-ldocs="" # the help docs - there is no doc locale without a corresponding po locale
-#                          so can be set within the po loop
-for Lang in $I18N
-do
-[[ -s po/$Lang.po ]] && {
-lpos="$lpos $Lang.po"
-langs="$langs $Lang"
-## ... and restore help documentation for the selected and available locales
-[[ -s doc/$Lang/CMakeLists.txt ]] && {
-echo "tde_create_handbook( LANG $Lang DESTINATION $PRGNAM )" >> doc/$Lang/CMakeLists.txt
-ldocs="$ldocs $Lang"
-}
-}
-done
-#
-## this GLOB overrides "LANG auto" in po/CMakeLists.txt:
-sed -i "s| \*.po| $lpos|" cmake/modules/TDEMacros.cmake
-[[ $lpos != "" ]] && TRANS=ON
-} || {
-## for slack-desc and to set TRANS=ON until 14.0.12 build removed
-langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang" && TRANS=ON;done
+## for slack-desc
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 ldocs="";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
-}
 
 listdocs_fn
 
@@ -84,7 +54,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
+    -DBUILD_TRANSLATIONS="ON" \
     -Wno-dev \
     ..
 

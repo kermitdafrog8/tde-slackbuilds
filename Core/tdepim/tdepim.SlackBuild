@@ -40,10 +40,10 @@ chown_fn
 cd_builddir_fn
 
 # If libcaldav is installed, include it in the build for korganizer
-[[ -s $INSTALL_TDE/include/libcaldav/caldav.h ]] 2>/dev/null && LCALDAV="ON"
+pkg-config libcaldav && LCALDAV="ON"
 
 # If libcarddav is installed, include it in the build for korganizer
-[[ -s $INSTALL_TDE/include/libcarddav/carddav.h ]] 2>/dev/null && LCARDDAV="ON"
+pkg-config libcarddav && LCARDDAV="ON"
 
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -71,7 +71,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DWITH_SASL="ON" \
     -DWITH_SCALIX="ON" \
     -DWITH_SLOX="ON" \
-    -DWITH_XSCREENSAVER="ON" \
+    -DWITH_XSCREENSAVER="OFF" \
     -DBUILD_AKREGATOR="ON" \
     -DBUILD_CERTMANAGER="ON" \
     -DBUILD_DOC="ON" \

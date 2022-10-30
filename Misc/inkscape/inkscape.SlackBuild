@@ -191,7 +191,6 @@ cmake ${G_NINJA:-} \
     -DWITH_PROFILING="OFF" \
     -DWITH_SVG2="ON" \
     -DWITH_X11="ON" \
-    -DENABLE_BINRELOC="OFF" \
     -Wno-dev \
     ..
 

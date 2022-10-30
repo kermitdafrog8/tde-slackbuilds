@@ -167,192 +167,14 @@ MUSICBRAINZ="ON"
 
 untar_fn
 
-[[ $TDEVERSION == 14.0.12 ]] && {
-## Re: commit 1f4a3ab - Make s_codecFeatures a "const char *" to remove ISO C++ warning
-patch -p0 << EOF
---- libk3b/jobs/k3bvideodvdtitletranscodingjob.cpp
-+++ libk3b/jobs/k3bvideodvdtitletranscodingjob.cpp
-@@ -564,1 +564,1 @@
--  static char* s_codecFeatures[] = { "xvid", "ffmpeg" };
-+  static const char* s_codecFeatures[] = { "xvid", "ffmpeg" };
-@@ -575,1 +575,1 @@
--  static char* s_codecFeatures[] = { "lame", "ac3", "ac3" };
-+  static const char* s_codecFeatures[] = { "lame", "ac3", "ac3" };
-EOF
-
-## all versons ffmpeg support, ported from upstream commits
-patch -p0 << EOF
---- plugins/decoder/ffmpeg/k3bffmpegwrapper.cpp
-+++ plugins/decoder/ffmpeg/k3bffmpegwrapper.cpp
-@@ -36,4 +36,2 @@
- 
--#define FFMPEG_CODEC(s) (s->codec)
--
- #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(52, 101, 0)
-@@ -105,3 +103,7 @@
-+  ::AVCodecContext *audio_stream_ctx;
-   ::AVSampleFormat sampleFormat;
-   ::AVFrame *frame;
--  ::AVPacket packet;
-+  ::AVPacket *packet;
-+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 12, 100)
-+  ::AVPacket _packet;
-+#endif
-@@ -120,2 +122,4 @@
-+  d->audio_stream_ctx = NULL;
-   d->frame = av_frame_alloc();
-   d->outputBufferPos = NULL;
-+  d->packet = NULL;
-@@ -161,16 +165,37 @@
--  ::AVCodecContext *codecContext = FFMPEG_CODEC(d->audio_stream);
--  if (codecContext->codec_type != AVMEDIA_TYPE_AUDIO) {
-+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(57, 33, 100)
-+  if (d->audio_stream->codecpar->codec_type != AVMEDIA_TYPE_AUDIO)
-+#else
-+  d->audio_stream_ctx = d->audio_stream->codec;
-+  if (d->audio_stream_ctx->codec_type != AVMEDIA_TYPE_AUDIO)
-+#endif
-+  {
-     kdDebug() << "(K3bFFMpegFile) not a simple audio stream: " << m_filename;
-     return false;
-   }
- 
-   // get the codec
--  d->codec = ::avcodec_find_decoder(codecContext->codec_id);
-+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(57, 33, 100)
-+  d->codec = (AVCodec *)::avcodec_find_decoder(d->audio_stream->codecpar->codec_id);
-+#else
-+  d->codec = (AVCodec *)::avcodec_find_decoder(d->audio_stream_ctx->codec_id);
-+#endif
-   if (!d->codec) {
-     kdDebug() << "(K3bFFMpegFile) no codec found for " << m_filename;
-     return false;
-   }
- 
-+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(57, 33, 100)
-+  // allocate a codec context
-+  d->audio_stream_ctx = avcodec_alloc_context3(d->codec);
-+  if (d->audio_stream_ctx) {
-+    avcodec_parameters_to_context(d->audio_stream_ctx, d->audio_stream->codecpar);
-+  }
-+  else {
-+    kdDebug() << "(K3bFFMpegFile) failed to allocate a codec context for "
-+              << m_filename;
-+  }
-+#endif
-+
-   // open the codec on our context
--  kdDebug() << "(K3bFFMpegFile) found codec for " << m_filename;
--  if (::avcodec_open2(codecContext, d->codec, NULL) < 0) {
-+  kdDebug() << "(K3bFFMpegFile) found codec for " << m_filename << endl;
-+  if (::avcodec_open2(d->audio_stream_ctx, d->codec, NULL) < 0) {
-@@ -210,2 +235,6 @@
--    ::avcodec_close(FFMPEG_CODEC(d->audio_stream));
-+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(57, 33, 100)
-+    ::avcodec_free_context(&d->audio_stream_ctx);
-+#else
-+    ::avcodec_close(d->audio_stream_ctx);
-     d->codec = NULL;
-+#endif
-@@ -304,7 +333,12 @@
--    ::av_init_packet(&d->packet);
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 12, 100)
-+    d->packet = ::av_packet_alloc();
-+#else
-+    ::av_init_packet(&d->_packet);
-+    d->packet = &d->_packet;
-+#endif
- 
--    if (::av_read_frame(d->formatContext, &d->packet) < 0) {
-+    if (::av_read_frame(d->formatContext, d->packet) < 0) {
-       return 0;
-     }
--    d->packetSize = d->packet.size;
--    d->packetData = d->packet.data;
-+    d->packetSize = d->packet->size;
-+    d->packetData = d->packet->data;
-@@ -327,10 +361,37 @@
--    int len = ::avcodec_decode_audio4(FFMPEG_CODEC(d->audio_stream), d->frame,
--                                      &gotFrame, &d->packet);
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 106, 100)
-+    int len = avcodec_receive_frame(d->audio_stream_ctx, d->frame);
-+    if (len == 0) {
-+      gotFrame = 1;
-+    }
-+    else if (len == AVERROR(EAGAIN)) {
-+      len = 0;
-+    }
-+
-+    if (len == 0) {
-+      len = avcodec_send_packet(d->audio_stream_ctx, d->packet);
-+      if (len == AVERROR(EAGAIN)) {
-+        len = 0;
-+      }
-+    }
-+#else
-+    int len = ::avcodec_decode_audio4(d->audio_stream_ctx, d->frame,
-+                                      &gotFrame, d->packet);
-+#endif
- 
--    if (d->packetSize <= 0 || len < 0)
--      ::av_packet_unref(&d->packet);
-+    if (d->packetSize <= 0 || len < 0) {
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 12, 100)
-+      ::av_packet_free(&d->packet);
-+#else
-+      ::av_packet_unref(d->packet);
-+      d->packet = NULL;
-+#endif
-+    }
-     if (len < 0) {
-       kdDebug() << "(K3bFFMpegFile) decoding failed for " << m_filename;
-       return -1;
-     }
- 
-+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 12, 100)
-+    len = d->packet->size;
-+#endif
-+
-@@ -389,1 +450,5 @@
--K3bFFMpegWrapper::K3bFFMpegWrapper() { ::av_register_all(); }
-+K3bFFMpegWrapper::K3bFFMpegWrapper() {
-+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58,9,100)
-+  ::av_register_all();
-+#endif
-+}
-EOF
-}
-
-[[ $TDEVERSION == 14.0.12 ]] && {
-## using cmake common rules
-find doc -name CMakeLists.txt | xargs rm
-
-sed -i '/tde_conditional_add_subdirectory( BUILD_DOC doc )/d' CMakeLists.txt
-sed -i 's|k3bsetup )|&\
-\
-\
-##### other data\
-\
-tde_conditional_add_project_docs( BUILD_DOC )|' CMakeLists.txt
-
-mv doc/tdeioslave doc/en
-mv doc/en/en doc/en/tdeioslave
-mv doc/*.* doc/en/
-}
 mkdir doc/misc
 mv FAQ doc/misc/
-
 
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
-
-## Add man page for development builds
-[[ $TDEVERSION != 14.0.12 ]] && {
-MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
-}
 
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -363,7 +185,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    ${MANDIR:-} \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_LIBDVDREAD="ON" \
     -DWITH_MUSICBRAINZ=${MUSICBRAINZ:-"OFF"} \
     -DWITH_SYSTEM_LIBSAMPLERATE="ON" \
@@ -389,7 +211,7 @@ make_fn
 
 installdocs_fn
 
-[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
+mangzip_fn
 
 strip_fn
 

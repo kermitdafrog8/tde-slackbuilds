@@ -33,45 +33,6 @@ getsource_fn
 
 untar_fn
 
-## clang build
-## ../chalk/plugins/filters/colorsfilters/kis_brightness_contrast_filter.cpp:243:40: error: non-constant-expression cannot be narrowed from type 'int' to 'TQ_UINT8' (aka 'unsigned char') in initializer list [-Wc++11-narrowing]
-## commit 7994981
-patch -p0 -N << EOF || true
---- chalk/plugins/filters/colorsfilters/kis_brightness_contrast_filter.cpp
-+++ chalk/plugins/filters/colorsfilters/kis_brightness_contrast_filter.cpp
-@@ -243,1 +243,1 @@
--                TQ_UINT8 weights[2] = {MAX_SELECTED - selectedness, selectedness};
-+                TQ_UINT8 weights[2] = {(TQ_UINT8)(MAX_SELECTED - selectedness), selectedness};
---- chalk/plugins/filters/colorsfilters/colorsfilters.cpp
-+++ chalk/plugins/filters/colorsfilters/colorsfilters.cpp
-@@ -212,1 +212,1 @@
--                TQ_UINT8 weights[2] = {MAX_SELECTED - selectedness, selectedness};
-+                TQ_UINT8 weights[2] = {(TQ_UINT8)(MAX_SELECTED - selectedness), selectedness};
-@@ -306,1 +306,1 @@
--                TQ_UINT8 weights[2] = {MAX_SELECTED - selectedness, selectedness};
-+                TQ_UINT8 weights[2] = {(TQ_UINT8)(MAX_SELECTED - selectedness), selectedness};
---- chalk/plugins/filters/colorsfilters/kis_perchannel_filter.cpp
-+++ chalk/plugins/filters/colorsfilters/kis_perchannel_filter.cpp
-@@ -257,1 +257,1 @@
--                TQ_UINT8 weights[2] = {MAX_SELECTED - selectedness, selectedness};
-+                TQ_UINT8 weights[2] = {(TQ_UINT8)(MAX_SELECTED - selectedness), selectedness};
---- chalk/plugins/filters/levelfilter/kis_level_filter.cpp
-+++ chalk/plugins/filters/levelfilter/kis_level_filter.cpp
-@@ -198,1 +198,1 @@
--                TQ_UINT8 weights[2] = {MAX_SELECTED - selectedness, selectedness};
-+                TQ_UINT8 weights[2] = {(TQ_UINT8)(MAX_SELECTED - selectedness), selectedness};
---- filters/kspread/excel/sidewinder/cell.cpp
-+++ filters/kspread/excel/sidewinder/cell.cpp
-@@ -120,1 +120,1 @@
--        char buf[3] = { 'A'+(d/26), 'A'+(d%26), 0};
-+        char buf[3] = { (char)('A'+(d / 26)), (char)('A'+(d % 26)), 0};
---- filters/kword/rtf/import/rtfimport.cpp
-+++ filters/kword/rtf/import/rtfimport.cpp
-@@ -1270,1 +1270,1 @@
--    char tmpch[2] = {token.value, '\0'};
-+    char tmpch[2] = {(char)(token.value), '\0'};
-EOF
-
 ## Workaround to prevent chalk/krita crashing when loading PNGs it has saved
 ## Awaiting fix for koffice issue 20
 patch -p0 << EOF
@@ -88,7 +49,7 @@ patch -p0 << EOF
 EOF
 
 ## fix chalk crashing -
-## - set liblcms as a direct dependency - see issue 37 for details
+## - set liblcms as a direct dependency - see TI issue 37 for details
 sed -i '23iKDE_CXXFLAGS = $(LCMS_LIBS)' chalk/Makefile.am
 ## - when launched from Applications menu
 sed -i "s|Exec=.*$|Exec=$INSTALL_TDE/bin/chalk %U|" chalk/chalk.desktop
@@ -98,7 +59,7 @@ sed -i "s|Exec=.*$|Exec=$INSTALL_TDE/bin/chalk %U|" chalk/chalk.desktop
 { mv $TQTDIR/lib$LIBDIRSUFFIX/libtqt-mt.la $TQTDIR/lib$LIBDIRSUFFIX/libtqt-mt.la-bak 2>/dev/null || true
 }
 
-## fix build problem for karbon - see issue 40 for details
+## fix build problem for karbon - see TI issue 40 for details
 sed -i 's|(Magick-config|(Wand-config|' configure.in.in
 
 ## revert name 'chalk' to 'krita' - option set in BUILD-TDE.sh
@@ -121,9 +82,14 @@ sed -i 's|KFORMULA$COMPILE_FILTER_KUGAR|&$COMPILE_FILTER_KRITA$COMPILE_FILTER_KI
 
 [[ $(cat $TMPVARS/DO_NOT_COMPILE) == *kross* ]] && SCRIPTING=--disable-scripting
 
-## Add man pages for development builds
-[[ $TDEVERSION != 14.0.12 ]] && \
-MANDIR=--mandir=$INSTALL_TDE/man
+## issue #31
+## to remove mailmerge from the kword build:
+[[ ${mailmerge:-} == [nN0] ]] && \
+sed -i 's|SUBDIRS = . mailmerge|SUBDIRS = .|' kword/Makefile.am
+## if kword is selected and includes mailmerge, ensure kspread is built
+[[ $(cat $TMPVARS/DO_NOT_COMPILE) != *kword* ]] && \
+[[ $(grep SUBDIRS kword/Makefile.am) == *mailmerge* ]] && \
+sed -i 's|kspread||' $TMPVARS/DO_NOT_COMPILE
 
 listdocs_fn
 
@@ -140,7 +106,7 @@ CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
    --prefix=$INSTALL_TDE \
-   ${MANDIR:-} \
+   --mandir=$INSTALL_TDE/man \
    --disable-rpath \
    ${SCRIPTING:-} \
    --enable-closure
@@ -149,7 +115,7 @@ make_fn
 
 installdocs_fn
 
-[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
+mangzip_fn
 
 strip_fn
 

@@ -60,14 +60,14 @@ cd_builddir_fn
 pkg-config mp4v2 && MP4V2="ON"
 
 ## Build xine-engine?
-[[ -s /usr/include/xine.h ]] && XINE="ON"
+pkg-config libxine && XINE="ON"
 
 ## Build yauap-engine_plugin?
 # Yauap does NOT handle the mp3 format.
 [[ -s $(which yauap) ]] && YAUAP="ON"
 
 ## Build aKode-engine?
-[[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && AKODE="ON"
+pkg-config akode && AKODE="ON"
 
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \

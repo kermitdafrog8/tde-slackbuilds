@@ -33,75 +33,13 @@ getsource_fn
 
 untar_fn
 
-## build error with cgit:
-##/tmp/build/tmp-tdegraphics/tdegraphics/build-tdegraphics/kmrml/kmrml/kcontrol/serverconfigwidget.cpp:37:61: error: invalid use of incomplete type ‘class KComboBox’
-## .. and more ..
-## patch based on solution for similar amarok errors, issue #16
-echo $'
---- kmrml/kmrml/kcontrol/serverconfigwidget.ui
-+++ kmrml/kmrml/kcontrol/serverconfigwidget.ui
-@@ -271,0 +272,5 @@
-+<includes>
-+    <include location="global" impldecl="in implementation">kcombobox.h</include>
-+    <include location="global" impldecl="in implementation">knuminput.h</include>
-+    <include location="global" impldecl="in implementation">klineedit.h</include>
-+</includes>
-' | patch -N -p0 || true
-
-[[ $TDEVERSION == 14.0.12 ]] && {
-## for poppler-22.03+
-patch -N -p0 << EOF || true
---- config.h.cmake
-+++ config.h.cmake
-@@ -3,2 +3,3 @@
- // poppler-tqt
-+#cmakedefine HAVE_POPPLER_2203
- #cmakedefine HAVE_POPPLER_2112
---- tdefile-plugins/dependencies/poppler-tqt/ConfigureChecks.cmake
-+++ tdefile-plugins/dependencies/poppler-tqt/ConfigureChecks.cmake
-@@ -27,1 +27,1 @@
--foreach( _poppler_ver 0.58 0.64 0.70 0.71 0.72 0.76 0.82 0.83 0.86 21.08 21.11 21.12 )
-+foreach( _poppler_ver 0.58 0.64 0.70 0.71 0.72 0.76 0.82 0.83 0.86 21.08 21.11 21.12 22.03 )
---- tdefile-plugins/dependencies/poppler-tqt/poppler-document.cpp
-+++ tdefile-plugins/dependencies/poppler-tqt/poppler-document.cpp
-@@ -53,1 +53,5 @@
-+# if defined(HAVE_POPPLER_2203)
-+  DocumentData *doc = new DocumentData(std::make_unique<GooString>(TQFile::encodeName(filePath)), {});
-+# else
-   DocumentData *doc = new DocumentData(new GooString(TQFile::encodeName(filePath)), NULL);
-+# endif
-@@ -87,4 +91,9 @@
-+#   if defined(HAVE_POPPLER_2203)
-+    DocumentData *doc2 = new DocumentData(std::make_unique<GooString>(data->doc.getFileName()),
-+                                          GooString(password.data()));
-+#   else
-     GooString *filename = new GooString(data->doc.getFileName());
-     GooString *pwd = new GooString(password.data());
-     DocumentData *doc2 = new DocumentData(filename, pwd);
-     delete pwd;
-+#   endif
---- tdefile-plugins/dependencies/poppler-tqt/poppler-private.h
-+++ tdefile-plugins/dependencies/poppler-tqt/poppler-private.h
-@@ -107,1 +107,5 @@
-+#   if defined(HAVE_POPPLER_2203)
-+    DocumentData(std::unique_ptr<GooString> &&filePath, const std::optional<GooString> &password) : doc(std::move(filePath), password), m_fontInfoScanner(0), m_outputDev(0) {}
-+#   else
-     DocumentData(GooString *filePath, GooString *password) : doc(filePath,password), m_fontInfoScanner(0), m_outputDev(0) {}
-+#   endif
-EOF
-}
-
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
 
-## Add man pages for development builds
-[[ $TDEVERSION != 14.0.12 ]] && {
-MANDIR=-DMAN_INSTALL_DIR=$INSTALL_TDE/man
 sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM/issues|" ../doc/man/*/*.1
-}
 
 # If imlib is installed, include Kuickshow:
 pkg-config imlib && KUICKSHOW=ON
@@ -115,7 +53,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
     -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    ${MANDIR:-} \
+    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
     -DWITH_T1LIB="OFF" \
     -DWITH_PAPER="OFF" \
     -DWITH_TIFF="ON" \
@@ -150,7 +88,7 @@ make_fn
 
 installdocs_fn
 
-[[ $TDEVERSION != 14.0.12 ]] && mangzip_fn
+mangzip_fn
 
 strip_fn
 

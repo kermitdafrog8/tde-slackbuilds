@@ -39,8 +39,8 @@ chown_fn
 
 cd_builddir_fn
 
-AKODE=OFF && [[ -s $INSTALL_TDE/include/akode/akodelib.h ]] && AKODE=ON
-FREEVERB=OFF && [[ -s $INSTALL_TDE/include/arts/artsmodules.h ]] && FREEVERB=ON
+pkg-config akode && AKODE=ON
+pkg-config arts && FREEVERB=ON
 
 cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
@@ -54,7 +54,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
     -DWITH_ARTS="ON" \
     -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
-    -DWITH_AKODE="$AKODE" \
+    -DWITH_AKODE="${AKODE:-OFF}" \
     -DWITH_ALSA="ON" \
     -DWITH_GSTREAMER="OFF" \
     -DBUILD_DOC="ON" \
@@ -63,7 +63,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DBUILD_KMOUSETOOL="ON" \
     -DBUILD_KMOUTH="ON" \
     -DBUILD_KSAYIT="ON" \
-    -DBUILD_KSAYIT_FREEVERB="$FREEVERB" \
+    -DBUILD_KSAYIT_FREEVERB="${FREEVERB:-OFF}" \
     -DBUILD_KTTSD="ON" \
     -DBUILD_KTTSD_COMMAND="ON" \
     -DBUILD_KTTSD_EPOS="ON" \

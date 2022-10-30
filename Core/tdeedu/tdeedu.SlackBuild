@@ -230,12 +230,7 @@ untar_fn
 ## patch for kig python scripting error:
 ## kig: /usr/include/boost/python/object_core.hpp:422: boost::python::api::object_base::~object_base(): Assertion `Py_REFCNT(m_ptr) > 0' failed.
 ## Re: https://bugs.kde.org/show_bug.cgi?id=401512#c5
-patch -N -p0 << EOF || true
---- kig/scripting/python_scripter.cpp
-+++ kig/scripting/python_scripter.cpp
-@@ -493,0 +494 @@
-+      Py_XINCREF((objectvect.begin() +i)->ptr());
-EOF
+sed -i 's|      PyTuple_SetItem|      Py_XINCREF((objectvect.begin() +i)->ptr());\n&|' kig/scripting/python_scripter.cpp
 
 ## add some files to html docs
 sed -i 's|*.png|& *.svgz README|' cmake/modules/TDEMacros.cmake
