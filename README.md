@@ -7,7 +7,7 @@
 See [*Cross compiling for RPi3*](#xcompiling) for building for arm_hf and aarch64.
 
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input,  
-which will build the release version 14.0.13, or the development versions 14.0.x, 14.1.0.
+which will build the release version 14.0.13, or the development versions 14.0.x [\[see note \[6\]\]](#6), or 14.1.0.
 
 [<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png "TDE version")  
 ... select TDE version
@@ -61,7 +61,7 @@ get-source.sh - common code for the SlackBuilds
 There is an override in the Misc SlackBuilds for non-trinity source archive URLs. Non-trinity builds have been included where a TDE package requires a dependency that is not in Slackware, or where it's an alternative to a TDE package.
 
 Some SlackBuilds require non-Slackware packages which aren't in the build list. These can be added to the build if they are not already installed by downloading the source archives to the 'src' directory. They will then be built and installed during the xxx.SlackBuild.   
-See the READMEs in Core/tdeedu, Apps/k3b, Apps/klamav, Apps/koffice and Misc/inkscape for details, which can also be viewed while running ./BUILD-TDE.sh.
+See the READMEs in Core/tdeedu, Apps/k3b, Apps/klamav, and Misc/inkscape for details, which can also be viewed while running ./BUILD-TDE.sh.
 
 ---
 
@@ -135,6 +135,9 @@ Includes:
 [4] The README for a [native build for Raspberry Pi3](./README-Raspberry-Pi3.md) is out-of-date and cross compiling is a better option.
 
 [5] The speex build for version 1.2.0 has been retained, but speex v1.2.1 is available as a Slackware 15.0 package and should be used for tdenetwork and amarok builds.
+
+<a id="6"></a>
+[6] There are no plans for a 14.0.14 release and so the 14.0.x branch is effectively frozen at 14.0.13 - go to [new target...](https://mail.trinitydesktop.org/mailman3/hyperkitty/list/users@trinitydesktop.org/thread/JKKMYZUAFMG4HT2EMKFSZHVSNSUTED27/) for more information.
 
 ---
 

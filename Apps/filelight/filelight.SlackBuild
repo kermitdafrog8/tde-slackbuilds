@@ -34,6 +34,26 @@ getsource_fn
 
 untar_fn
 
+[[ $TDEVERSION == 14.0.13 ]] && {
+patch -p0 << EOF
+--- src/part/radialMap/widget.cpp
++++ src/part/radialMap/widget.cpp
+@@ -44,3 +44,11 @@
+ {
+-   return KURL::fromPathOrURL( file ? file->fullPath() : m_tree->fullPath() );
++   if (file)
++   {
++      return KURL::fromPathOrURL(file->fullPath());
++   }
++   if (m_tree)
++   {
++      return KURL::fromPathOrURL(m_tree->fullPath());
++   }
++   return KURL::fromPathOrURL(TQString::null);
+ }
+EOF
+}
+
 ## for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 ldocs="en";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
@@ -44,21 +64,7 @@ chown_fn
 
 cd_builddir_fn
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
-    -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS="ON" \
-    -Wno-dev \
-    ..
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-}
 
 make_fn
 

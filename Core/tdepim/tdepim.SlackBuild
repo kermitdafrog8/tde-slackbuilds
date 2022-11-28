@@ -33,6 +33,9 @@ getsource_fn
 
 untar_fn
 
+## build fails with gcc visibility support
+sed -i '/check for gcc visibility support/,+4d' ConfigureChecks.cmake
+
 listdocs_fn
 
 chown_fn
@@ -45,15 +48,7 @@ pkg-config libcaldav && LCALDAV="ON"
 # If libcarddav is installed, include it in the build for korganizer
 pkg-config libcarddav && LCARDDAV="ON"
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_ARTS="ON" \
     -DWITH_BIRTHDAYS="ON" \
     -DWITH_CALDAV=${LCALDAV:-"OFF"} \
@@ -74,7 +69,6 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DWITH_XSCREENSAVER="OFF" \
     -DBUILD_AKREGATOR="ON" \
     -DBUILD_CERTMANAGER="ON" \
-    -DBUILD_DOC="ON" \
     -DBUILD_INDEXLIB="ON" \
     -DBUILD_KADDRESSBOOK="ON" \
     -DBUILD_KALARM="ON" \
@@ -108,9 +102,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DBUILD_TDEFILE_PLUGINS="ON" \
     -DBUILD_TDEIOSLAVE="ON" \
     -DBUILD_TDERESOURCES="ON" \
-    -DBUILD_WIZARDS="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_WIZARDS="ON"
 
 make_fn
 

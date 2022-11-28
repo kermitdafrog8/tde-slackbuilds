@@ -43,16 +43,7 @@ sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/g
 
 ## TDEFileReplace has been moved from tdewebdev for R14.1.0
 [[ $TDEVERSION == 14.1.0 ]] && TDEFileReplace="-DBUILD_TDEFILEREPLACE=ON"
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_DPMS="ON" \
     -DWITH_XSCREENSAVER="OFF" \
     -DWITH_SENSORS="ON" \
@@ -65,7 +56,6 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DWITH_I8K="OFF" \
     -DWITH_XMMS="OFF" \
     -DWITH_TDENEWSTUFF="OFF" \
-    -DBUILD_DOC="ON" \
     -DBUILD_ARK="ON" \
     -DBUILD_CHARSELECTAPPLET="ON" \
     -DBUILD_KCALC="ON" \
@@ -85,9 +75,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DBUILD_KTIMER="ON" \
     -DBUILD_TDEWALLET="ON" \
     -DBUILD_SUPERKARAMBA="ON" \
-    ${TDEFileReplace:-} \
-    -Wno-dev \
-    ..
+    ${TDEFileReplace:-}
 
 make_fn
 

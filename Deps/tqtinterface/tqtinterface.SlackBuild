@@ -40,21 +40,12 @@ chown_fn
 cd_builddir_fn
 
 [[ $TDEVERSION == 14.1.0 ]] && QTINC_PFX=T
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$TQTDIR \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DQT_PREFIX_DIR=$TQTDIR \
     -D${QTINC_PFX:-}QT_INCLUDE_DIR=$TQTDIR/include/tqt \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
     -DQT_VERSION=3 \
     -DWITH_QT3="OFF" \
-    -DWITH_QT4="OFF" \
-    -Wno-dev \
-    ..
+    -DWITH_QT4="OFF"
 
 make_fn
 

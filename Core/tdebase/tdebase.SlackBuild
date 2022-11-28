@@ -154,19 +154,9 @@ endif( )
 #
 sed -i "s|/opt/.*/share/doc/tdm/README.gz|$INSTALL_TDE/share/config/tdm/README-config|" ../doc/man/tdm{,ctl}.1
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_ARTS="ON" \
     -DWITH_ELFICON="OFF" \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DWITH_HAL="OFF" \
     -DWITH_I8K="OFF" \
     -DWITH_LDAP="OFF" \
@@ -197,7 +187,6 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DWITH_XTEST="ON" \
     -DBUILD_APPLNK="ON" \
     -DBUILD_CRASHTEST="ON" \
-    -DBUILD_DOC="ON" \
     -DBUILD_DRKONQI="ON" \
     -DBUILD_KAPPFINDER="ON" \
     -DBUILD_KATE="ON" \
@@ -246,9 +235,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DBUILD_TDM_SYSTEMD_UNIT_FILE="OFF" \
     -DBUILD_TQT3INTEGRATION="ON" \
     -DBUILD_TSAK="ON" \
-    -DBUILD_TWIN="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_TWIN="ON"
 
 make_fn
 

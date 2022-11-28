@@ -56,9 +56,9 @@ cd clamav-$clamav_VERS/
 ## set RPATH relative to ORIGIN always
 sed -i 's|CMAKE_INSTALL_RPATH.*$|CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")|' CMakeLists.txt
 
-[[ -s /usr/lib64/libmilter.a ]] && MILTER="ON"
+[[ -s /usr/lib$LIBDIRSUFFIX/libmilter.a ]] && MILTER="ON"
 
-[[ $GCC_VIS == 0 ]] && unset GCC_VIS # needs to be unset for parameter expansion for CMAKE_CXX_FLAGS
+[[ $GCC_VIS == 0 ]] && unset GCC_VIS # needs to be null or unset for parameter expansion for CMAKE_CXX_FLAGS
 
 mkdir build
 cd build/
@@ -135,21 +135,9 @@ cd_builddir_fn
 
 ! pkg-config sqlite3 && EMB_SQL="ON"
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_EMBEDDED_SQLITE=${EMB_SQL:-"OFF"} \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
-    -DBUILD_DOC="ON" \
-    -DBUILD_KLAMMAIL="ON" \
-    -DBUILD_TRANSLATIONS="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_KLAMMAIL="ON"
 
 make_fn
 

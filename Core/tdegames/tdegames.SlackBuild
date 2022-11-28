@@ -39,19 +39,8 @@ chown_fn
 
 cd_builddir_fn
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_ARTS="ON" \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
-    -DBUILD_DOC="ON" \
     -DBUILD_LIBTDEGAMES="ON" \
     -DBUILD_ATLANTIK="ON" \
     -DBUILD_KASTEROIDS="ON" \
@@ -85,9 +74,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DBUILD_KTUBERLING="ON" \
     -DBUILD_LSKAT="ON" \
     -DBUILD_TWIN4="ON" \
-    -DBUILD_TDEFIFTEEN="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_TDEFIFTEEN="ON"
 
 # don't package carddecks if they're not needed for chosen games:
 [[ ! $(grep -E "kpat|kpoker|lskat" cmake_install.cmake) ]] && sed -i '/carddecks/d' libtdegames/cmake_install.cmake

@@ -75,7 +75,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc" DESTINATION ${CMA
 sed -i 's|VERSION 3.2.0|VERSION 3.2.1|' CMakeLists.txt
 
 cd cmake/
-# LIBDIRSUFFIX not required - builds to lib64 where appropriate ..
+# LIBDIRSUFFIX not required - include(GNUInstallDirs) sets lib64 where appropriate ..
 cmake ${G_NINJA:-} \
     -DBUILD_SHARED_LIBS=ON \
     -DBUILD_TESTING=OFF \
@@ -157,8 +157,14 @@ chown_fn
 
 cd_builddir_fn
 
+## for a clang/i586 build, linking inkscape and inkview:
+##| /usr/bin/ld: lib/libinkscape_base.so: undefined reference to `__atomic_store'
+##| /usr/bin/ld: lib/libinkscape_base.so: undefined reference to `__atomic_load'
+## Override the LIBATOMIC_NOT_NEEDED test in DefineDependsandFlags.cmake to add -latomic to the linker flags
+[[ $COMPILER == clang && $ARCH == i586 ]] && LIBATOMIC=-DLIBATOMIC_NOT_NEEDED=0
+
 ## options have been pulled from CMakeLists.txt
-cmake ${G_NINJA:-} \
+cmake ${G_NINJA:-} ${LIBATOMIC:-} \
     -DCMAKE_C_FLAGS="$SLKCFLAGS" \
     -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
     -DCMAKE_C_COMPILER=$COMPILER \

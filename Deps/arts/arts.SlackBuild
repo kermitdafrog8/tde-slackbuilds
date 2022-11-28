@@ -42,26 +42,14 @@ cd_builddir_fn
 sed -i 's|^KDE|TDE|' ../README.md
 for i in ../doc/man/*.1 ; do mv $i ${i%%-trinity.1}.1 ; done
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_ALSA="ON" \
     -DWITH_AUDIOFILE="ON" \
     -DWITH_ESOUND="OFF" \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DWITH_JACK="OFF" \
     -DWITH_MAD="ON" \
     -DWITH_SNDIO="OFF" \
-    -DWITH_VORBIS="ON" \
-    -DBUILD_DOC="ON" \
-    -Wno-dev \
-    ..
+    -DWITH_VORBIS="ON"
 
 make_fn
 

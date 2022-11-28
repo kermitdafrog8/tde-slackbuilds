@@ -60,23 +60,12 @@ cd_builddir_fn
 sed -i 's|\\fI/opt/trinity/share/doc/ksig/README.Debian\\fP|the Ksig Handbook|' ../doc/man/ksig/ksig.1
 sed -i 's|^done|& - in konqueror enter \\fI'\''help:/ksig'\''\\f  - or on the command line run \\fI'\''khelpcenter help:/ksig'\''\\f|' ../doc/man/ksig/ksig.1
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_ARTS="ON" \
     -DWITH_SDL="ON" \
     -DWITH_BERKELEY_DB="ON" \
     -DWITH_XMMS="OFF" \
     -DWITH_TEST="OFF" \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
-    -DBUILD_DOC="ON" \
     -DBUILD_ATLANTIKDESIGNER=${ATLANTIKDESIGNER:-"OFF"} \
     -DBUILD_KADDRESSBOOK_PLUGINS=${KADDRESSBOOK_PLUGINS:-"OFF"} \
     -DBUILD_NOATUN_PLUGINS=${NOATUN_PLUGINS:-"OFF"} \
@@ -87,9 +76,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DBUILD_KSIG="ON" \
     -DBUILD_RENAMEDLG_PLUGINS="ON" \
     -DBUILD_TDEFILE_PLUGINS="ON" \
-    -DBUILD_TUTORIALS="OFF" \
-    -Wno-dev \
-    ..
+    -DBUILD_TUTORIALS="OFF"
 
 make_fn
 

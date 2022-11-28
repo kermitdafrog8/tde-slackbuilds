@@ -43,20 +43,10 @@ cd_builddir_fn
 sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM/issues|" ../cervisia/cervisia.1.in
 sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM/issues|" ../scripts/tdesvn-build
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_DBSEARCHENGINE="ON" \
     -DWITH_KCAL="ON" \
     -DBUILD_CERVISIA="ON" \
-    -DBUILD_DOC="ON" \
     -DBUILD_KAPPTEMPLATE="ON" \
     -DBUILD_KBABEL="ON" \
     -DBUILD_KBUGBUSTER="ON" \
@@ -74,9 +64,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DBUILD_TDEFILE_PLUGINS="ON" \
     -DBUILD_TDEIOSLAVE="ON" \
     -DBUILD_TDEUNITTEST="ON" \
-    -DBUILD_UMBRELLO="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_UMBRELLO="ON"
 
 make_fn
 

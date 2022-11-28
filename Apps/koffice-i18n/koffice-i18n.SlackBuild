@@ -67,16 +67,9 @@ chown_fn
 
 cd_builddir_fn
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DBUILD_DOC="ON" \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DBUILD_DATA="ON" \
-    -DBUILD_MESSAGES="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_MESSAGES="ON"
 
 make_fn
 

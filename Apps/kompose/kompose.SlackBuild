@@ -44,20 +44,8 @@ chown_fn
 cd_builddir_fn
 
 pkg-config xdamage && pkg-config xcomposite && XCOMP="ON"
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
-    -DWITH_XCOMPOSITE=${XCOMP:-"OFF"} \
-    -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS="ON" \
-    -Wno-dev \
-    ..
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
+    -DWITH_XCOMPOSITE=${XCOMP:-"OFF"}
 
 make_fn
 

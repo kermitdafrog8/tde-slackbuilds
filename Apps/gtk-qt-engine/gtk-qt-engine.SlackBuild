@@ -34,10 +34,7 @@ getsource_fn
 untar_fn
 
 ## for slack-desc
-langs=""
-for Lang in $I18N
-do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang"
-done
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 
@@ -46,20 +43,7 @@ chown_fn
 cd_builddir_fn
 
 ## BONOBO will be included in the build if installed
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
-    -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS="ON" \
-    -Wno-dev \
-    ..
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-}
 
 make_fn
 
@@ -86,7 +70,7 @@ $PRGNAM: Styles and Fonts' section in the TDE control center and select
 $PRGNAM: 'Use my TDE style in GTK applications'.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en$langs
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

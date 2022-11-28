@@ -47,17 +47,7 @@ sed -i "s|/opt/trinity/share/doc/lisa/README.gz|$INSTALL_TDE/share/apps/lisa/REA
 # If speex is installed, include it in the build for jingle
 pkg-config speex && SPX="ON"
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_ARTS="ON" \
     -DWITH_JINGLE="ON" \
     -DWITH_SPEEX=${SPX:-"OFF"} \
@@ -67,7 +57,6 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DWITH_SLP="OFF" \
     -DWITH_WEBCAM="OFF" \
     -DBUILD_DCOPRSS="ON" \
-    -DBUILD_DOC="ON" \
     -DBUILD_FILESHARING="ON" \
     -DBUILD_KDICT="ON" \
     -DBUILD_TDEDNSSD="ON" \
@@ -111,9 +100,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DBUILD_KOPETE_PLUGIN_NETMEETING="ON" \
     -DBUILD_KOPETE_PLUGIN_ADDBOOKMARKS="ON" \
     -DBUILD_KOPETE_PLUGIN_STATISTICS="ON" \
-    -DBUILD_KOPETE_PLUGIN_SMPPPDCS="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_KOPETE_PLUGIN_SMPPPDCS="ON"
 
 make_fn
 

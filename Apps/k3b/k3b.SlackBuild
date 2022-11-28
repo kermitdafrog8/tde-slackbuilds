@@ -170,22 +170,27 @@ untar_fn
 mkdir doc/misc
 mv FAQ doc/misc/
 
+## build fails with gcc visibility support
+sed -i '/check for gcc visibility support/,+4d' ConfigureChecks.cmake
+
+[[ $TDEVERSION == 14.0.13 ]] && {
+patch -p0 << EOF
+--- plugins/decoder/libsndfile/CMakeLists.txt
++++ plugins/decoder/libsndfile/CMakeLists.txt
+@@ -20,2 +20,3 @@
+   \${TQT_INCLUDE_DIRS}
++  \${SNDFILE_INCLUDE_DIRS}
+ )
+EOF
+}
+
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_LIBDVDREAD="ON" \
     -DWITH_MUSICBRAINZ=${MUSICBRAINZ:-"OFF"} \
     -DWITH_SYSTEM_LIBSAMPLERATE="ON" \
@@ -202,10 +207,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DWITH_MUSEPACK=${MUSEPACK:-"OFF"} \
     -DWITH_VORBIS="ON" \
     -DWITH_LAME=${LAME:-"OFF"} \
-    -DBUILD_K3BSETUP="ON" \
-    -DBUILD_DOC="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_K3BSETUP="ON"
 
 make_fn
 

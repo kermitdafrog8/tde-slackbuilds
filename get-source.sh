@@ -124,6 +124,8 @@ cd $BUILD_TDE_ROOT/src/cgit
 [[ -d admin ]] && \
 (echo "Updating admin ..."
 cd admin
+## remove any old .git/worktrees records - only being used here as a build source
+rm -rf .git/worktrees/*
 git checkout -- *
 git pull
 ## repo is in master - update r14.0.x to latest revision
@@ -131,6 +133,7 @@ git fetch origin r14.0.x:r14.0.x)
 [[ -d cmake ]] && \
 (echo "Updating cmake ..."
 cd cmake
+rm -rf .git/worktrees/*
 git checkout -- *
 git pull
 git fetch origin r14.0.x:r14.0.x)
@@ -151,6 +154,7 @@ touch $TMPVARS/admin-cmake-done
 [[ -d $PRGNAM ]] && \
 (echo "Updating $PRGNAM ..."
 cd $PRGNAM
+rm -rf .git/worktrees/*
 git checkout -- *
 git pull
 git fetch origin r14.0.x:r14.0.x)
@@ -163,6 +167,7 @@ git clone https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM
 [[ -d libltdl ]] && \
 (echo "Updating libltdl ..."
 cd libltdl
+rm -rf .git/worktrees/*
 git checkout -- *
 git pull
 git fetch origin r14.0.x:r14.0.x)
@@ -176,6 +181,7 @@ git clone https://mirror.git.trinitydesktop.org/gitea/TDE/libltdl
 [[ -d libtdevnc ]] && \
 (echo "Updating libtdevnc ..."
 cd libtdevnc
+rm -rf .git/worktrees/*
 git checkout -- *
 git pull
 # git fetch origin r14.0.x:r14.0.x
@@ -250,7 +256,7 @@ cd $TMP_BUILD/tmp-$PRGNAM
 ## unpack R14 or misc
 echo -e "\n unpacking $(basename $SOURCE) ... \n"
 tar -xf $SOURCE
-[[ $TDEMIR_SUBDIR != misc ]] && (
+[[ $TDEMIR_SUBDIR != misc ]] && [[ -e $(ls $PRGNAM*/CMakeLists.txt) ]] && (
 cd $PRGNAM*
 tar -xf $SRCDIR/cmake-$TDEVERSION.tar.xz
 mv cmake-trinity-$TDEVERSION cmake
@@ -308,9 +314,27 @@ echo # if this fails, SlackBuild will fail from [3]
 #
 cd $PRGNAM*
 
-## For cmake builds - the path to the TDE cmake modules
-## Added for 14.0.11+ & 14.1.0 which assume a cmake-trinity package is installed to the CMake system directories
-export CMAKE_OPTS=-DCMAKE_MODULE_PATH=$PWD/cmake/modules
+## The path to the TDE cmake modules is added for 14.0.11+ & 14.1.0
+##  which otherwise assume a cmake-trinity package is installed to the CMake system directories
+## Create an initial cache file for TDE cmake builds:
+[[ $VERSION == 14.* ]] && [[ -e CMakeLists.txt ]] && {
+[[ $PRGNAM == libart-lgpl ]] && SLKRCFLAGS=$SLKCFLAGS
+echo 'set ( CMAKE_C_COMPILER '"$(which $COMPILER)"' CACHE FILEPATH "" )
+set ( CMAKE_CXX_COMPILER '"$(which $COMPILER_CXX)"' CACHE FILEPATH "" )
+set ( CMAKE_C_FLAGS "'"$SLKRCFLAGS"'" CACHE STRING "Slackware set c flags" )
+set ( CMAKE_CXX_FLAGS "'"$SLKRCFLAGS"'" CACHE STRING "Slackware set c++ flags" )
+set ( CMAKE_INSTALL_PREFIX '"$INSTALL_TDE"' CACHE PATH "Path to TDE installation directory" )
+set ( PLUGIN_INSTALL_DIR '"$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR"' CACHE PATH "Path to plugins directory" )
+set ( MAN_INSTALL_DIR '"$INSTALL_TDE"'/man CACHE PATH "Path to TDE man pages directory" )
+set ( CMAKE_BUILD_TYPE Release CACHE STRING "The type of build" )
+set ( CMAKE_MODULE_PATH '"$PWD"'/cmake/modules CACHE PATH "Path to TDE cmake modules" )
+set ( LIB_SUFFIX '"$LIBDIRSUFFIX"' CACHE STRING "Libraries directory /lib suffix" )
+set ( WITH_GCC_VISIBILITY '"${GCC_VIS:-}"' CACHE BOOL "Used if ON and included in ConfigureChecks.cmake" )
+set ( BUILD_DOC ON CACHE BOOL "Set but not used for this project" )
+set ( BUILD_TRANSLATIONS ON CACHE BOOL "Set but not used for this project" )
+' > $TMPVARS/CMAKE_CACHE
+export CMAKE_OPTS='-Wno-dev --no-warn-unused-cli ..'
+} || : # exit 0 if not a TDE cmake build
 }
 
 listdocs_fn ()

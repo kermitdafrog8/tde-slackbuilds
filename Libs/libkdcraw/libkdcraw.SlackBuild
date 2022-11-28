@@ -128,27 +128,19 @@ tde_add_executable( dcraw_half AUTOMOC
   LINK raw-static
 )' >> libkdcraw/test/CMakeLists.txt
 
+## for pkg-config .pc file
+sed -i 's|project( libkdcraw|& VERSION 0.1.9|' CMakeLists.txt
+sed -i 's|Version:.*$|Version: @PROJECT_VERSION@|' libkdcraw/libkdcraw.pc.cmake
+
 chown_fn
 
 cd_builddir_fn
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_LCMS="ON" \
     -DWITH_OPENMP="ON" \
     -DBUILD_DCRAW="ON" \
-    -DBUILD_TESTS="ON" \
-    -DBUILD_TRANSLATIONS="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_TESTS="ON"
 
 make_fn
 

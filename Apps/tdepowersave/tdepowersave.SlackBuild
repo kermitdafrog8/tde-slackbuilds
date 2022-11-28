@@ -34,8 +34,8 @@ getsource_fn
 untar_fn
 
 ## for slack-desc
-langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
-ldocs="";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+ldocs="en";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
 
 listdocs_fn
 
@@ -43,20 +43,7 @@ chown_fn
 
 cd_builddir_fn
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS="ON" \
-    -Wno-dev \
-    ..
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-}
 
 make_fn
 
@@ -84,10 +71,10 @@ $PRGNAM: screen on a laptop can be configured to turn off if the computer is
 $PRGNAM: not used for a specified amount of time, extending battery life.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en$langs
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM: With help documentation for:
-$PRGNAM: en$ldocs
+$PRGNAM: $ldocs
 $PRGNAM:
 " > $PKG/install/slack-desc
 

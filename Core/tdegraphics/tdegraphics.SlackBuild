@@ -33,6 +33,9 @@ getsource_fn
 
 untar_fn
 
+## build fails with gcc visibility support
+sed -i '/check for gcc visibility support/,+4d' ConfigureChecks.cmake
+
 listdocs_fn
 
 chown_fn
@@ -44,22 +47,12 @@ sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/g
 # If imlib is installed, include Kuickshow:
 pkg-config imlib && KUICKSHOW=ON
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_T1LIB="OFF" \
     -DWITH_PAPER="OFF" \
     -DWITH_TIFF="ON" \
     -DWITH_OPENEXR="OFF" \
     -DWITH_PDF="ON" \
-    -DBUILD_DOC="ON" \
     -DBUILD_TDEFILE_PLUGINS="ON" \
     -DBUILD_KUICKSHOW=${KUICKSHOW:-OFF} \
     -DBUILD_KPDF="ON" \
@@ -80,9 +73,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DBUILD_KRULER="ON" \
     -DBUILD_KSNAPSHOT="ON" \
     -DBUILD_KVIEW="ON" \
-    -DBUILD_KVIEWSHELL="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_KVIEWSHELL="ON"
 
 make_fn
 

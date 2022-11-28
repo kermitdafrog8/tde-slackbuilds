@@ -100,10 +100,10 @@ dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Version " --menu 
 Set the version of TDE to be built.
  
 " \
-13 75 3 \
+12 75 2 \
 "14.0.13" "the R14.0.13 release - source from archives" \
-"14.0.x" "next release preview - source from Trinity git" \
-"14.1.0" "R14.1.0 development - source from Trinity git" \
+"14.1.0" "R14.1.0 release preview - source from Trinity git" \
+" [14.0.x]" " [14.0.14 release preview - currently not planned]" \
 2> $TMPVARS/TDEVERSION
 
 
@@ -336,7 +336,7 @@ about_4="Full-screen window/desktop manager"
 status_4=off
 comment_4="\Zb\Z6 Imlib2 is a build time requirement \Zn"
 
-## there is no 14.0.x/12 port for this
+## there is no 14.0.* port for this
 [[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 ]] && {
 app_5="Apps/kplayer"
 about_5="Multimedia player with MPlayer backend"
@@ -911,7 +911,7 @@ export PATH
 export ARM_FABI=$(readelf -Ah $(which bash)|grep -oE "soft|hard")
 ## override hard coded trinity plugins directory - used for:
 ## autotools: get-source.sh|ltoolupdate_fn
-## cmake: -DPLUGIN_INSTALL_DIR=
+## cmake: -DPLUGIN_INSTALL_DIR= --> removed from SB and set in get-source.sh
 export PLUGIN_INSTALL_DIR=$(cat $TMPVARS/TDE_CNF_DIR | grep -o [a-z]*/share | cut -d/ -f1)
 [[ $PLUGIN_INSTALL_DIR != tde ]] && PLUGIN_INSTALL_DIR=trinity
 ### set up variables for the summary list:

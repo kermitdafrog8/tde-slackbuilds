@@ -42,16 +42,9 @@ sed -i "s|CONFIG.*$|& ${NO_WARN:+warn_off}|" mkspecs/linux-g++/qmake.conf
 
 ## RPATH is set to $ORIGIN/../lib to locate libs during the build
 ## and added during configure with the -R option
-sed -i "s|QMAKE_RPATH.*$|QMAKE_RPATH =|" mkspecs/linux-g++/qmake.conf
-
-## tqt libs might be installed in $([T]QTDIR)/lib64
-sed -i "s|QTDIR)/lib|&$LIBDIRSUFFIX|" mkspecs/linux-g++/qmake.conf
-## [open]GL libs might be installed in ../lib64
-sed -i "s|X11R6/lib|&$LIBDIRSUFFIX|" mkspecs/linux-g++/qmake.conf
+## lib suffix might be 64
 ## add -headerdir as set in configure
 [[ $TDEVERSION == 14.1.0 ]] && QTDIR_PFX=T || QTDIR=$TQTDIR
-sed -i "s|QMAKE_INCDIR		=|& \$(${QTDIR_PFX:-}QTDIR)/include/tqt|" mkspecs/linux-g++/qmake.conf
-
 ## allow building with clang, either build-time or run-time
 [[ ! $(grep COMPILER mkspecs/linux-g++/qmake.conf) ]] && {
 echo $'--- mkspecs/linux-g++/qmake.conf
@@ -62,16 +55,44 @@ echo $'--- mkspecs/linux-g++/qmake.conf
 @@ -29 +29 @@
 -QMAKE_CXX		= g++
 +QMAKE_CXX		= $(COMPILER_CXX)
+@@ -40 +40 @@
+-QMAKE_INCDIR		=
++QMAKE_INCDIR		= $('"${QTDIR_PFX:-}"$'QTDIR)/include/tqt
+@@ -42,2 +42,2 @@
+-QMAKE_INCDIR_X11	= /usr/X11R6/include
+-QMAKE_LIBDIR_X11	= /usr/X11R6/lib
++QMAKE_INCDIR_X11	= /usr/include/X11
++QMAKE_LIBDIR_X11	= /usr/lib'"$LIBDIRSUFFIX"$'
+@@ -45,3 +45,3 @@
+-QMAKE_LIBDIR_'"${QTDIR_PFX:-}"$'QT		= $('"${QTDIR_PFX:-}"$'QTDIR)/lib
+-QMAKE_INCDIR_OPENGL	= /usr/X11R6/include
+-QMAKE_LIBDIR_OPENGL	= /usr/X11R6/lib
++QMAKE_LIBDIR_'"${QTDIR_PFX:-}"$'QT		= $('"${QTDIR_PFX:-}"$'QTDIR)/lib'"$LIBDIRSUFFIX"$'
++QMAKE_INCDIR_OPENGL	= /usr/include/GL
++QMAKE_LIBDIR_OPENGL	= /usr/lib'"$LIBDIRSUFFIX"$'
 @@ -49,2 +49,2 @@
 -QMAKE_LINK		= g++
 -QMAKE_LINK_SHLIB	= g++
 +QMAKE_LINK		= $(COMPILER_CXX)
-+QMAKE_LINK_SHLIB	= $(COMPILER_CXX)' | patch -p0
++QMAKE_LINK_SHLIB	= $(COMPILER_CXX)
+@@ -58 +58 @@
+-QMAKE_RPATH		= -Wl,-rpath,
++QMAKE_RPATH =
+' | patch -p0
 }
 
 ## don't install html docs if 'nodocs' has been selected
 [[ $TQT_OPTS == *nodocs* ]] && sed -i '/htmldocs/d' src/qt_install.pri
 
+## install translations only for the languages set with I18N
+(cd translations
+I18N=$(echo $I18N | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+for lang in $I18N
+do
+file="${file:+${file}:}*${lang}*"
+done
+GLOBIGNORE=${file:-}
+rm *)
 ## for a minimal build
 [[ $TQT_OPTS == *minimal* ]] && {
 sed -i '/translations/d' src/qt_install.pri
@@ -140,6 +161,12 @@ echo "yes" | \
  -plugin-style-windows \
  -fast \
  -R-Wl,-rpath,\'\\\$\$ORIGIN/../lib:$INST_RPATH\' ## +$INST_RPATH for run-time RPATH
+
+#| cc1plus: error: one or more PCH files were found, but they were invalid
+#| <command-line>: fatal error: tqtdesignercore: No such file or directory
+## Not a fatal error causing a build failure - qmake_image_collection.o compiles later
+## at its correct position in the Makefile OBJECTS list - but it's misleading
+sed -i 's|./qmake_image_collection.o:.*$|& tqtdesignercore.gch/c++|' tools/designer/designer/Makefile
 
 ## don't build tutorial and examples which won't be installed because the release version is being built
 make -i $NUMJOBS symlinks src-qmake src-moc sub-src sub-tools || exit 1
@@ -303,12 +330,12 @@ EOF
 
 ## This could be a first build of tqt3, so build with the packaging directory binaries
 $PKG$INSTALL_TDE/bin/tqmake -project -o regextester.pro
-$PKG$INSTALL_TDE/bin/tqmake TARGET=regextester -spec $PKG$INSTALL_TDE/lib64/tqt/mkspecs/linux-g++
+$PKG$INSTALL_TDE/bin/tqmake TARGET=regextester -spec $PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/tqt/mkspecs/linux-g++
 
 sed -i "s|-ltqt-mt|$PKG$INSTALL_TDE/lib$LIBDIRSUFFIX/libtqt-mt.so.3|" Makefile
 sed -i "s|tqmake|$PKG$INSTALL_TDE/bin/tqmake|" Makefile
 
-QTDIR=$PKG$INSTALL_TDE COMPILER_CXX=g++ make
+make
 
 strip regextester
 

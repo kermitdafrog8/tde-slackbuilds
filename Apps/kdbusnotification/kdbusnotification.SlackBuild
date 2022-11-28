@@ -44,17 +44,8 @@ chown_fn
 cd_builddir_fn
 
 ## The BUILD_TRANSLATIONS option is set in CMakeLists.txt but there are none available yet
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
-    -DBUILD_TRANSLATIONS="OFF" \
-    -Wno-dev \
-    ..
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
+    -DBUILD_TRANSLATIONS="OFF"
 
 make_fn
 

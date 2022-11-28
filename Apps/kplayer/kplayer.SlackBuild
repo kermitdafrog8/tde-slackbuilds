@@ -33,22 +33,6 @@ getsource_fn
 
 untar_fn
 
-## set up use of cmake common rules for translations/messages
-mkdir translations
-mv po translations/messages
-#
-find doc -name CMakeLists.txt | xargs rm
-find translations -name CMakeLists.txt | xargs rm
-#
-sed -i '/tde_conditional_add_subdirectory/d' CMakeLists.txt
-sed -i 's|add_subdirectory( icons )|&\
-\
-\
-##### other data\
-\
-tde_conditional_add_project_docs( BUILD_DOC )\
-tde_conditional_add_project_translations( BUILD_TRANSLATIONS )|' CMakeLists.txt
-
 ## for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 ldocs="en";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
@@ -59,20 +43,7 @@ chown_fn
 
 cd_builddir_fn
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
-    -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS="ON" \
-    -Wno-dev \
-    ..
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-}
 
 make_fn
 

@@ -186,6 +186,12 @@ patch -p0 << EOF
 +        .section    .rodata.cst16,"aM",@progbits,16
 EOF
 
+## config.guess uses uname to identify the system so incorrectly identifies
+## a 32 bit system using a 64 bit kernel as 64 bit
+## Could use --build=, but this way configure gets to choose the triple
+[[ $(getconf LONG_BIT) == 32 && $(uname -m) == *64 ]] && \
+sed -i 's|^UNAME_MACHINE=.*$|UNAME_MACHINE=i586|' config/gnu/config.guess
+
 ## force "gcc -fcommon" for gcc10 build - see https://github.com/ocaml/ocaml/issues/9622
 ./configure -cc "$COMPILER -fcommon" -libdir /usr/local/lib$LIBDIRSUFFIX/ocaml
 ## finish build with -j1 if there are race condition errors
@@ -244,18 +250,8 @@ cd_builddir_fn
 ## kig python scripting support
 [[ $(ls -1 /usr/lib$LIBDIRSUFFIX/libboost_python*.so) ]] && KIG_PS="ON"
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_ARTS="ON" \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
     -DWITH_KIG_PYTHON_SCRIPTING=${KIG_PS:-"OFF"} \
     -DWITH_LIBUSB="ON" \
     -DWITH_OCAML_SOLVER=${OCAML:-"OFF"} \
@@ -278,10 +274,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DBUILD_KTURTLE="ON" \
     -DBUILD_KVERBOS="ON" \
     -DBUILD_KVOCTRAIN="ON" \
-    -DBUILD_KWORDQUIZ="ON" \
-    -DBUILD_DOC="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_KWORDQUIZ="ON"
 
 ## remove obsolete tags
 doxygen -u doc/kig/scripting-api/Doxyfile.scripting-api

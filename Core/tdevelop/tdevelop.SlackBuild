@@ -33,21 +33,16 @@ getsource_fn
 
 untar_fn
 
+## build fails with gcc visibility support
+sed -i '/check for gcc visibility support/,+4d' ConfigureChecks.cmake
+
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_BUILDTOOL_ADA="ON" \
     -DWITH_BUILDTOOL_ANT="ON" \
     -DWITH_BUILDTOOL_AUTOTOOLS="ON" \
@@ -72,11 +67,8 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DWITH_VCS_CVSSERVICE="ON" \
     -DWITH_VCS_PERFORCE="ON" \
     -DWITH_VCS_SUBVERSION="ON" \
-    -DBUILD_DOC="ON" \
     -DBUILD_KDEVDESIGNER="ON" \
-    -DBUILD_VISUALBOYADVANCE="ON" \
-    -Wno-dev \
-    ..
+    -DBUILD_VISUALBOYADVANCE="ON"
 
 make_fn
 

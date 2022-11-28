@@ -33,6 +33,9 @@ getsource_fn
 
 untar_fn
 
+## build fails with gcc visibility support
+sed -i '/check for gcc visibility support/,+4d' ConfigureChecks.cmake
+
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po";done
@@ -49,21 +52,10 @@ chown_fn
 
 cd_builddir_fn
 
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DPLUGIN_INSTALL_DIR=$INSTALL_TDE/lib$LIBDIRSUFFIX/$PLUGIN_INSTALL_DIR \
-    -DBUILD_DOC="ON" \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DBUILD_TRANSLATIONS=${TRANS:-"OFF"} \
     -DUSE_STRIGI="OFF" \
-    -DUSE_MENUDRAKE="OFF" \
-    -Wno-dev \
-    ..
+    -DUSE_MENUDRAKE="OFF"
 
 make_fn
 

@@ -42,6 +42,12 @@ langs="";for Lang in $I18N;do [[ -e po/$Lang.po ]] && langs="$langs $Lang.po";do
 sed -i "s|POFILES =.*$|POFILES =$langs|" po/Makefile.am
 [[ $langs != "" ]] && langs=" $(echo $langs | sed 's|.po||g')"
 
+## config.guess uses uname to identify the system so incorrectly identifies
+## a 32 bit system using a 64 bit kernel as 64 bit
+## Could use --build=, but this way configure gets to choose the triple
+[[ $(getconf LONG_BIT) == 32 && $(uname -m) == *64 ]] && \
+sed -i 's|^UNAME_MACHINE=.*$|UNAME_MACHINE=i586|' admin/config.guess
+
 listdocs_fn
 
 ltoolupdate_fn

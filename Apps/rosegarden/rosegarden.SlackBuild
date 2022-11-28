@@ -34,8 +34,8 @@ getsource_fn
 untar_fn
 
 ## for slack-desc
-langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
-ldocs="";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+ldocs="en";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
 
 ## delete zero length files
 find data/pixmaps/feta -type f -empty -delete
@@ -52,21 +52,7 @@ pkg-config jack && JACK="ON"
 # Check for DSSI aka "Dizzy"
 pkg-config dssi && DSSI="ON"
 
-## for cmake version 3.21.x?
-sed -i 's|PROJECT(ROSEGARDEN)|project(rosegarden)|' ../CMakeLists.txt
-
-cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
-    -DCMAKE_C_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_CXX_FLAGS="$SLKRCFLAGS" \
-    -DCMAKE_C_COMPILER=$COMPILER \
-    -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_TDE \
-    -DLIB_SUFFIX=$LIBDIRSUFFIX \
-    -DWITH_GCC_VISIBILITY=${GCC_VIS:-} \
-    -DMAN_INSTALL_DIR=$INSTALL_TDE/man \
-    -DBUILD_DOC="ON" \
-    -DBUILD_TRANSLATIONS="ON" \
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWANT_SOUND="ON" \
     -DWANT_DEBUG="OFF" \
     -DWANT_FULLDBG="OFF" \
@@ -74,9 +60,7 @@ cmake ${G_NINJA:-} ${CMAKE_OPTS:-} \
     -DWANT_DSSI=${DSSI:-"OFF"} \
     -DWANT_LIRC="OFF" \
     -DWANT_PCH="OFF" \
-    -DWANT_TEST="OFF" \
-    -Wno-dev \
-    ..
+    -DWANT_TEST="OFF"
 
 make_fn
 
@@ -101,10 +85,10 @@ echo "
 $PRGNAM: Rosegarden is a MIDI and audio sequencer and musical notation editor.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en$langs
+$PRGNAM: $langs
 $PRGNAM:
 $PRGNAM: With help documentation for:
-$PRGNAM: en$ldocs
+$PRGNAM: $ldocs
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:
