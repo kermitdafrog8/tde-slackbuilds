@@ -157,7 +157,7 @@ cd $PRGNAM
 rm -rf .git/worktrees/*
 git checkout -- *
 git pull
-git fetch origin r14.0.x:r14.0.x)
+[[ $PRGNAM != kplayer ]] && git fetch origin r14.0.x:r14.0.x)
 ## if the local repository for PRGNAM doesn't exist, clone it ..
 [[ ! -d $PRGNAM ]] && \
 git clone https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM

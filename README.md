@@ -7,7 +7,7 @@
 See [*Cross compiling for RPi3*](#xcompiling) for building for arm_hf and aarch64.
 
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input,  
-which will build the release version 14.0.13, or the development versions 14.0.x [\[see note \[6\]\]](#6), or 14.1.0.
+which will build the release version 14.0.13, or the development versions 14.0.x [\[see note \[5\]\]](#5), or 14.1.0.
 
 [<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png "TDE version")  
 ... select TDE version
@@ -134,10 +134,8 @@ Includes:
 
 [4] The README for a [native build for Raspberry Pi3](./README-Raspberry-Pi3.md) is out-of-date and cross compiling is a better option.
 
-[5] The speex build for version 1.2.0 has been retained, but speex v1.2.1 is available as a Slackware 15.0 package and should be used for tdenetwork and amarok builds.
-
-<a id="6"></a>
-[6] There are no plans for a 14.0.14 release and so the 14.0.x branch is effectively frozen at 14.0.13 - go to [new target...](https://mail.trinitydesktop.org/mailman3/hyperkitty/list/users@trinitydesktop.org/thread/JKKMYZUAFMG4HT2EMKFSZHVSNSUTED27/) for more information.
+<a id="5"></a>
+[5] There are no plans for a 14.0.14 release and so the 14.0.x branch is effectively frozen at 14.0.13 - go to [new target...](https://mail.trinitydesktop.org/mailman3/hyperkitty/list/users@trinitydesktop.org/thread/JKKMYZUAFMG4HT2EMKFSZHVSNSUTED27/) for more information.
 
 ---
 

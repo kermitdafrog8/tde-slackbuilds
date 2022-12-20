@@ -371,7 +371,6 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Core/tdelibs" "\Zb\Zr\Z4R\Zn TDE libraries" off "\Zb\Z6 Will build with avahi support if avahi & avahi-tqt are installed. \Zn" \
 "Core/tdebase" "\Zb\Zr\Z4R\Zn TDE base" off "\Zb\Z6   \Zn" \
 "Core/tde-i18n" "Additional language support for TDE" off "\Zb\Z6 Required when any \Zb\Z3Additional language support\Zb\Z6 has been selected \Zn" \
-" Misc/speex" "Audio compression format designed for speech" off "\Zb\Z6 Buildtime option for akode [xiph], tdenetwork and amarok. Requires l/speexdsp  \Zn" \
 "Deps/akode" "A player and plugins for aRts music formats" off "\Zb\Z6 For tdemultimedia - aRts-plugin and Juk, and amarok engine \Zn" \
 "Core/tdemultimedia" "Multimedia packages for TDE" off "\Zb\Z6 Optional build-time dependency -> akode \Zn" \
 "Core/tdeaccessibility" "Accessibility programs" off "\Zb\Z6 Optional build-time dependencies -> akode + tdemultimedia \Zn" \

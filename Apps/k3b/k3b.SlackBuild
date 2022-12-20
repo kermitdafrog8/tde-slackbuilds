@@ -171,7 +171,7 @@ mkdir doc/misc
 mv FAQ doc/misc/
 
 ## build fails with gcc visibility support
-sed -i '/check for gcc visibility support/,+4d' ConfigureChecks.cmake
+sed -i 's|tde_setup_gcc_visibility|#&|' ConfigureChecks.cmake
 
 [[ $TDEVERSION == 14.0.13 ]] && {
 patch -p0 << EOF
