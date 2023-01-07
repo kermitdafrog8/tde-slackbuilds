@@ -26,7 +26,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=graphviz
-VERSION=5.0.1
+VERSION=7.0.5
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
@@ -72,23 +72,27 @@ patch -p0 << EOF
  }
 EOF
 
-## The primary purpose of this build is for 'dot' for kscope, tdeedu, ...
-## To include the pdf and html documentation, build with 'GVZ_DOCS=y ./BUILD-TDE.sh'
-[[ ${GVZ_DOCS:-} != [yY1] ]] && {
-patch -p0 << EOF
---- Makefile.in
-+++ Makefile.in
-@@ -614 +614 @@
--SUBDIRS = \$(subdirs) lib plugin cmd tclpkg doc contrib share graphs tests
-+SUBDIRS = \$(subdirs) lib plugin cmd tclpkg contrib share graphs tests
-EOF
-sed -i '/tcldot.html/d' tclpkg/tcldot/Makefile.in
+## .. output man pages to pdf, sans-serif [helvetica] font, 10pt, indentation, page size, paper size
+## with at least one line before a section heading
+## User set paper size or as per locale - see groff_font for valid sizes
+[[ ! ${PS:-} ]] && {
+[[ $(locale LC_PAPER) == 297* ]] && PS=a4 || PS=letter
 }
-## relevant if including docs, but not installed otherwise
-sed -i 's|../doc/||;28,54s|../pdf/|../../../man/man1/|;58,71s|../pdf/|../../../man/man3/|;28,71s|\.pdf|\.gz|' doc/index.html
-sed -i '56,62d;s|pages (PDF)|pages|' doc/index.html
-sed -i '/dotty/d;/lefty/d;/circo/d;/fdp/d;/gv2gxl/d;/neato\.1/d;/twopi/d;/\/graph/d' doc/index.html
+#
+echo 'patching for man page pdfs'
+find . -name "Makefile.*" | while read file
+do
+sed -i '/(PS2PDF)/d' $file
+sed -i 's|psfile=$${pdffile%pdf}ps; ||' $file
+sed -i 's|$(GROFF) -Tps.*$|sed "s^.PP^^;s^\.SH^\\n\&^" $< \| $(GROFF) -man -Tpdf -fH -rS10 -rIN=4n -dpaper='"$PS"' -P-p'"$PS"' > $$pdffile|' $file
+done
+#
+## the pdfs are installed in the same directory as index.html
+sed -i 's|../doc/||;s|../pdf/||' doc/index.html
+## add the cgraph tutorial
 sed -i 's|libguide.*$|&\n  <li><a href="Agraph.pdf">cgraph tutorial</a>|' doc/index.html
+## these don't exist
+sed -i '/dotty/d;/lefty/d;/circo/d;/fdp/d;/gv2gxl/d;/neato\.1/d;/twopi/d;/>graph/d;/tkspline/d' doc/index.html
 
 listdocs_fn
 
@@ -96,16 +100,19 @@ chown_fn
 
 cd_builddir_fn
 
+PRFX=/usr/local
+## build machine id is based on config.sub which doesn't work for a 32bit os/64bit kernel combination
+[[ $(getconf LONG_BIT) == 32 && $(uname -m) == *64 ]] && BLD=--build=i586-pc-linux-gnu
+
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
 CC=$COMPILER \
 CXX=$COMPILER_CXX \
 ../configure \
-  --prefix=/usr \
-  --libdir=/usr/lib$LIBDIRSUFFIX \
-  --mandir=/usr/man \
-  --enable-man-pdfs=no \
-  --enable-ocaml=no
+  --prefix=$PRFX \
+  --libdir=$PRFX/lib$LIBDIRSUFFIX \
+  --mandir=$PRFX/man \
+  --enable-ocaml=no ${BLD:-}
 
 make_fn
 
@@ -122,20 +129,20 @@ cat << EOF > $PKG/etc/php.d/graphviz.ini.new
 ; In case you still prefer to use the wrapper class you have to
 ; include it using its absolute path:
 ; <?php
-; include ('/usr/lib$LIBDIRSUFFIX/graphviz/php/gv.php');
+; include ('$PRFX/lib$LIBDIRSUFFIX/graphviz/php/gv.php');
 ; ?>
 EOF
 
 # Remove empty directories of language bindings that are absent.
-find $PKG/usr/lib$LIBDIRSUFFIX/graphviz -depth -type d -empty -exec rmdir {} \;
+find $PKG$PRFX/lib$LIBDIRSUFFIX/graphviz -depth -type d -empty -exec rmdir {} \;
 
 # Configure plugins
-# (writes $PKG/usr/lib$LIBDIRSUFFIX/graphviz/config6 with available plugin information)
-LD_LIBRARY_PATH=$PKG/usr/lib$LIBDIRSUFFIX $PKG/usr/bin/dot -c
+# (writes $PKG$PRFX/lib$LIBDIRSUFFIX/graphviz/config6 with available plugin information)
+LD_LIBRARY_PATH=$PKG$PRFX/lib$LIBDIRSUFFIX $PKG$PRFX/bin/dot -c
 
 installdocs_fn
 
-INSTALL_TDE=/usr
+INSTALL_TDE=$PRFX
 mangzip_fn
 
 strip_fn
@@ -175,10 +182,9 @@ $PRGNAM: It has several main graph layout programs.  It also has
 $PRGNAM: web and interactive graphical interfaces, and auxiliary
 $PRGNAM: tools, libraries, and language bindings.
 $PRGNAM:
+$PRGNAM: Documentation: $PRFX/share/doc/graphviz/index.html
+$PRGNAM:
 $PRGNAM: Homepage: graphviz.org
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc
 

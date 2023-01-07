@@ -21,17 +21,20 @@
 #   SUCH DAMAGE.
 
 PRGNAM=imlib2
-VERSION=1.9.1
+VERSION=1.10.0
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
 ARCHIVE_TYPE="tar.xz"
-SRCURL="https://sourceforge.net/projects/enlightenment/files/$PRGNAM-src/$VERSION/$PRGNAM-$VERSION.$ARCHIVE_TYPE"
+SRCURL="https://downloads.sourceforge.net/project/enlightenment/$PRGNAM-src/$VERSION/$PRGNAM-$VERSION.$ARCHIVE_TYPE"
 
 source ../../get-source.sh
 getsource_fn
 
 untar_fn
+
+## remove obsolete tags
+doxygen -u doc/Doxyfile.in
 
 listdocs_fn
 
@@ -40,17 +43,18 @@ chown_fn
 cd_builddir_fn
 
 ## gcc visibility hidden is the default
+PRFX=/usr/local
 CFLAGS="$SLKCFLAGS" \
 CC=$COMPILER \
 ../configure \
-  --prefix=/usr/local \
-  --libdir=/usr/local/lib$LIBDIRSUFFIX \
+  --prefix=$PRFX \
+  --libdir=$PRFX/lib$LIBDIRSUFFIX \
   --enable-doc-build \
   --disable-static
 
 make_fn
 
-INSTALL_TDE=/usr/local
+INSTALL_TDE=$PRFX
 installdocs_fn
 ## index.html should be created during the build
 [[ -s doc/html/index.html ]] && cp doc/html/{index.html,imlib2_logo.png} $PKG$INSTALL_TDE/doc/$PRGNAM-$VERSION
@@ -79,7 +83,7 @@ $PRGNAM: * Apply filters to images
 $PRGNAM: * Scale images
 $PRGNAM: * Apply color correction .. and more
 $PRGNAM:
-$PRGNAM: See /usr/local/doc/$PRGNAM-$VERSION/index.html for the full list.
+$PRGNAM: See $PRFX/doc/$PRGNAM-$VERSION/index.html for the full list.
 $PRGNAM:
 " > $PKG/install/slack-desc
 

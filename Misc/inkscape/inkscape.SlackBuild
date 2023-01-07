@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=inkscape
-VERSION=1.2.1
+VERSION=1.2.2
 BUILD=${BUILD:-1}
 
 ARCHIVE_TYPE="tar.xz"
@@ -147,7 +147,7 @@ sed -i "s|*.pod.in|$pods|" man/CMakeLists.txt
 ## and install man pages to $prefix, as per most other Slackware packages
 sed -i 's|MANFILE_DEST "${CMAKE_INSTALL_FULL_MANDIR}|MANFILE_DEST "${CMAKE_INSTALL_PREFIX}/man|' CMakeScripts/Pod2man.cmake
 #
-## Add the TRANSLATING file if any of the locales has no start-welcome-text.$I18N.svg
+## Add the TRANSLATING file if any of the locales has no start-welcome-text.$locale.svg
 [[ ${COUNT_I18N:-} != ${COUNT_TEXT:-} ]] && I18N_SVG="TRANSLATING $I18N_SVG"
 sed -i "s|\"\*.svg\"|$I18N_SVG|" share/screens/CMakeLists.txt
 
