@@ -136,33 +136,6 @@ patch -N -p0 << EOF || true
 +			<itemData name="difflineadd" defStyleNum="dsNormal" backgroundColor="#eeeeee" color="#0000FF" />
 EOF
 
-[[ $TDEVERSION == 14.0.13 ]] && {
-patch -p0 << EOF
---- CMakeLists.txt
-+++ CMakeLists.txt
-@@ -376,2 +376,5 @@
-     set ( HAVE_BACKTRACE 1 )
-+  else ()
-+    set ( Backtrace_LIBRARY "" )
-+    set ( Backtrace_HEADER "" )
-   endif ()
-EOF
-}
-
-## fix build error for clang/i586
-[[ $TDEVERSION == 14.0.13 ]] && \
-[[ $COMPILER == clang ]] && \
-[[ $ARCH == i586 ]] && \
-patch -p0 << EOF
---- tdehtml/ecma/kjs_proxy.cpp
-+++ tdehtml/ecma/kjs_proxy.cpp
-@@ -390,2 +390,2 @@
--      { i_ms / 1000, (i_ms % 1000) * 1000 },
--      { ms / 1000, (ms % 1000) * 1000 }
-+      { static_cast<time_t>( i_ms / 1000 ), static_cast<suseconds_t>( (i_ms % 1000) * 1000 ) },
-+      { static_cast<time_t>( ms / 1000 ), static_cast<suseconds_t>( (ms % 1000) * 1000 ) }
-EOF
-
 listdocs_fn
 
 chown_fn
@@ -182,14 +155,6 @@ pkg-config jasper && JASPER="ON"
 ## just show message without failing if no spell checker is installed
 sed -i 's|tde_message_fatal( "Spell checker|message( "Spell checker|' ../CMakeLists.txt
 
-<<'comment'
-    WITH_CRYPTSETUP
-    WITH_PCSC
-    WITH_PKCS
-    WITH_UDEVIL
-are 14.1.0 options and will be ignored by 14.0.* builds
-comment
-
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DDEFAULT_SPELL_CHECKER=${DEF_SP_CHKR:-"ASPELL"} \
     -DTDE_MALLOC="OFF" \
@@ -205,7 +170,6 @@ cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_DEVKITPOWER="ON" \
     -DWITH_ELFICON="OFF" \
     -DWITH_GAMIN="OFF" \
-    -DWITH_HAL="OFF" \
     -DWITH_HSPELL="OFF" \
     -DWITH_IMAGETOPS_BINARY="OFF" \
     -DWITH_INOTIFY="ON" \

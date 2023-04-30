@@ -10,7 +10,7 @@ export TMPVARS=/tmp/build/vars
 rm -f $TMPVARS/admin-cmake-done
 ## remove any PRE_DOWNLOAD record to allow BUILD-TDE.sh to be run in Re-use mode after a pre-download
 rm -f $TMPVARS/PRE_DOWNLOAD
-## .. and if building 14.0.x/14.1.0, turn off cgit downloads
+## .. and if building 14.1.x/14.2.0, turn off cgit downloads
 [[ $(cat $TMPVARS/DL_CGIT) == yes ]] && echo \\Z0\\Zbno > $TMPVARS/DL_CGIT
 
 
@@ -100,10 +100,10 @@ dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Version " --menu 
 Set the version of TDE to be built.
  
 " \
-12 75 2 \
-"14.0.13" "the R14.0.13 release - source from archives" \
-"14.1.0" "R14.1.0 release preview - source from Trinity git" \
-" [14.0.x]" " [14.0.14 release preview - currently not planned]" \
+13 75 3 \
+"14.1.0" "the R14.1.0 release - source from archives" \
+"14.1.x" "next release preview - source from Trinity git" \
+"14.2.0" "R14.2.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
 
 
@@ -312,43 +312,6 @@ If following the build method on the previous screen, the answer here should pro
 [[ $? == 1 ]] && echo no > $TMPVARS/KEEP_BUILD
 
 
-## new apps for 14.0.11 & 14.1.0
-# Use non-breaking space - U00a0 - in strings for this to work with 'dialog'
-# nbsp prefixing Misc avoids double quote in TDEbuilds list
-app_1="Apps/codeine"
-about_1="Simple multimedia player"
-status_1=off
-comment_1="\Zb\Z6 \Zn"
-
-app_2="Apps/klamav"
-about_2="Antivirus manager for ClamAV"
-status_2=off
-comment_2="\Zb\Z6 ClamAV is a build time requirement, included in klamav.Slackbuild \Zn"
-## if ClamAV isn't installed, the klamav.SlackBuild will show the download URL, and build and install ClamAV from the downloaded archive.
-
-app_3=" Misc/imlib2"
-about_3="An image loading and rendering library"
-status_3=off
-comment_3="\Zb\Z6 Build-time requirement for kompose \Zn"
-
-app_4="Apps/kompose"
-about_4="Full-screen window/desktop manager"
-status_4=off
-comment_4="\Zb\Z6 Imlib2 is a build time requirement \Zn"
-
-## there is no 14.0.* port for this
-[[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 ]] && {
-app_5="Apps/kplayer"
-about_5="Multimedia player with MPlayer backend"
-status_5=off
-comment_5="\Zb\Z6 MPlayer is a run time requirement \Zn"
-}
-
-app_6="Apps/twin-style-suse2"
-about_6="SUSE window decorations"
-status_6=off
-comment_6="\Zb\Z6 \Zn"
-
 rm -f $TMPVARS/TDEbuilds
 dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Packages Selection " --item-help --checklist \
 "
@@ -403,7 +366,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 " Misc/moodbar" "GStreamer plugin for Amarok for moodbar feature" off "\Zb\Z6 Requires gstreamer-1.x. Runtime option for Amarok \Zn" \
 " Misc/yauap" "A simple commandline audio player" off "\Zb\Z6 Provides an optional engine for Amarok \Zn" \
 "Apps/amarok" "A Music Player" off "\Zb\Z6 Optional dependencies - xine-lib, mp4v2, speex, moodbar, akode, yauap \Zn" \
-${app_1:-} ${about_1:-} ${status_1:-} ${comment_1:-} \
+"Apps/codeine" "Simple multimedia player" off "\Zb\Z6 \Zn" \
 "Apps/digikam" "A digital photo management application + Showfoto viewer" off "\Zb\Z6 Requires kipi-plugins libkdcraw libkexiv2 libkipi.  \Zn" \
 "Apps/dolphin" "Dolphin file manager for TDE" off "\Zb\Z6 A d3lphin.desktop file is included - see dolphin.SlackBuild.  \Zn" \
 "Apps/filelight" "Graphical diskspace display" off "\Zb\Z6 Runtime requirement x/xdpyinfo \Zn" \
@@ -421,7 +384,7 @@ ${app_1:-} ${about_1:-} ${status_1:-} ${comment_1:-} \
 "Apps/kdbusnotification" "A DBUS notification to TDE interface" off "\Zb\Z6   \Zn" \
 "Apps/kile" "A TEX and LATEX source editor and shell" off "\Zb\Z6   \Zn" \
 "Apps/kkbswitch" "A keyboard layout indicator" off "\Zb\Z6   \Zn" \
-${app_2:-} ${about_2:-} ${status_2:-} ${comment_2:-} \
+"Apps/klamav" "Antivirus manager for ClamAV" off "\Zb\Z6 ClamAV is a build time requirement, included in klamav.Slackbuild \Zn" \
 "Apps/knemo" "The TDE Network Monitor" off "\Zb\Z6   \Zn" \
 "Apps/knetstats" "A network monitor that shows rx/tx LEDs" off "\Zb\Z6   \Zn" \
 "Apps/knights" "A graphical chess interface" off "\Zb\Z6   \Zn" \
@@ -429,9 +392,9 @@ ${app_2:-} ${about_2:-} ${status_2:-} ${comment_2:-} \
 " Misc/GraphicsMagick" "Swiss army knife of image processing" off "\Zb\Z6 Buildtime option for chalk[krita] in koffice, and inkscape \Zn" \
 "Apps/koffice" "Office Suite" off "\Zb\Z6 Optional build-time dependency - GraphicsMagick \Zn" \
 "Apps/koffice-i18n" "Internationalization files for koffice" off "\Zb\Z6 Provides \Zb\Z3Additional language support\Zb\Z6 for koffice \Zn" \
-${app_3:-} ${about_3:-} ${status_3:-} ${comment_3:-} \
-${app_4:-} ${about_4:-} ${status_4:-} ${comment_4:-} \
-${app_5:-} ${about_5:-} ${status_5:-} ${comment_5:-} \
+" Misc/imlib2" "An image loading and rendering library" off "\Zb\Z6 Build-time requirement for kompose \Zn" \
+"Apps/kompose" "Full-screen window/desktop manager" off "\Zb\Z6 Imlib2 is a build time requirement \Zn" \
+"Apps/kplayer" "Multimedia player with MPlayer backend" off "\Zb\Z6 MPlayer is a run time requirement \Zn" \
 "Apps/krusader" "File manager for TDE" off "\Zb\Z6   \Zn" \
 "Apps/kscope" "A source-editing environment for C and C-style languages." off "\Zb\Z6 Runtime options cscope [d/cscope], ctags [ap/vim], dot [graphviz] \Zn" \
 "Apps/ksensors" "A graphical interface for sensors" off "\Zb\Z6 Runtime requirement ap/lm_sensors \Zn" \
@@ -447,12 +410,13 @@ ${app_5:-} ${about_5:-} ${status_5:-} ${comment_5:-} \
 "Apps/soundkonverter" "Frontend to various audio converters" off "\Zb\Z6   \Zn" \
 "Apps/tde-style-lipstik" "Lipstik theme" off "\Zb\Z6   \Zn" \
 "Apps/tde-style-qtcurve" "QtCurve theme" off "\Zb\Z6   \Zn" \
+"Apps/tdebluez" "Bluetooth Bluez5 functionality" off "\Zb\Z6   \Zn" \
 "Apps/tdeio-locate" "TDE frontend for the locate command" off "\Zb\Z6   \Zn" \
 "Apps/tdepowersave" "Set power consumption and conservation options" off "\Zb\Z6   \Zn" \
 "Apps/tdesudo" "Graphical frontend for the sudo command" off "\Zb\Z6   \Zn" \
 "Apps/tdmtheme" "TDM theme editor module" off "\Zb\Z6   \Zn" \
 "Apps/twin-style-crystal" "Twin theme" off "\Zb\Z6   \Zn" \
-${app_6:-} ${about_6:-} ${status_6:-} ${comment_6:-} \
+"Apps/twin-style-suse2" "SUSE window decorations" off "\Zb\Z6 \Zn" \
 "Apps/yakuake" "Quake-style terminal emulator" off "\Zb\Z6   \Zn" \
 " Misc/inkscape" "SVG editor - an alternative to potracegui [and GraphicsMagick]." off "\Zb\Z6 potrace is a build-time dependency. \Zn" \
 2> $TMPVARS/TDEbuilds
@@ -761,7 +725,7 @@ to avoid confusion with identical packages which might be installed for KDE.
 
 
 rm -f $TMPVARS/DL_CGIT  # place this here to facilitate testing for summary screen
-[[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 || $(cat $TMPVARS/TDEVERSION) == 14.0.x ]] && \
+[[ $(cat $TMPVARS/TDEVERSION) == 14.2.0 || $(cat $TMPVARS/TDEVERSION) == 14.1.x ]] && \
 [[ $(grep -o [ACDLM][a-z]*/ $TMPVARS/TDEbuilds | sort | head -n1) != Misc/ ]] && {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " TDE development build " --yesno \
 "
@@ -788,8 +752,8 @@ Create and/or update the git repositories local copies.
 
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
-[[ $(cat $TMPVARS/TDEVERSION) == 14.0.13 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
-## testing for cgit!=no will allow =yes, or null, which is the 14.0.13 build case
+[[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
+## testing for cgit!=no will allow =yes, or null, which is the 14.1.0 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "

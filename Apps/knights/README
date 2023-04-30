@@ -3,11 +3,4 @@ There is a Spanish language file in the source, but it has no translations in it
 Any involvement from a Spanish speaker to check and correct will be welcome. Kbabel is not necessary, it will display in a text editor just fine.
 
 Tested with gnuchess-6.2.2, stockfish-7-linux, and komodo-7, in UCI mode.
-
------------
-A themepack is available and will be included if pre-downloaded to the 'src' directory or downloaded during the build:
-
-https://downloads.sourceforge.net/project/knights/knights-themepack/0.5.9/knights-themepack-0.5.9.tar.gz
-
-If it's not in 'src', the build will continue with the default theme.
  

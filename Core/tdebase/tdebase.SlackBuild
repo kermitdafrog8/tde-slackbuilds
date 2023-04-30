@@ -106,17 +106,17 @@ sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" tdeioslave/trash/testtrash.cpp || true
 patch -N -p0 << EOF || true
 --- translations/desktop_files/kcontrol-desktops/en_GB.po
 +++ translations/desktop_files/kcontrol-desktops/en_GB.po
-@@ -1338,3 +1338,3 @@
+@@ -1355,3 +1355,3 @@
  msgid "Configure display ICC color profile"
 -msgstr ""
 +msgstr "Configure display ICC colour profile"
  
-@@ -1343,3 +1343,3 @@
+@@ -1360,3 +1360,3 @@
  msgid "ICC;display;color;profile;"
 -msgstr ""
 +msgstr "ICC;display;colour;profile;"
  
-@@ -1348,3 +1348,3 @@
+@@ -1365,3 +1365,3 @@
  msgid "Color Profile"
 -msgstr ""
 +msgstr "Colour Profile"
@@ -157,7 +157,6 @@ sed -i "s|/opt/.*/share/doc/tdm/README.gz|$INSTALL_TDE/share/config/tdm/README-c
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_ARTS="ON" \
     -DWITH_ELFICON="OFF" \
-    -DWITH_HAL="OFF" \
     -DWITH_I8K="OFF" \
     -DWITH_LDAP="OFF" \
     -DWITH_LIBART="ON" \

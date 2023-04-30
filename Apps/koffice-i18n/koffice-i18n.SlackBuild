@@ -39,7 +39,17 @@ untar_fn
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
-langdir="";for Lang in $I18N;do [[ -d koffice-i18n-$Lang ]] && langdir="${langdir}koffice-i18n-$Lang ";done
+langdir=""
+ldocdir="" ## for slack-desc
+for Lang in $I18N
+do
+[[ -d koffice-i18n-$Lang ]] && {
+langdir="${langdir}koffice-i18n-$Lang "
+[[ -d koffice-i18n-$Lang/docs ]] && {
+ldocdir="${ldocdir} $Lang "
+}
+}
+done
 
 for dir in $langdir
 do
@@ -59,7 +69,6 @@ mv docs/koffice/chalk docs/koffice/krita || true
 mv docs/koffice/krita/toolbar-chalk.png docs/koffice/krita/toolbar-krita.png || true
 sed -i -e 's/chalk/krita/g;s/Chalk/Krita/g' ../template/messages/koffice/{kofficefilters,krita}.pot
 sed -i -e 's/chalk/krita/g;s/Chalk/Krita/g' messages/koffice/{kofficefilters,krita,desktop_koffice}.po
-sed -i -e 's/chalk/krita/g;s/Chalk/Krita/g' configure.in
 find docs/koffice -type f -exec sed -i -e 's/chalk/krita/g;s/Chalk/Krita/g' {} \; || true
 }
 
@@ -76,6 +85,7 @@ make_fn
 cd ../../
 done
 langs=$(echo $langdir | sed 's|koffice-i18n-||g')
+ldocs=$(echo $ldocdir | sed 's|koffice-i18n-||g')
 
 mkdir_install_fn
 
@@ -92,8 +102,8 @@ $PRGNAM:
 $PRGNAM: For languages:
 $PRGNAM: $langs
 $PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: With help documentation for:
+$PRGNAM: $ldocs
 $PRGNAM:
 $PRGNAM:
 $PRGNAM:

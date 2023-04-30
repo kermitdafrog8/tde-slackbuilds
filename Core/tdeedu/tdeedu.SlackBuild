@@ -54,6 +54,7 @@ cd ocaml-4.05.0/
 ##       https://github.com/dra27/ocaml/[pull/56]
 ##         └ 0d2c1fd77b4715c70d0ffc4348f1bc2d3eaacbf7 refs/remotes/origin/alt-signal-stack-4.05
 ##           └ commit 50c2d1275e537906ea144bd557fde31e0bf16e5f
+echo -e "\033[39;1m"
 patch -p0 << EOF
 --- asmrun/fail.c
 +++ asmrun/fail.c
@@ -185,6 +186,7 @@ patch -p0 << EOF
 -        .section    .rodata.cst8,"a",@progbits
 +        .section    .rodata.cst16,"aM",@progbits,16
 EOF
+echo -e "\033[0m"
 
 ## config.guess uses uname to identify the system so incorrectly identifies
 ## a 32 bit system using a 64 bit kernel as 64 bit
@@ -240,6 +242,13 @@ sed -i 's|      PyTuple_SetItem|      Py_XINCREF((objectvect.begin() +i)->ptr())
 
 ## add some files to html docs
 sed -i 's|*.png|& *.svgz README|' cmake/modules/TDEMacros.cmake
+
+## User set paper size or as per locale ..
+[[ ! ${PS:-} ]] && {
+[[ $(locale LC_PAPER) == 297* ]] && PS=a4 || PS=letter
+}
+sed -i "s|^PAPER_TYPE.*$|PAPER_TYPE             = $PS|" doc/kig/scripting-api/Doxyfile.scripting-api.in
+sed -i "s|^PAPER_TYPE.*$|PAPER_TYPE             = $PS|" admin/Doxyfile.global
 
 listdocs_fn
 

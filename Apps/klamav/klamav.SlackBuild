@@ -33,7 +33,7 @@ source ../../get-source.sh
 ## klamav needs clamav as a build time requirement
 [[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 # ### clamav  - start
-clamav_VERS=0.105.1
+clamav_VERS=1.0.1
 clamav_installed_fn () { pkg-config libclamav ;}
 ## If it's already installed, go to end
 clamav_installed_fn || {
@@ -54,7 +54,7 @@ tar xf $BUILD_TDE_ROOT/src/clamav-$clamav_VERS.tar.gz
 cd clamav-$clamav_VERS/
 
 ## set RPATH relative to ORIGIN always
-sed -i 's|CMAKE_INSTALL_RPATH.*$|CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")|' CMakeLists.txt
+sed -i 's|set(CMAKE_INSTALL_RPATH.*$|set(CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")|' CMakeLists.txt
 
 [[ -s /usr/lib$LIBDIRSUFFIX/libmilter.a ]] && MILTER="ON"
 

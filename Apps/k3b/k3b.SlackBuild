@@ -173,17 +173,6 @@ mv FAQ doc/misc/
 ## build fails with gcc visibility support
 sed -i 's|tde_setup_gcc_visibility|#&|' ConfigureChecks.cmake
 
-[[ $TDEVERSION == 14.0.13 ]] && {
-patch -p0 << EOF
---- plugins/decoder/libsndfile/CMakeLists.txt
-+++ plugins/decoder/libsndfile/CMakeLists.txt
-@@ -20,2 +20,3 @@
-   \${TQT_INCLUDE_DIRS}
-+  \${SNDFILE_INCLUDE_DIRS}
- )
-EOF
-}
-
 listdocs_fn
 
 chown_fn
@@ -194,7 +183,6 @@ cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_LIBDVDREAD="ON" \
     -DWITH_MUSICBRAINZ=${MUSICBRAINZ:-"OFF"} \
     -DWITH_SYSTEM_LIBSAMPLERATE="ON" \
-    -DWITH_HAL="OFF" \
     -DWITH_DEBUG="OFF" \
     -DWITH_ALSA="ON" \
     -DWITH_ARTS="ON" \

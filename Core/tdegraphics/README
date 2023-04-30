@@ -1,0 +1,10 @@
+For 14.1.0 the option to edit the image created with ksnapshot [PrtSc] has been added with an emphasis on KolourPaint which has been assigned its own button as well as being available in the 'Open with...' drop-down menu.
+
+See the PR for details - https://mirror.git.trinitydesktop.org/gitea/TDE/tdegraphics/pulls/50
+
+If you DON'T want this extra button, use KP_BTN as a command line build option:
+KP_BTN=n ./BUILD-TDE.sh
+KolourPaint will still be available from the drop-down menu.
+
+The default build will be with the upstream source to include the extra KolourPaint button.
+ 

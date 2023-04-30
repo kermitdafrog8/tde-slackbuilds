@@ -41,8 +41,6 @@ cd_builddir_fn
 
 sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM/issues|" ../doc/man/*/*.1
 
-## TDEFileReplace has been moved from tdewebdev for R14.1.0
-[[ $TDEVERSION == 14.1.0 ]] && TDEFileReplace="-DBUILD_TDEFILEREPLACE=ON"
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_DPMS="ON" \
     -DWITH_XSCREENSAVER="OFF" \
@@ -75,7 +73,7 @@ cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DBUILD_KTIMER="ON" \
     -DBUILD_TDEWALLET="ON" \
     -DBUILD_SUPERKARAMBA="ON" \
-    ${TDEFileReplace:-}
+    -DBUILD_TDEFILEREPLACE="ON"
 
 make_fn
 
@@ -89,7 +87,6 @@ mkdir_install_fn
 
 doinst_sh_fn
 
-[[ $TDEVERSION == 14.1.0 ]] && TDEFileReplace=" * TDEFileReplace: powerful search and replace in multiple files"
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
@@ -119,7 +116,7 @@ $PRGNAM: * ktimer: execute programs after some time
 $PRGNAM: * superkaramba: a version of Karamba with python scripting
 $PRGNAM: * tdelirc: a TDE frontend for the Linux Infrared Remote Control system
 $PRGNAM: * tdewallet: a convenient and secure way to manage all your passwords
-$PRGNAM:${TDEFileReplace:-}
+$PRGNAM: * TDEFileReplace: powerful search and replace in multiple files
 " > $PKG/install/slack-desc
 
 makepkg_fn

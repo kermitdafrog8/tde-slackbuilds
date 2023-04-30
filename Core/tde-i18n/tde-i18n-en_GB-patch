@@ -1,34 +1,3 @@
-## In the Configure Panel|Taskbar window, the Alt-c shortcut is assigned
-## to the Cancel button, which takes priority over 'custom colors'
-## which becomes "Us&e custom colours", so force &Use ..
---- tde-i18n-en_GB/messages/tdebase/kcmtaskbar.po
-+++ tde-i18n-en_GB/messages/tdebase/kcmtaskbar.po
-@@ -378,3 +378,3 @@
- msgid "Use &custom colors"
--msgstr ""
-+msgstr "&Use custom colours"
- 
-@@ -383,3 +383,3 @@
- msgid "Inacti&ve task text color:"
--msgstr ""
-+msgstr "Inacti&ve task text colour:"
- 
-@@ -388,3 +388,3 @@
- msgid "Active task te&xt color:"
--msgstr ""
-+msgstr "Active task te&xt colour:"
- 
-@@ -393,3 +393,3 @@
- msgid "&Background color:"
--msgstr ""
-+msgstr "&Background colour:"
- 
-@@ -413,3 +413,3 @@
- msgid "Right b&utton:"
--msgstr "Right b&utton:"
-+msgstr "&Right button:"
- 
-
 --- tde-i18n-en_GB/messages/tdebase/tderandr.po
 +++ tde-i18n-en_GB/messages/tdebase/tderandr.po
 @@ -188,3 +188,3 @@
@@ -91,40 +60,76 @@
 
 --- tde-i18n-en_GB/messages/tdebase/kcmlayout.po
 +++ tde-i18n-en_GB/messages/tdebase/kcmlayout.po
-@@ -1239,3 +1239,3 @@
+@@ -1325,3 +1325,3 @@
  msgid "Use &theme colors"
 -msgstr ""
 +msgstr "Use &theme colours"
  
-@@ -1244,3 +1244,3 @@
+@@ -1330,3 +1330,3 @@
  msgid "Use c&ustom colors"
 -msgstr ""
 +msgstr "Use c&ustom colours"
  
-@@ -1249,3 +1249,3 @@
+@@ -1335,3 +1335,3 @@
  msgid "Background color:"
 -msgstr ""
 +msgstr "Background colour:"
  
-@@ -1256,4 +1256,4 @@
+@@ -1342,4 +1342,4 @@
  "was set to display a flag."
 -msgstr ""
 -
 +msgstr "This colour will be used as the indicator's background unless the indicator "
 +"was set to display a flag."
- #: kcmlayoutwidget.ui:617
-@@ -1261,3 +1261,3 @@
+ #: kcmlayoutwidget.ui:807
+@@ -1347,3 +1347,3 @@
  msgid "Text color:"
 -msgstr ""
 +msgstr "Text colour:"
  
-@@ -1266,3 +1266,3 @@
+@@ -1352,3 +1352,3 @@
  msgid "This color will be used to draw the language label on the indicator."
 -msgstr ""
 +msgstr "This colour will be used to draw the language label on the indicator."
  
-@@ -1307,3 +1307,3 @@
+@@ -1393,3 +1393,3 @@
  msgid "The drop shadow behind the language label will be of this color."
 -msgstr ""
 +msgstr "The drop shadow behind the language label will be of this colour."
+ 
+
+## In the Configure Panel|Taskbar window, the Alt-c shortcut is assigned
+## to the Cancel button, which takes priority over 'custom colors'
+## which becomes "Us&e custom colours", so force &Use ..
+--- tde-i18n-en_GB/messages/tdebase/kcmtaskbar.po
++++ tde-i18n-en_GB/messages/tdebase/kcmtaskbar.po
+@@ -382,3 +382,3 @@
+ msgid "Colors"
+-msgstr ""
++msgstr "Colours"
+ 
+@@ -387,3 +387,3 @@
+ msgid "Use &custom colors"
+-msgstr ""
++msgstr "&Use custom colours"
+ 
+@@ -392,3 +392,3 @@
+ msgid "Active task te&xt color:"
+-msgstr ""
++msgstr "Active task te&xt colour:"
+ 
+@@ -397,3 +397,3 @@
+ msgid "&Background color:"
+-msgstr ""
++msgstr "&Background colour:"
+ 
+@@ -402,3 +402,3 @@
+ msgid "Inacti&ve task text color:"
+-msgstr ""
++msgstr "Inacti&ve task text colour:"
+ 
+@@ -525,3 +525,3 @@
+ msgid "Right b&utton:"
+-msgstr "Right b&utton:"
++msgstr "&Right button:"
  

@@ -11,14 +11,14 @@ Build-time options to be hard-coded into the app are:
 
 [2] Alternative text on the num pad keys.
 
-For example:
-|Ho|
-|me| can be replaced with |H←|, which is a better fit on the keys.
+    For example:
+    |Ho|
+    |me| can be replaced with |H←|, which is a better fit on the keys.
 
 [3] Small icons are a better fit on the buttons if the keyboard is to be used at the default size.
 
 [4] Show blank keys where AltGr doesn't produce a character.
 
-Usually, not all keys have 3rd and 4th level characters assigned.
-Select this option to see only those characters which AltGr or AltGr+Shift generate.
+    Usually, not all keys have 3rd and 4th level characters assigned.
+    Select this option to see only those characters which AltGr or AltGr+Shift generate.
  

@@ -7,7 +7,7 @@
 See [*Cross compiling for RPi3*](#xcompiling) for building for arm_hf and aarch64.
 
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input,  
-which will build the release version 14.0.13, or the development versions 14.0.x [\[see note \[5\]\]](#5), or 14.1.0.
+which will build the release version 14.1.0, or the development versions 14.1.x/14.2.0.
 
 [<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png "TDE version")  
 ... select TDE version
@@ -19,7 +19,7 @@ Information about dependencies for some packages has been added at the bottom of
 
 Only building the packages is a global option. It therefore can't be used where the build list includes packages which will need to be installed as dependencies for other packages in the build list [for example tdesdk needs tdepim to be installed].
 
-14.0.13 source archives will be downloaded from a geoIP located mirror site, or the development sources [14.0.x/14.1.0] cloned or updated from trinitydesktop gitea.  
+14.1.0 source archives will be downloaded from a geoIP located mirror site, or the development sources 14.1.x/14.2.0 cloned or updated from trinitydesktop gitea.  
 Downloading can be done pre-build [useful for an off-line build], or during the build.
 
 If you're curious about what this might involve, [take a look at a sample build set up](https://ray-v.github.io/A_typical_TDE_SlackBuild.html).
@@ -35,6 +35,7 @@ URLs for this and other locations are @ https://www.trinitydesktop.org/mirrorsta
 * FEAT= - for development builds - see get-source.sh
 * build_regextester=[yp] - build the regex tester from the tqt3 example - see the tqt3 README
 * mailmerge=n - build kword without mailmerge - see the koffice README and SlackBuild
+* KP_BTN=n - build ksnapshot without the dedicated KolourPaint button - see the tdegraphics README and SlackBuild
 
 ---
 
@@ -76,7 +77,7 @@ Deps/libart-lgpl
 Core/tdelibs
 Core/tdebase
 ```
-The newly introduced cmake-trinity package for R14.0.11+ is downloaded with the first archive, usually tqt3.
+The cmake-trinity package is downloaded with the first archive, usually tqt3.
 
 ---
 
@@ -132,9 +133,6 @@ Includes:
 [3] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.
 
 [4] The README for a [native build for Raspberry Pi3](./README-Raspberry-Pi3.md) is out-of-date and cross compiling is a better option.
-
-<a id="5"></a>
-[5] There are no plans for a 14.0.14 release and so the 14.0.x branch is effectively frozen at 14.0.13 - go to [new target...](https://mail.trinitydesktop.org/mailman3/hyperkitty/list/users@trinitydesktop.org/thread/JKKMYZUAFMG4HT2EMKFSZHVSNSUTED27/) for more information.
 
 ---
 

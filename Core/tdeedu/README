@@ -11,4 +11,8 @@ As I'm not aware of any other uses, the builds have not been added to the build 
 If kalzium crashes when trying to use the equation solver, there is an open issue @ https://mirror.git.trinitydesktop.org/gitea/TDE/tdeedu/issues/8.
 
 If it works for you, or the crash is caused by a problem with the build, please raise an issue here to let me know.
+
+------------------------------
+
+The page/paper size can be set with the command line option PS= or will default to the size set for the system locale.
  

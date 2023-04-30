@@ -57,17 +57,17 @@ echo $'--- mkspecs/linux-g++/qmake.conf
 +QMAKE_CXX		= $(COMPILER_CXX)
 @@ -40 +40 @@
 -QMAKE_INCDIR		=
-+QMAKE_INCDIR		= $('"${QTDIR_PFX:-}"$'QTDIR)/include/tqt
++QMAKE_INCDIR		= $(TQTDIR)/include/tqt
 @@ -42,2 +42,2 @@
 -QMAKE_INCDIR_X11	= /usr/X11R6/include
 -QMAKE_LIBDIR_X11	= /usr/X11R6/lib
 +QMAKE_INCDIR_X11	= /usr/include/X11
 +QMAKE_LIBDIR_X11	= /usr/lib'"$LIBDIRSUFFIX"$'
 @@ -45,3 +45,3 @@
--QMAKE_LIBDIR_'"${QTDIR_PFX:-}"$'QT		= $('"${QTDIR_PFX:-}"$'QTDIR)/lib
+-QMAKE_LIBDIR_TQT		= $(TQTDIR)/lib
 -QMAKE_INCDIR_OPENGL	= /usr/X11R6/include
 -QMAKE_LIBDIR_OPENGL	= /usr/X11R6/lib
-+QMAKE_LIBDIR_'"${QTDIR_PFX:-}"$'QT		= $('"${QTDIR_PFX:-}"$'QTDIR)/lib'"$LIBDIRSUFFIX"$'
++QMAKE_LIBDIR_TQT		= $(TQTDIR)/lib'"$LIBDIRSUFFIX"$'
 +QMAKE_INCDIR_OPENGL	= /usr/include/GL
 +QMAKE_LIBDIR_OPENGL	= /usr/lib'"$LIBDIRSUFFIX"$'
 @@ -49,2 +49,2 @@
@@ -190,12 +190,12 @@ mkdir -p $PKG/etc/profile.d
 #
 echo '#!'"/bin/sh
 # Environment path variable for the tQt package.
-export ${QTDIR_PFX:-}QTDIR=$TQTDIR
+export TQTDIR=$TQTDIR
 " > $PKG/etc/profile.d/tqt3.sh
 #
 echo '#!'"/bin/csh
 # Environment path variable for the tQt package:
-setenv ${QTDIR_PFX:-}QTDIR $TQTDIR
+setenv TQTDIR $TQTDIR
 " > $PKG/etc/profile.d/tqt3.csh
 #
 chmod 755 $PKG/etc/profile.d/*

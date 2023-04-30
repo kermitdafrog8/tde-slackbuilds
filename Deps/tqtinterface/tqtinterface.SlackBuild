@@ -39,13 +39,10 @@ chown_fn
 
 cd_builddir_fn
 
-[[ $TDEVERSION == 14.1.0 ]] && QTINC_PFX=T
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DQT_PREFIX_DIR=$TQTDIR \
-    -D${QTINC_PFX:-}QT_INCLUDE_DIR=$TQTDIR/include/tqt \
-    -DQT_VERSION=3 \
-    -DWITH_QT3="OFF" \
-    -DWITH_QT4="OFF"
+    -DTQT_INCLUDE_DIR=$TQTDIR/include/tqt \
+    -DQT_VERSION=3
 
 make_fn
 

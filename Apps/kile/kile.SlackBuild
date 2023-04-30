@@ -33,20 +33,6 @@ getsource_fn
 
 untar_fn
 
-## fix build error for clang/i586
-[[ $TDEVERSION == 14.0.13 ]] && \
-[[ $COMPILER == clang ]] && \
-[[ $ARCH == i586 ]] && \
-patch -p0 << EOF
---- src/kile/kilejscript.cpp
-+++ src/kile/kilejscript.cpp
-@@ -70,2 +70,2 @@
--      { i_ms / 1000, (i_ms % 1000) * 1000 },
--      { ms / 1000, (ms % 1000) * 1000 }
-+      { static_cast<time_t>( i_ms / 1000 ), static_cast<suseconds_t>( (i_ms % 1000) * 1000 ) },
-+      { static_cast<time_t>( ms / 1000 ), static_cast<suseconds_t>( (ms % 1000) * 1000 ) }
-EOF
-
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
 langs=""

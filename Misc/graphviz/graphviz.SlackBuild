@@ -26,7 +26,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=graphviz
-VERSION=7.0.5
+VERSION=7.1.0
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
@@ -39,6 +39,7 @@ getsource_fn
 untar_fn
 
 # ghostscript918.patch from Arch (thanks!)
+echo -e "\033[39;1m"
 patch -p0 << EOF
 --- plugin/gs/gvloadimage_gs.c
 +++ plugin/gs/gvloadimage_gs.c
@@ -86,7 +87,7 @@ sed -i '/(PS2PDF)/d' $file
 sed -i 's|psfile=$${pdffile%pdf}ps; ||' $file
 sed -i 's|$(GROFF) -Tps.*$|sed "s^.PP^^;s^\.SH^\\n\&^" $< \| $(GROFF) -man -Tpdf -fH -rS10 -rIN=4n -dpaper='"$PS"' -P-p'"$PS"' > $$pdffile|' $file
 done
-#
+echo -e "\033[0m"
 ## the pdfs are installed in the same directory as index.html
 sed -i 's|../doc/||;s|../pdf/||' doc/index.html
 ## add the cgraph tutorial

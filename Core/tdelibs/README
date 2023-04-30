@@ -6,6 +6,6 @@ Some formatting for help pages has been changed by a patch in the SlackBuild - i
 
 ---
 
-Markdown syntax highlighting for kate has been added for 14.0.13.
-There is a patch in the SlackBuild to revert the diff highlighting - comment out if not required.
+Markdown syntax highlighting for kate ...
+There is a patch in the SlackBuild to revert the diff highlighting introduced for R14.0.13 - comment out if not required.
  

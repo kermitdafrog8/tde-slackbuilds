@@ -23,7 +23,7 @@
 #   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 #   SUCH DAMAGE.
 
-PRGNAM=tdewebdev
+PRGNAM=tdebluez
 VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -33,16 +33,17 @@ getsource_fn
 
 untar_fn
 
-## override hard coded trinity references - PLUGIN_INSTALL_DIR is derived from TDE_CNF_DIR,
-## and is relative to the TDE libraries directory
-sed -i "s|FileName=trinity|FileName=$PLUGIN_INSTALL_DIR|" quanta/data/config/plugins.rc
-sed -i "s|/opt/trinity|$INSTALL_TDE|" */*.tdevelop
-sed -i "s|trinity/|$PLUGIN_INSTALL_DIR/|" doc/*/*.docbook
-sed -i "s|/opt/trinity|$INSTALL_TDE|" doc/man/*/*.1
+## path to configuration file
+sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" {README.md,doc/en/tdebluez.docbook}
 
-## the path LIB_INSTALL_DIR can be set by cmake
-sed -i 's|project(.*$|&\ninclude( GNUInstallDirs )|' CMakeLists.txt
-sed -i 's|${LIB_INSTALL_DIR}|${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}|' kommander/{widget{,s},plugin}/CMakeLists.txt
+## User set paper size or as per locale ..
+[[ ! ${PS:-} ]] && {
+[[ $(locale LC_PAPER) == 297* ]] && PS=a4 || PS=letter
+}
+sed -i "s|^PAPER_TYPE.*$|PAPER_TYPE             = $PS|" Doxyfile
+
+## for slack-desc
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 
@@ -51,19 +52,14 @@ chown_fn
 cd_builddir_fn
 
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
-    -DWITH_OTHER_EDITORS="ON" \
-    -DWITH_QUANTA_CVSSERVICE="ON" \
-    -DBUILD_KIMAGEMAPEDITOR="ON" \
-    -DBUILD_KLINKSTATUS="ON" \
-    -DBUILD_KOMMANDER="ON" \
-    -DBUILD_KXSLDBG="ON" \
-    -DBUILD_QUANTA="ON"
+    -DBUILD_LIBTDEBLUEZ="ON" \
+    -DBUILD_TDEIOSLAVE="ON"
 
 make_fn
 
 installdocs_fn
 
-mangzip_fn
+#mangzip_fn
 
 strip_fn
 
@@ -74,20 +70,20 @@ doinst_sh_fn
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
-# up the first '|' above the ':' following the base package name, and the '|' on
-# the right side marks the last column you can put a character in.  You must make
-# exactly 11 lines for the formatting to be correct.  It's also customary to
-# leave one space after the ':'.
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: Quanta Plus and runtime dependencies
+$PRGNAM: tdebluez - A set of applications to provide Bluetooth Bluez5
+$PRGNAM: functionality to TDE.
 $PRGNAM:
-$PRGNAM: * Quanta Plus: a web IDE
+$PRGNAM: Requires bluez >= 5.43
+$PRGNAM: openobex support works with v1.5 only
 $PRGNAM:
-$PRGNAM: The runtime dependencies are:
-$PRGNAM: * Kommander: a GUI script builder and executor tool.
-$PRGNAM: * KXSLDbg: XSL debugger
-$PRGNAM: * KImageMapEditor: image map editor
-$PRGNAM: * KLinkStatus: link checker
+$PRGNAM: With language support for:
+$PRGNAM: $langs
+$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc

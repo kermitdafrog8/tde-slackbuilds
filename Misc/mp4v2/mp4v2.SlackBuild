@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=mp4v2
-VERSION=2.1.1
+VERSION=2.1.2
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
@@ -38,6 +38,7 @@ untar_fn
 
 ## patch for gcc10 - error: narrowing conversion of ‘mp4v2::util::SubtitleUtility::LC_LIST’ from ‘unsigned int’ to ‘int’, etc..
 ## thanks to https://bugs.gentoo.org/723098
+echo -e "\033[39;1m"
 patch -N -p0 << EOF || true
 --- libutil/Utility.cpp
 +++ libutil/Utility.cpp
@@ -70,6 +71,7 @@ patch -N -p0 << EOF || true
 -    switch( code ) {
 +    switch( static_cast<unsigned int>( code ) ) {
 EOF
+echo -e "\033[0m"
 
 listdocs_fn
 
@@ -77,13 +79,14 @@ listdocs_fn
 sed -i '/^configure_pkg_config_file/d' CMakeLists.txt
 sed -i 's|install.*mp4v2.pc.*$|configure_pkg_config_file(mp4v2.pc.in)\n&|' CMakeLists.txt
 
-## cmake build needs to be in top level directory for created project.h file installation
+cd_builddir_fn
+
 cmake ${G_NINJA:-} \
     -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
     -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
     -DBUILD_SHARED="ON" \
     -DBUILD_UTILS="ON" \
-    .
+    ..
 
 make_fn
 

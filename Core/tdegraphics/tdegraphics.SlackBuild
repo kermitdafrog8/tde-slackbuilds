@@ -36,6 +36,72 @@ untar_fn
 ## build fails with gcc visibility support
 sed -i 's|tde_setup_gcc_visibility|#&|' ConfigureChecks.cmake
 
+## option to build without the dedicated KolourPaint button in ksnapshot
+[[ ${KP_BTN:-} == [nN0] ]] && {
+echo -e "\033[39;1m"
+patch -p0 << EOF
+--- ksnapshot/ksnapshot.cpp
++++ ksnapshot/ksnapshot.cpp
+@@ -84 +83,0 @@
+-    connect(mainWidget, TQT_SIGNAL(openWithKPClicked()), TQT_SLOT(slotOpenWithKP()));
+@@ -135,6 +133,0 @@
+-    // Check for KolourPaint availability
+-    KService::Ptr kpaint = KService::serviceByDesktopName("kolourpaint");
+-    if (!kpaint) {
+-        mainWidget->btnOpenWithKP->hide();
+-    }
+-
+@@ -395,7 +388,0 @@
+-void KSnapshot::slotOpenWithKP() {
+-    KService::Ptr kpaint = KService::serviceByDesktopName("kolourpaint");
+-    if (kpaint) {
+-        openWithExternalApp(*kpaint);
+-    }
+-}
+-
+--- ksnapshot/ksnapshot.h
++++ ksnapshot/ksnapshot.h
+@@ -114 +113,0 @@
+-  void slotOpenWithKP();
+--- ksnapshot/ksnapshotwidget.ui
++++ ksnapshot/ksnapshotwidget.ui
+@@ -245,14 +244,0 @@
+-                <widget class="KPushButton">
+-                    <property name="name">
+-                        <cstring>btnOpenWithKP</cstring>
+-                    </property>
+-                    <property name="text">
+-                        <string>Open in &amp;KolourPaint</string>
+-                    </property>
+-                    <property name="whatsThis" stdset="0">
+-                        <string>Click this button to edit the snapshot in KolourPaint.</string>
+-                    </property>
+-                    <property name="iconSet">
+-                        <iconset>"kolourpaint"</iconset>
+-                    </property>
+-                </widget>
+@@ -320,6 +305,0 @@
+-    <connection>
+-        <sender>btnOpenWithKP</sender>
+-        <signal>clicked()</signal>
+-        <receiver>KSnapshotWidget</receiver>
+-        <slot>slotOpenWithKPClicked()</slot>
+-    </connection>
+@@ -365 +344,0 @@
+-    <signal>openWithKPClicked()</signal>
+@@ -375 +353,0 @@
+-    <slot access="protected" specifier="non virtual">slotOpenWithKPClicked()</slot>
+--- ksnapshot/ksnapshotwidget.ui.h
++++ ksnapshot/ksnapshotwidget.ui.h
+@@ -140,4 +139,0 @@
+-void KSnapshotWidget::slotOpenWithKPClicked()
+-{
+-    emit openWithKPClicked();
+-}
+EOF
+echo -e "\033[0m"
+}
+
 listdocs_fn
 
 chown_fn
@@ -48,7 +114,6 @@ sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/g
 pkg-config imlib && KUICKSHOW=ON
 
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
-    -DWITH_T1LIB="OFF" \
     -DWITH_PAPER="OFF" \
     -DWITH_TIFF="ON" \
     -DWITH_OPENEXR="OFF" \
