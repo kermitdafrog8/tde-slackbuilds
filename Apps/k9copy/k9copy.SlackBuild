@@ -35,6 +35,11 @@ untar_fn
 
 ## clang build - C++11 requires a space between literal and identifier
 sed -i 's|%%"REG_b|%%" REG_b|;s|%%"REG_S|%%" REG_S|' k9vamps/cputest.cpp
+## clang build - fix error for development builds
+[[ ! $(grep sFileName.local8Bit\(\).data\(\) libk9copy/k9saveimage.cpp) ]] && \
+sed -i 's|sFileName.local8Bit()|&.data()|' libk9copy/k9saveimage.cpp
+
+[[ $TDEVERSION == 14.1.0 ]] && {
 
 # set support for additional language(s) as per I18N variable
 # but only for languages available with this package
@@ -48,13 +53,22 @@ sed -i "s|POFILES =.*$|POFILES =$langs|" po/Makefile.am
 [[ $(getconf LONG_BIT) == 32 && $(uname -m) == *64 ]] && \
 sed -i 's|^UNAME_MACHINE=.*$|UNAME_MACHINE=i586|' admin/config.guess
 
+} || {
+
+## for slack-desc
+langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang";done
+
+}
+
 listdocs_fn
 
-ltoolupdate_fn
+[[ $TDEVERSION == 14.1.0 ]] && ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
+
+[[ $TDEVERSION == 14.1.0 ]] && {
 
 [[ $GCC_VIS == ON ]] && EN_GCC_VIS="--enable-gcc-hidden-visibility"
 
@@ -69,6 +83,13 @@ CXX=$COMPILER_CXX \
    ${EN_GCC_VIS:-} \
    --enable-closure \
    --enable-k3bdevices # do not activate hal/dbus support (use k3bdevice instead)
+
+} || {
+
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
+    -DWITH_OPENGL="ON"
+
+}
 
 make_fn
 

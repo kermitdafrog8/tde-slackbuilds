@@ -48,6 +48,8 @@ pkg-config libcaldav && LCALDAV="ON"
 # If libcarddav is installed, include it in the build for korganizer
 pkg-config libcarddav && LCARDDAV="ON"
 
+## KITCHENSYNC removed from 14.2.0
+[[ $TDEVERSION != 14.2.0 ]] && BUILD_KITCHENSYNC=-DBUILD_KITCHENSYNC="OFF"
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_ARTS="ON" \
     -DWITH_BIRTHDAYS="ON" \
@@ -75,7 +77,7 @@ cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DBUILD_KANDY="ON" \
     -DBUILD_KARM="ON" \
     -DBUILD_KGANTT="ON" \
-    -DBUILD_KITCHENSYNC="OFF" \
+    ${BUILD_KITCHENSYNC:-} \
     -DBUILD_KMAIL="ON" \
     -DBUILD_KMAILCVT="ON" \
     -DBUILD_KMOBILE="ON" \

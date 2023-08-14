@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=inkscape
-VERSION=1.2.2
+VERSION=1.3
 BUILD=${BUILD:-1}
 
 ARCHIVE_TYPE="tar.xz"
@@ -41,15 +41,15 @@ getsource_fn
 ## If it is already installed, go to end
 pkg-config double-conversion || ldconfig -p|grep libdouble-conversion 1>/dev/null || { # ldconfig if no .pc file
 ## otherwise, if the source archive is in 'src' ..
-[[ -s $BUILD_TDE_ROOT/src/v3.2.1.tar.gz ]] && {
+[[ -s $BUILD_TDE_ROOT/src/v3.3.0.tar.gz ]] && {
 ## .. build, package, and install ..
 (
 echo -e "\n building double-conversion \n"
 
 cd /$TMP_BUILD
 rm -rf *double-conversion*
-tar xf $BUILD_TDE_ROOT/src/v3.2.1.tar.gz
-cd double-conversion-3.2.1/
+tar xf $BUILD_TDE_ROOT/src/v3.3.0.tar.gz
+cd double-conversion-3.3.0/
 
 ## add a pkg-config .pc file
 echo 'prefix=@CMAKE_INSTALL_PREFIX@
@@ -72,8 +72,6 @@ configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 ' >> CMakeLists.txt
 
-sed -i 's|VERSION 3.2.0|VERSION 3.2.1|' CMakeLists.txt
-
 cd cmake/
 # LIBDIRSUFFIX not required - include(GNUInstallDirs) sets lib64 where appropriate ..
 cmake ${G_NINJA:-} \
@@ -87,8 +85,8 @@ PKG=$TMP_BUILD/package-double-conversion
 make_fn
 
 cd $TMP_BUILD/package-double-conversion
-makepkg -l y -c n $OUTPUT/double-conversion-3.2.1-$ARCH-$BUILD.txz
-installpkg $OUTPUT/double-conversion-3.2.1-$ARCH-$BUILD.txz
+makepkg -l y -c n $OUTPUT/double-conversion-3.3.0-$ARCH-$BUILD.txz
+installpkg $OUTPUT/double-conversion-3.3.0-$ARCH-$BUILD.txz
 )
 echo -e "\n now building inkscape \n"
 } || { ## .. but if the source archive isn't in 'src', display download URL ..
@@ -100,7 +98,7 @@ echo -e "
  Download:
              \033[39;1m
 ( cd $BUILD_TDE_ROOT/src
-  wget https://github.com/google/double-conversion/archive/v3.2.1.tar.gz )
+  wget https://github.com/google/double-conversion/archive/v3.3.0.tar.gz )
              \033[0m
  and re-run this script ..
 
@@ -115,7 +113,7 @@ untar_fn
 
 ## set internal 2geom lib paths to lib$LIBDIRSUFFIX
 sed -i 's|set(CMAKE_INSTALL_RPATH.*$|set(CMAKE_INSTALL_RPATH $ORIGIN)|' src/3rdparty/2geom/CMakeLists.txt
-sed -i "s|libdir=.*$|&$LIBDIRSUFFIX|" src/3rdparty/2geom/2geom.pc.in
+sed -i 's|libdir=.*$|libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@|' src/3rdparty/2geom/2geom.pc.in
 
  ### only build for required locales
 ## .. for translations and slack-desc
@@ -181,6 +179,7 @@ cmake ${G_NINJA:-} ${LIBATOMIC:-} \
     -DWITH_FUZZ="OFF" \
     -DWITH_GNU_READLINE="ON" \
     -DWITH_GRAPHICS_MAGICK="ON" \
+    -DWITH_GSOURCEVIEW="OFF" \
     -DWITH_GSPELL="OFF" \
     -DWITH_IMAGE_MAGICK="ON" \
     -DWITH_INTERNAL_2GEOM="ON" \

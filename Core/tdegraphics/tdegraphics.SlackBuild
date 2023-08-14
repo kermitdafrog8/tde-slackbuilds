@@ -102,6 +102,14 @@ EOF
 echo -e "\033[0m"
 }
 
+## _OBJECT_NAME_STRING defines have been removed from tqt.h for 14.1.x [aka 14.1.1] and 14.2.0,
+## but KMRML remains an option for 14.1.x
+[[ $TDEVERSION == 14.1.x ]] && {
+sed -i 's|TQSTRINGLIST_OBJECT_NAME_STRING|"TQStringList"|' kmrml/kmrml/lib/watcher_stub.cpp
+## and Q_OBJECT has been replaced with TQ_OBJECT
+find kmrml/kmrml/ -type f -exec sed -i -e 's|Q_OBJECT|T&|' {} \;
+}
+
 listdocs_fn
 
 chown_fn
@@ -113,6 +121,8 @@ sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/g
 # If imlib is installed, include Kuickshow:
 pkg-config imlib && KUICKSHOW=ON
 
+## KMRML removed from 14.2.0
+[[ $TDEVERSION != 14.2.0 ]] && BUILD_KMRML=-DBUILD_KMRML="ON"
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_PAPER="OFF" \
     -DWITH_TIFF="ON" \
@@ -132,7 +142,7 @@ cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DBUILD_KGAMMA="ON" \
     -DBUILD_KGHOSTVIEW="ON" \
     -DBUILD_TDEICONEDIT="ON" \
-    -DBUILD_KMRML="ON" \
+    ${BUILD_KMRML:-} \
     -DBUILD_KOLOURPAINT="ON" \
     -DBUILD_KPOVMODELER="ON" \
     -DBUILD_KRULER="ON" \
