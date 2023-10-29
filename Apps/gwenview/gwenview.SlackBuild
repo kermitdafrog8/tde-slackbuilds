@@ -34,6 +34,9 @@ getsource_fn
 
 untar_fn
 
+## fix check for visibility support - tde-common-admin pull #20
+sed -i 's| Q_EXPORT| TQ_EXPORT|' admin/acinclude.m4.in
+
 listdocs_fn
 
 ltoolupdate_fn

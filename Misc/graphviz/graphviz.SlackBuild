@@ -26,7 +26,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=graphviz
-VERSION=8.1.0
+VERSION=9.0.0
 BUILD=${BUILD:-1}
 TAG=${TAG:-}
 
@@ -73,7 +73,7 @@ patch -p0 << EOF
  }
 EOF
 
-## .. output man pages to pdf, sans-serif [helvetica] font, 10pt, indentation, page size, paper size
+## The groff options will output man pages to pdf, sans-serif [helvetica] font, 10pt, indentation, page size, paper size
 ## with at least one line before a section heading
 ## User set paper size or as per locale - see groff_font for valid sizes
 [[ ! ${PS:-} ]] && {

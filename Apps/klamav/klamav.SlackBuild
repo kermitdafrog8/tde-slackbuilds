@@ -33,7 +33,7 @@ source ../../get-source.sh
 ## klamav needs clamav as a build time requirement
 [[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 # ### clamav  - start
-clamav_VERS=1.1.0
+clamav_VERS=1.2.0
 clamav_installed_fn () { pkg-config libclamav ;}
 ## If it's already installed, go to end
 clamav_installed_fn || {

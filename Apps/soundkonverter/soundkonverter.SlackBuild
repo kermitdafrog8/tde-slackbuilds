@@ -39,6 +39,9 @@ langs="";for Lang in $I18N;do [[ -e po/$Lang".po" ]] && langs="$langs $Lang"".po
 sed -i "s|POFILES =.*$|POFILES =$langs|" po/Makefile.am
 langs=$(echo $langs | sed "s|.po||g")
 
+## fix check for visibility support - tde-common-admin pull #20
+sed -i 's| Q_EXPORT| TQ_EXPORT|' admin/acinclude.m4.in
+
 listdocs_fn
 
 ltoolupdate_fn

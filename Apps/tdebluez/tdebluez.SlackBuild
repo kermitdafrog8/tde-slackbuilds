@@ -40,8 +40,7 @@ sed -i "s|trinity|$PLUGIN_INSTALL_DIR|" {README.md,doc/en/tdebluez.docbook}
 [[ ! ${PS:-} ]] && {
 [[ $(locale LC_PAPER) == 297* ]] && PS=a4 || PS=letter
 }
-[[ $TDEVERSION == 14.1.0 ]] && DXYFILE=Doxyfile || DXYFILE=tdebluez.Doxyfile.cmake
-sed -i "s|^PAPER_TYPE.*$|PAPER_TYPE             = $PS|" $DXYFILE
+sed -i "s|^PAPER_TYPE.*$|PAPER_TYPE             = $PS|" tdebluez.Doxyfile.cmake
 
 ## for slack-desc
 langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done

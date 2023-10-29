@@ -43,6 +43,9 @@ langdocdk="digikam";for Lang in $langs;do [[ -d doc/$Lang"_digikam" ]] && langdo
 langdocsf="showfoto";for Lang in $langs;do [[ -d doc/$Lang"_showfoto" ]] && langdocsf=$(echo $Lang"_showfoto" $langdocsf);done
 sed -i "s|SUBDIRS =.*$|SUBDIRS =. $langdocdk $langdocsf|" doc/Makefile.am
 
+## fix check for visibility support - tde-common-admin pull #20
+sed -i 's| Q_EXPORT| TQ_EXPORT|' admin/acinclude.m4.in
+
 listdocs_fn
 
 ltoolupdate_fn

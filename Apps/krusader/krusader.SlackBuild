@@ -72,6 +72,9 @@ langs=$(echo $langs | sed 's|.po||g')
 ldocs="en tdeioslave/{krarc,virt}"
 [[ $I18N != *ru* ]] && sed -i 's| ru||' doc/Makefile.am || ldocs="$ldocs ru"
 
+## fix check for visibility support - tde-common-admin pull #20
+sed -i 's| Q_EXPORT| TQ_EXPORT|' admin/acinclude.m4.in
+
 listdocs_fn
 
 ltoolupdate_fn

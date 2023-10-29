@@ -101,7 +101,7 @@ Set the version of TDE to be built.
  
 " \
 13 75 3 \
-"14.1.0" "the R14.1.0 release - source from archives" \
+"14.1.1" "the R14.1.1 release - source from archives" \
 "14.1.x" "next release preview - source from Trinity git" \
 "14.2.0" "R14.2.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
@@ -339,7 +339,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Core/tdeaccessibility" "Accessibility programs" off "\Zb\Z6 Optional build-time dependencies -> akode + tdemultimedia \Zn" \
 "Core/tdeadmin" "System admin packages" off "\Zb\Z6  \Zn" \
 "Core/tdeartwork" "Extra artwork/themes/wallpapers for TDE" off "\Zb\Z6   \Zn" \
-" Misc/graphviz" "Graph Visualization" off "\Zb\Z6 Runtime option for kscope. pdf/html docs not installed by default  \Zn" \
+" Misc/graphviz" "Graph Visualization" off "\Zb\Z6 Runtime option for kscope. Build-time option for tdeedu. \Zn" \
 "Core/tdeedu" "Educational software" off "\Zb\Z6 Build-time option -> dot [graphviz] \Zn" \
 "Core/tdegames" "Games for TDE - atlantik, kasteroids, katomic, etc." off "\Zb\Z6   \Zn" \
 " Misc/imlib" "An image loading and rendering library" off "\Zb\Z6 Build-time option for tdegraphics - needed for kuickshow \Zn" \
@@ -422,7 +422,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 2> $TMPVARS/TDEbuilds
 # successful builds are removed from the TDEbuilds list as '$dir ' so add a space to the last entry
 # and the " needs to be removed because the Misc entries are double-quoted,
-## and if they're not, they have a non-breaking space prefixed
+## or, they have a non-breaking space prefixed
 sed -i 's|$| |;s|" M|M|g;s|"||g;s| ||g' $TMPVARS/TDEbuilds
 ##                                ^ == nbsp
 
@@ -752,8 +752,8 @@ Create and/or update the git repositories local copies.
 
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
-[[ $(cat $TMPVARS/TDEVERSION) == 14.1.0 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
-## testing for cgit!=no will allow =yes, or null, which is the 14.1.0 build case
+[[ $(cat $TMPVARS/TDEVERSION) == 14.1.1 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
+## testing for cgit!=no will allow =yes, or null, which is the 14.1.1 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "

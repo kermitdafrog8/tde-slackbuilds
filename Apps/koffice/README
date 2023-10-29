@@ -1,24 +1,6 @@
-Chalk/krita will crash trying to load PNGs it saved if it is built with libpng-1.6.
-
-The patch included with the SlackBuild is a workaround until koffice issue 20 has been fixed.
-
-If it is necessary to convert the image to the RGB working space, there are a number of profiles installed with {chalk,krita} in <TDE-installation-directory>/share/apps/{chalk,krita}/profiles/ which can be installed with Imagemagick's 'convert', or GraphicsMagick's 'gm convert'
-
-Example:
-"""""""
-in=<path-to>/original.png    # existing
-out=<path-to>/converted.png  # will be created
-profile=<TDE-installation-directory>/share/apps/{chalk,krita}/profiles/srgb_color_space_profile.icm
-convert='gm convert'
-
-($convert $in -profile $profile $out)
-
--------------
-
 kword/mailmerge requires kspread/libkspreadcommon so if kword is chosen to be built, the SlackBuild will add kspread to the build list if not already selected.
 
 Or, to build kword without mailmerge and the kspread dependency, run:
 
 mailmerge=n ./BUILD-TDE.sh
- 
  

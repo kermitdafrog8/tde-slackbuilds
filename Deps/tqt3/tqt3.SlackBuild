@@ -44,7 +44,6 @@ sed -i "s|CONFIG.*$|& ${NO_WARN:+warn_off}|" mkspecs/linux-g++/qmake.conf
 ## and added during configure with the -R option
 ## lib suffix might be 64
 ## add -headerdir as set in configure
-[[ $TDEVERSION == 14.1.0 ]] && QTDIR_PFX=T || QTDIR=$TQTDIR
 ## allow building with clang, either build-time or run-time
 [[ ! $(grep COMPILER mkspecs/linux-g++/qmake.conf) ]] && {
 echo $'--- mkspecs/linux-g++/qmake.conf

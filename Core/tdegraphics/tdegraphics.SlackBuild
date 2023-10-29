@@ -102,20 +102,13 @@ EOF
 echo -e "\033[0m"
 }
 
-## _OBJECT_NAME_STRING defines have been removed from tqt.h for 14.1.x [aka 14.1.1] and 14.2.0,
-## but KMRML remains an option for 14.1.x
-[[ $TDEVERSION == 14.1.x ]] && {
-sed -i 's|TQSTRINGLIST_OBJECT_NAME_STRING|"TQStringList"|' kmrml/kmrml/lib/watcher_stub.cpp
-## and Q_OBJECT has been replaced with TQ_OBJECT
-find kmrml/kmrml/ -type f -exec sed -i -e 's|Q_OBJECT|T&|' {} \;
-}
-
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
 
+## change the bug reporting URL
 sed -i "s|http://bugs.trinitydesktop.org|https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM/issues|" ../doc/man/*/*.1
 
 # If imlib is installed, include Kuickshow:
@@ -162,7 +155,9 @@ mkdir_install_fn
 
 doinst_sh_fn
 
-echo "
+## KMRML removed from 14.2.0
+[[ $TDEVERSION != 14.2.0 ]] && kmrml=\\n$PRGNAM': * kmrml: Connects to a MRML server and find similar images'
+echo -e "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
 # up the first '|' above the ':' following the base package name, and the '|'
@@ -179,8 +174,7 @@ $PRGNAM: * kdvi: Program (and embeddable KPart) to display *.DVI files from TeX
 $PRGNAM: * kfax: Display raw and tiffed fax images (g3, g3-2d, g4).
 $PRGNAM: * kfaxview: An embeddable KPart to display tiffed fax images.
 $PRGNAM: * kgamma: set monitor gamma
-$PRGNAM: * kghostview: Program (and embeddable KPart) to display *.pdf and *.ps
-$PRGNAM: * kmrml: Connects to a MRML server and find similar images
+$PRGNAM: * kghostview: Program (and embeddable KPart) to display *.pdf and *.ps${kmrml:-}
 $PRGNAM: * kolourpaint: An easy-to-use paint program designed for drawing
 $PRGNAM:                simple diagrams/logos/icons and editing screenshots.
 $PRGNAM: * kooka: A raster image scan program, based on SANE and libkscan.

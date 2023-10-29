@@ -72,7 +72,7 @@ $PRGNAM: System admin packages
 $PRGNAM:
 $PRGNAM: * kcron: Editor for the cron command scheduler.
 $PRGNAM: * kdat: Tape backup tool.
-$PRGNAM: * tdefile-plugins: Make Konquerer display info about *.dep/rpm files.
+$PRGNAM: * tdefile-plugins: Make Konquerer display info about *.deb/rpm files.
 $PRGNAM: * kpackage: Manager for DEB, RPM and similar software packages.
 $PRGNAM: * ksysv: An editor for System V startup schemes.
 $PRGNAM: * kuser: An user manager.

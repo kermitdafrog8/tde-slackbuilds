@@ -48,6 +48,9 @@ done
 sed -i "s|SUBDIRS =.*$|SUBDIRS =$langs|" po/Makefile.am
 sed -i "s|SUBDIRS =.*$|SUBDIRS =$langdoc|" doc/Makefile.am
 
+## fix check for visibility support - tde-common-admin pull #20
+sed -i 's| Q_EXPORT| TQ_EXPORT|' admin/acinclude.m4.in
+
 listdocs_fn
 
 ltoolupdate_fn

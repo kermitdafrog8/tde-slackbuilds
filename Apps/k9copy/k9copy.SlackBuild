@@ -33,63 +33,22 @@ getsource_fn
 
 untar_fn
 
-## clang build - C++11 requires a space between literal and identifier
-sed -i 's|%%"REG_b|%%" REG_b|;s|%%"REG_S|%%" REG_S|' k9vamps/cputest.cpp
-## clang build - fix error for development builds
-[[ ! $(grep sFileName.local8Bit\(\).data\(\) libk9copy/k9saveimage.cpp) ]] && \
-sed -i 's|sFileName.local8Bit()|&.data()|' libk9copy/k9saveimage.cpp
-
-[[ $TDEVERSION == 14.1.0 ]] && {
-
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -e po/$Lang.po ]] && langs="$langs $Lang.po";done
-sed -i "s|POFILES =.*$|POFILES =$langs|" po/Makefile.am
-[[ $langs != "" ]] && langs=" $(echo $langs | sed 's|.po||g')"
-
-## config.guess uses uname to identify the system so incorrectly identifies
-## a 32 bit system using a 64 bit kernel as 64 bit
-## Could use --build=, but this way configure gets to choose the triple
-[[ $(getconf LONG_BIT) == 32 && $(uname -m) == *64 ]] && \
-sed -i 's|^UNAME_MACHINE=.*$|UNAME_MACHINE=i586|' admin/config.guess
-
-} || {
-
 ## for slack-desc
 langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang";done
 
-}
-
 listdocs_fn
-
-[[ $TDEVERSION == 14.1.0 ]] && ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
 
-[[ $TDEVERSION == 14.1.0 ]] && {
-
-[[ $GCC_VIS == ON ]] && EN_GCC_VIS="--enable-gcc-hidden-visibility"
-
-CFLAGS="$SLKRCFLAGS" \
-CXXFLAGS="$SLKRCFLAGS" \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --mandir=$INSTALL_TDE/man \
-   --disable-rpath \
-   ${EN_GCC_VIS:-} \
-   --enable-closure \
-   --enable-k3bdevices # do not activate hal/dbus support (use k3bdevice instead)
-
-} || {
+##${CMAKE_SYSTEM_PROCESSOR} is identified as x86_64 when using a 64 bit kernel on a 32 bit system
+## which incorrectly sets the OS as 64 bit
+[[ $(getconf LONG_BIT) == 32 && $(uname -m) == *64 ]] && \
+sed -i 's|# architecture|&\n set ( CMAKE_SYSTEM_PROCESSOR i686 )|' ../ConfigureChecks.cmake
 
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_OPENGL="ON"
-
-}
 
 make_fn
 

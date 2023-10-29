@@ -34,27 +34,87 @@ getsource_fn
 untar_fn
 
 ## don't install 'sources' docs
-sed -i 's|sources ||' doc/Makefile.am
+sed -i '13,18d' doc/CMakeLists.txt
 
 listdocs_fn
 
-ltoolupdate_fn
-
 chown_fn
 
-#cd_builddir_fn - don't use
-
 ## don't include man pages, they're a waste of space
-sed -i 's|SUBDIRS =.*$|SUBDIRS =. html sources|' doc/Makefile.in
+sed -i '7,12d' doc/CMakeLists.txt
 
-CFLAGS="$SLKRCFLAGS" \
-CXXFLAGS="$SLKRCFLAGS" \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-./configure \
-   --prefix=$INSTALL_TDE \
-   --disable-rpath \
-   --enable-closure
+## These tests are for codecs that don't have native Slackware support
+## and are therefore turned on only if the required dependencies are found
+[[ $(which medcon) ]] 2>/dev/null && DICOM=ON || echo " ## the dicom codec won't be built because medcon not found";echo
+[[ $(which vec2web) ]] 2>/dev/null && DXF=ON || echo " ## the dxf codec won't be built because vec2web not found";echo
+
+## These codecs all require dependencies which are found in the l/netpbm package
+[[ $(which ilbmtoppm) ]] 2>/dev/null && NETPBM=ON || echo " ## the iff, leaf, mac, neo, pi1, pi3, pict, utah, xim codecs
+ ## won't be built - the l/netpbm package is needed";echo
+
+cd_builddir_fn
+
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
+    -DWITH_JPEG="ON" \
+    -DWITH_LCMS="ON" \
+    -DBUILD_AVS="ON" \
+    -DBUILD_BMP="ON" \
+    -DBUILD_CAMERA="ON" \
+    -DBUILD_CUT="ON" \
+    -DBUILD_DDS="ON" \
+    -DBUILD_DICOM=${DICOM:-OFF} \
+    -DBUILD_DJVU="ON" \
+    -DBUILD_DXF=${DXF:-OFF} \
+    -DBUILD_EPS="ON" \
+    -DBUILD_FIG="ON" \
+    -DBUILD_FLI="ON" \
+    -DBUILD_GIF="ON" \
+    -DBUILD_HDR="ON" \
+    -DBUILD_ICO="ON" \
+    -DBUILD_IFF=${NETPBM:-OFF} \
+    -DBUILD_JBIG="ON" \
+    -DBUILD_JPEG2000="ON" \
+    -DBUILD_JPEG="ON" \
+    -DBUILD_KOALA="ON" \
+    -DBUILD_LEAF=${NETPBM:-OFF} \
+    -DBUILD_LIF="ON" \
+    -DBUILD_LJPEG="ON" \
+    -DBUILD_MAC=${NETPBM:-OFF} \
+    -DBUILD_MDL="ON" \
+    -DBUILD_MNG="ON" \
+    -DBUILD_MSP="ON" \
+    -DBUILD_MTV="ON" \
+    -DBUILD_NEO=${NETPBM:-OFF} \
+    -DBUILD_OPENEXR="ON" \
+    -DBUILD_PCX="ON" \
+    -DBUILD_PI1=${NETPBM:-OFF} \
+    -DBUILD_PI3=${NETPBM:-OFF} \
+    -DBUILD_PICT=${NETPBM:-OFF} \
+    -DBUILD_PIX="ON" \
+    -DBUILD_PNG="ON" \
+    -DBUILD_PNM="ON" \
+    -DBUILD_PSD="ON" \
+    -DBUILD_PSP="ON" \
+    -DBUILD_PXR="ON" \
+    -DBUILD_RAS="ON" \
+    -DBUILD_RAWRGB="ON" \
+    -DBUILD_SCT="ON" \
+    -DBUILD_SGI="ON" \
+    -DBUILD_SUN="ON" \
+    -DBUILD_SVG="ON" \
+    -DBUILD_TGA="ON" \
+    -DBUILD_TIFF="ON" \
+    -DBUILD_TTF="ON" \
+    -DBUILD_UTAH=${NETPBM:-OFF} \
+    -DBUILD_WAL="ON" \
+    -DBUILD_WBMP="ON" \
+    -DBUILD_WMF="ON" \
+    -DBUILD_XBM="ON" \
+    -DBUILD_XCF="ON" \
+    -DBUILD_XCUR="ON" \
+    -DBUILD_XIM=${NETPBM:-OFF} \
+    -DBUILD_XPM="ON" \
+    -DBUILD_XWD="ON"
 
 make_fn
 

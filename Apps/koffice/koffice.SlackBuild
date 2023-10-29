@@ -33,23 +33,6 @@ getsource_fn
 
 untar_fn
 
-[[ $TDEVERSION == 14.1.0 ]] && {
-## Workaround to prevent chalk/krita crashing when loading PNGs it has saved
-## Awaiting fix for koffice issue 20 - done for 14.1.x/14.1.1
-patch -p0 << EOF
---- filters/chalk/png/kis_png_converter.cpp
-+++ filters/chalk/png/kis_png_converter.cpp
-@@ -202,4 +202,7 @@
-     // read all PNG info up to image data
-     png_read_info(png_ptr, info_ptr);
-+#if PNG_LIBPNG_VER >= 10600
-+    png_set_invalid(png_ptr, info_ptr, PNG_INFO_iCCP);
-+#endif
- 
-     // Read information about the png
-EOF
-}
-
 ## fix chalk crashing -
 ## - set liblcms as a direct dependency - see TI issue 37 for details
 sed -i '23iKDE_CXXFLAGS = $(LCMS_LIBS)' chalk/Makefile.am
