@@ -1,6 +1,7 @@
 This file is for applications [Apps] download URLs, for BUILD-TDE.sh to identify which applications sub-directory a program source archive is in.
 
 development-Apps/kdbg
+development-Apps/kdiff3
 development-Apps/kscope
 development-Apps/piklab
 games-Apps/knights

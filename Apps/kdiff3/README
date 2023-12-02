@@ -1,0 +1,6 @@
+There is an option in kdiff3.SlackBuild to include a language specific patch file in the build.
+
+It needs to be named {lang}.po.patch and will then automatically be included for the build for that language.
+
+Because of its position in the Slackbuild and the patch -p0 option, the path to the patched file must be relative to the top level source directory - see en_GB.po.patch for an example.
+ 

@@ -33,19 +33,20 @@ getsource_fn
 
 untar_fn
 
+##${CMAKE_SYSTEM_PROCESSOR} is identified as x86_64 when using a 64 bit kernel on a 32 bit system
+## which incorrectly sets the OS as 64 bit
+[[ $(getconf LONG_BIT) == 32 && $(uname -m) == *64 ]] && \
+sed -i 's|# architecture|&\n set ( CMAKE_SYSTEM_PROCESSOR i586 )|' ConfigureChecks.cmake
+
 ## for slack-desc
-langs="";for Lang in $I18N;do [[ -s po/$Lang.po ]] && langs="$langs $Lang";done
+[[ $TDEVERSION != 14.1.1 ]] && TRANS_DIR=translations/messages
+langs="";for Lang in $I18N;do [[ -s ${TRANS_DIR:-po}/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 
 chown_fn
 
 cd_builddir_fn
-
-##${CMAKE_SYSTEM_PROCESSOR} is identified as x86_64 when using a 64 bit kernel on a 32 bit system
-## which incorrectly sets the OS as 64 bit
-[[ $(getconf LONG_BIT) == 32 && $(uname -m) == *64 ]] && \
-sed -i 's|# architecture|&\n set ( CMAKE_SYSTEM_PROCESSOR i686 )|' ../ConfigureChecks.cmake
 
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_OPENGL="ON"

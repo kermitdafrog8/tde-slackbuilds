@@ -382,6 +382,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/kbookreader" "Twin-panel text files viewer esp. for reading e-books." off "\Zb\Z6   \Zn" \
 "Apps/kdbg" "GUI for gdb using TDE" off "\Zb\Z6   \Zn" \
 "Apps/kdbusnotification" "A DBUS notification to TDE interface" off "\Zb\Z6   \Zn" \
+"Apps/kdiff3" "Compare two or three input files" off "\Zb\Z6   \Zn" \
 "Apps/kile" "A TEX and LATEX source editor and shell" off "\Zb\Z6   \Zn" \
 "Apps/kkbswitch" "A keyboard layout indicator" off "\Zb\Z6   \Zn" \
 "Apps/klamav" "Antivirus manager for ClamAV" off "\Zb\Z6 ClamAV is a build time requirement, included in klamav.Slackbuild \Zn" \

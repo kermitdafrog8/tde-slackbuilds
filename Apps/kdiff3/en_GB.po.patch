@@ -1,0 +1,26 @@
+--- translations/messages/kdiff3/en_GB.po
++++ translations/messages/kdiff3/en_GB.po
+@@ -1466 +1466 @@
+-msgstr ""
++msgstr "Colour for manually aligned difference ranges:"
+@@ -1475 +1475 @@
+-msgstr ""
++msgstr "Newest file colour:"
+@@ -1481 +1481,2 @@
+-msgstr ""
++msgstr "Changing this colour will only be effective when starting the next directory "
++"comparison."
+@@ -1485 +1486 @@
+-msgstr ""
++msgstr "Oldest file colour:"
+@@ -1489 +1490 @@
+-msgstr ""
++msgstr "Middle age file colour:"
+@@ -1493 +1494 @@
+-msgstr ""
++msgstr "Colour for missing files:"
+@@ -2098 +2099,3 @@
+-msgstr ""
++msgstr "If enabled then the encoding from the input files is used.\n"
++"In ambiguous cases a dialogue will ask the user to choose the encoding for "
++"saving."
