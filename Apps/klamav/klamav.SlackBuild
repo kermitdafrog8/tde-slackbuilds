@@ -33,8 +33,8 @@ source ../../get-source.sh
 ## klamav needs clamav as a build time requirement
 [[ $(cat $TMPVARS/PRE_DOWNLOAD) != yes ]] && {
 # ### clamav  - start
-clamav_VERS=1.2.0
-clamav_installed_fn () { pkg-config libclamav ;}
+clamav_VERS=1.2.1
+clamav_installed_fn () { pkg-config --atleast-version=$clamav_VERS libclamav ;}
 ## If it's already installed, go to end
 clamav_installed_fn || {
 ## otherwise, if the source archive is in 'src' ..
@@ -94,7 +94,7 @@ strip_fn
 
 cd $TMP_BUILD/package-clamav
 makepkg -l y -c n $OUTPUT/clamav-$clamav_VERS-$ARCH-$BUILD.txz
-installpkg $OUTPUT/clamav-$clamav_VERS-$ARCH-$BUILD.txz
+upgradepkg --install-new --reinstall $OUTPUT/clamav-$clamav_VERS-$ARCH-$BUILD.txz
 )
 clamav_installed_fn && echo "
  now building klamav" || { echo -e "\033[39;1m
@@ -111,7 +111,7 @@ echo -e "
 ( cd $BUILD_TDE_ROOT/src
   wget https://www.clamav.net/downloads/production/clamav-$clamav_VERS.tar.gz )
              \033[0m
- and re-run this script ..
+ and re-run ./BUILD-TDE.sh, choosing Re-use ..
 
  ############
 " ; exit 1 ; }

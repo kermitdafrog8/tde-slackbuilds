@@ -24,7 +24,7 @@
 #   SUCH DAMAGE.
 
 PRGNAM=inkscape
-VERSION=1.3
+VERSION=1.3.2
 BUILD=${BUILD:-1}
 
 ARCHIVE_TYPE="tar.xz"
@@ -100,7 +100,7 @@ echo -e "
 ( cd $BUILD_TDE_ROOT/src
   wget https://github.com/google/double-conversion/archive/v3.3.0.tar.gz )
              \033[0m
- and re-run this script ..
+ and re-run ./BUILD-TDE.sh, choosing Re-use ..
 
   ############
 " ; exit 1 ; }
@@ -115,7 +115,7 @@ untar_fn
 sed -i 's|set(CMAKE_INSTALL_RPATH.*$|set(CMAKE_INSTALL_RPATH $ORIGIN)|' src/3rdparty/2geom/CMakeLists.txt
 sed -i 's|libdir=.*$|libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@|' src/3rdparty/2geom/2geom.pc.in
 
- ### only build for required locales
+ ### only build for required locales, always including en[_US]
 ## .. for translations and slack-desc
 locas=""
 ## .. for tutorials
@@ -127,12 +127,14 @@ I18N_SVG="about.svg start-welcome-text.svg"
 #
 for locale in $I18N
  do
- locas="$locas $locale"
+# only add translations where inkscape supports the locale
+ [[ $(grep $locale po/LINGUAS) ]] && locas="$locas $locale"
  tuts="$tuts $(ls share/tutorials/*.$locale.*)" || true
  pods="$pods $(ls man/*.$locale.pod.in)" || true
  [[ -s share/screens/start-welcome-text.$locale.svg ]] && I18N_SVG="$I18N_SVG start-welcome-text.$locale.svg" && COUNT_TEXT=$[${COUNT_TEXT:-}+1]
 COUNT_I18N=$[${COUNT_I18N:-}+1]
  done
+[[ ${locas:-} ]] && NLS=ON
 #
 pos=$(echo $locas | sed 's| |.po |g;s|$|.po|')
 sed -i "s|*.po|$pos|" po/CMakeLists.txt
@@ -160,7 +162,6 @@ cd_builddir_fn
 ##| /usr/bin/ld: lib/libinkscape_base.so: undefined reference to `__atomic_load'
 ## Override the LIBATOMIC_NOT_NEEDED test in DefineDependsandFlags.cmake to add -latomic to the linker flags
 [[ $COMPILER == clang && $ARCH == i586 ]] && LIBATOMIC=-DLIBATOMIC_NOT_NEEDED=0
-
 ## options have been pulled from CMakeLists.txt
 cmake ${G_NINJA:-} ${LIBATOMIC:-} \
     -DCMAKE_C_FLAGS="$SLKCFLAGS" \
@@ -191,7 +192,7 @@ cmake ${G_NINJA:-} ${LIBATOMIC:-} \
     -DWITH_LPETOOL="OFF" \
     -DLPE_ENABLE_TEST_EFFECTS="OFF" \
     -DWITH_MANPAGE_COMPRESSION="ON" \
-    -DWITH_NLS="ON" \
+    -DWITH_NLS="${NLS:-OFF}" \
     -DWITH_OPENMP="ON" \
     -DWITH_PROFILING="OFF" \
     -DWITH_SVG2="ON" \
