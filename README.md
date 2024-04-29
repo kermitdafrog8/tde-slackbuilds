@@ -1,5 +1,5 @@
 [<img src="https://ray-v.github.io/TDE-aarch64-gui.png">](https://ray-v.github.io/TDE-aarch64-gui.png "TDE desktop")  
-... a TDE desktop, cross compiled for aarch64, running on a RPi3.
+... a TDE desktop, cross compiled for aarch64, running on a RPi4.
 
 ---
 ***Build TDE [Trinity Desktop Environment]***  
@@ -7,7 +7,7 @@
 See [*Cross compiling for RPi3*](#xcompiling) for building for arm_hf and aarch64.
 
 For a native build, run **./BUILD-TDE.sh** - a dialog based script with a series of screens for user input,  
-which will build the release version 14.1.1, or the development versions 14.1.x/14.2.0.
+which will build the release version 14.1.2, or the development versions 14.1.x/14.2.0.
 
 [<img src="https://ray-v.github.io/TDE-version.png">](https://ray-v.github.io/TDE-version.png "TDE version")  
 ... select TDE version
@@ -19,7 +19,7 @@ Information about dependencies for some packages has been added at the bottom of
 
 Only building the packages is a global option. It therefore can't be used where the build list includes packages which will need to be installed as dependencies for other packages in the build list [for example tdesdk needs tdepim to be installed].
 
-14.1.1 source archives will be downloaded from a geoIP located mirror site, or the development sources 14.1.x/14.2.0 cloned or updated from trinitydesktop gitea.  
+14.1.2 source archives will be downloaded from a geoIP located mirror site, or the development sources 14.1.x/14.2.0 cloned or updated from trinitydesktop gitea.  
 Downloading can be done pre-build [useful for an off-line build], or during the build.
 
 If you're curious about what this might involve, [take a look at a sample build set up](https://ray-v.github.io/A_typical_TDE_SlackBuild.html).

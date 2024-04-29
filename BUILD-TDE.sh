@@ -101,7 +101,7 @@ Set the version of TDE to be built.
  
 " \
 13 75 3 \
-"14.1.1" "the R14.1.1 release - source from archives" \
+"14.1.2" "the R14.1.2 release - source from archives" \
 "14.1.x" "next release preview - source from Trinity git" \
 "14.2.0" "R14.2.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
@@ -396,6 +396,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 " Misc/imlib2" "An image loading and rendering library" off "\Zb\Z6 Build-time requirement for kompose \Zn" \
 "Apps/kompose" "Full-screen window/desktop manager" off "\Zb\Z6 Imlib2 is a build time requirement \Zn" \
 "Apps/kplayer" "Multimedia player with MPlayer backend" off "\Zb\Z6 MPlayer is a run time requirement \Zn" \
+"Apps/krename" "Batch renaming files, with KFilePlugins support" off "\Zb\Z6   \Zn" \
 "Apps/krusader" "File manager for TDE" off "\Zb\Z6   \Zn" \
 "Apps/kscope" "A source-editing environment for C and C-style languages." off "\Zb\Z6 Runtime options cscope [d/cscope], ctags [ap/vim], dot [graphviz] \Zn" \
 "Apps/ksensors" "A graphical interface for sensors" off "\Zb\Z6 Runtime requirement ap/lm_sensors \Zn" \
@@ -753,8 +754,8 @@ Create and/or update the git repositories local copies.
 
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
-[[ $(cat $TMPVARS/TDEVERSION) == 14.1.1 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
-## testing for cgit!=no will allow =yes, or null, which is the 14.1.1 build case
+[[ $(cat $TMPVARS/TDEVERSION) == 14.1.2 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
+## testing for cgit!=no will allow =yes, or null, which is the 14.1.2 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "

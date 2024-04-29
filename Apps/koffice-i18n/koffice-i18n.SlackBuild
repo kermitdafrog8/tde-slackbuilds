@@ -63,6 +63,7 @@ echo -e "\033[39;1m
   $(printf '%0.s¯' $(seq 1 $[${#dir}+29]))
 \033[0m"
 ## Rename files and contents:
+## added '|| true' to continue build where file has already been renamed or doesn't exist for that locale
 mv ../template/messages/koffice/chalk.pot ../template/messages/koffice/krita.pot || true
 mv messages/koffice/chalk.po messages/koffice/krita.po
 mv docs/koffice/chalk docs/koffice/krita || true

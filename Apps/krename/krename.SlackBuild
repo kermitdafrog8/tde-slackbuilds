@@ -23,7 +23,7 @@
 #   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 #   SUCH DAMAGE.
 
-PRGNAM=akode
+PRGNAM=krename
 VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -33,52 +33,56 @@ getsource_fn
 
 untar_fn
 
+sed -i 's| "TQt: 3.3.5"||' doc/man/krename.1
+sed -i 's|^TQt.*$|krename \- a batch file renamer|' doc/man/krename.1
+sed -i 's|TQt:|krename|' doc/man/krename.1
+sed -i '/KDE: 3.4.2/d' doc/man/krename.1
+sed -i '/KRename: 3.0.8/d' doc/man/krename.1
+sed -i 's|info TQt|info krename|' doc/man/krename.1
+
+## for slack-desc
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+
+listdocs_fn
+
 chown_fn
 
 cd_builddir_fn
 
-## see README for cmake options
-cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
-    -DWITH_LIBLTDL="ON" \
-    -DWITH_ALSA_SINK="ON" \
-    -DWITH_JACK_SINK="OFF" \
-    -DWITH_PULSE_SINK="ON" \
-    -DWITH_OSS_SINK="OFF" \
-    -DWITH_SUN_SINK="OFF" \
-    -DWITH_FFMPEG_DECODER="ON" \
-    -DWITH_MPC_DECODER="ON" \
-    -DWITH_MPEG_DECODER="ON" \
-    -DWITH_SRC_RESAMPLER="ON" \
-    -DWITH_XIPH_DECODER="ON" \
-    -DWITH_XIPH_FLAC="ON" \
-    -DWITH_XIPH_SPEEX="ON" \
-    -DWITH_XIPH_VORBIS="ON"
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-}
 
 make_fn
+
+installdocs_fn
+
+mangzip_fn
 
 strip_fn
 
 mkdir_install_fn
 
+doinst_sh_fn
+
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
-# up the first '|' above the ':' following the base package name, and the '|'
-# on the right side marks the last column you can put a character in.  You must
-# make exactly 11 lines for the formatting to be correct.  It's also
-# customary to leave one space after the ':'.
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: akode - player and plugins for aRts music formats
+$PRGNAM: krename is for renaming a list of files based on a set of expressions
+$PRGNAM: and additionally:
+$PRGNAM: * copying/moving a list of files to another directory
+$PRGNAM: * converting filenames to upper/lower case
+$PRGNAM: * adding numbers to filenames
+$PRGNAM: * finding and replacing parts of the filename
+$PRGNAM: * renaming Mp3/Ogg Vorbis files based on their ID3 tags
+$PRGNAM: * setting access & modification dates, permissions & file ownership
+$PRGNAM: * renaming directories recursively
 $PRGNAM:
-$PRGNAM: - Ogg Vorbis
-$PRGNAM: - Musepack (MPC)
-$PRGNAM: - FLAC
-$PRGNAM: - Speex
-$PRGNAM: - Libmad (MPEG-1 and MPEG-2)
-$PRGNAM: - Libsamplerate
-$PRGNAM:
-$PRGNAM:
-$PRGNAM:
+$PRGNAM: With language support for:
+$PRGNAM: $langs
 " > $PKG/install/slack-desc
 
 makepkg_fn

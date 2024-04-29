@@ -39,8 +39,7 @@ untar_fn
 sed -i 's|# architecture|&\n set ( CMAKE_SYSTEM_PROCESSOR i586 )|' ConfigureChecks.cmake
 
 ## for slack-desc
-[[ $TDEVERSION != 14.1.1 ]] && TRANS_DIR=translations/messages
-langs="";for Lang in $I18N;do [[ -s ${TRANS_DIR:-po}/$Lang.po ]] && langs="$langs $Lang";done
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 

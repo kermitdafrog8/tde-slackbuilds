@@ -34,29 +34,16 @@ getsource_fn
 
 untar_fn
 
-## fix check for visibility support - tde-common-admin pull #20
-sed -i 's| Q_EXPORT| TQ_EXPORT|' admin/acinclude.m4.in
-
 listdocs_fn
-
-ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
 
-[[ $GCC_VIS == ON ]] && EN_GCC_VIS="--enable-gcc-hidden-visibility"
-
-CFLAGS="$SLKRCFLAGS" \
-CXXFLAGS="$SLKRCFLAGS" \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --mandir=$INSTALL_TDE/man \
-   ${EN_GCC_VIS:-} \
-   --disable-rpath \
-   --enable-closure
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
+    -DWITH_KIPI="ON" \
+    -DWITH_MNG="ON" \
+    -DWITH_XCURSOR="ON"
 
 make_fn
 

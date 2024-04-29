@@ -95,13 +95,13 @@ patch -N -p0 << EOF || true
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
 @@ -515 +515 @@
--		m->insertItem ( i18n("Font ..."), this, TQT_SLOT ( chooseFont() ) );
-+		m->insertItem ( i18n("Font"), this, TQT_SLOT ( chooseFont() ) );
+-		m->insertItem ( i18n("Font ..."), this, TQ_SLOT ( chooseFont() ) );
++		m->insertItem ( i18n("Font"), this, TQ_SLOT ( chooseFont() ) );
 @@ -520,0 +521 @@
 +		m->insertSeparator();
 @@ -522 +523 @@
--		m->insertItem ( i18n ("Keys color"), this, TQT_SLOT ( chooseKeysColor() ) );
-+		m->insertItem ( i18n ("Key color"), this, TQT_SLOT ( chooseKeysColor() ) );
+-		m->insertItem ( i18n ("Keys color"), this, TQ_SLOT ( chooseKeysColor() ) );
++		m->insertItem ( i18n ("Key color"), this, TQ_SLOT ( chooseKeysColor() ) );
 EOF
 
 ## key spacing & sizing
@@ -192,7 +192,7 @@ patch -N -p0 << EOF || true
 ## generate keycode on click rather than wait for next key-click
 @@ -318 +318,2 @@
 -	mod_keys.append ( lwin );
-+	connect ( lwin, TQT_SIGNAL ( keyClick ( unsigned int ) ), this, TQT_SLOT ( keyPress ( unsigned int ) ) );
++	connect ( lwin, TQ_SIGNAL ( keyClick ( unsigned int ) ), this, TQ_SLOT ( keyPress ( unsigned int ) ) );
 +	other_keys.append( lwin );
 #
 ## don't lock the RWin button
@@ -202,7 +202,7 @@ patch -N -p0 << EOF || true
 ## generate keycode on click rather than wait for next key-click
 @@ -355 +356,2 @@
 -	mod_keys.append ( rwin );
-+	connect ( rwin, TQT_SIGNAL ( keyClick ( unsigned int ) ), this, TQT_SLOT ( keyPress ( unsigned int ) ) );
++	connect ( rwin, TQ_SIGNAL ( keyClick ( unsigned int ) ), this, TQ_SLOT ( keyPress ( unsigned int ) ) );
 +	other_keys.append( rwin );
 EOF
 }
