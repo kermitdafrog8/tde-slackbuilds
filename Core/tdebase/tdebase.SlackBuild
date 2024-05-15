@@ -127,6 +127,12 @@ EOF
 ## rather than set HTDIG_SEARCH_BINARY which fixes the location
 sed -i 's|HINTS|&\n      /var/www/cgi-bin|' khelpcenter/searchhandlers/CMakeLists.txt
 
+## Work-around to build the handbooks, fixes tdebase issues 458 & 483
+## See tdebase issue 483, #issuecomment-51339
+[[ $TDEVERSION == 14.1.2 ]] && {
+sed -i 's|MATCHES ";${_lang};" ))|MATCHES ";1;" ))|' cmake/modules/TDEMacros.cmake
+}
+
 listdocs_fn
 
 chown_fn
