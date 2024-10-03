@@ -23,7 +23,7 @@
 #   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 #   SUCH DAMAGE.
 
-PRGNAM=soundkonverter
+PRGNAM=tde-ebook-reader
 VERSION=$TDEVERSION
 BUILD=${BUILD:-1}
 TAG=${TAG:-_tde}
@@ -33,21 +33,35 @@ getsource_fn
 
 untar_fn
 
-## for slack-desc
-[[ $TDEVERSION != 14.1.2 ]] && PO_DIR=translations/messages
-langs="";for Lang in $I18N;do [[ -s ${PO_DIR:-po}/$Lang.po ]] && langs="$langs $Lang";done
+## default font
+sed -i 's|Georgia|Liberation Sans|;s|16|13|' reader/data/default/config.xml
+## default line spacing
+sed -i 's|1.4|1.2|;s|140|120|' reader/src/options/FBTextStyle.cpp
+## no auto hyphenation
+sed -i 's|AutoHyphenation", true|AutoHyphenation", false|' zlibrary/text/src/style/ZLTextStyleCollection.cpp
+
+## work-around for desktop files translations pending translations/desktop_files being set up
+for locn in ar es hu pl ru zh_CN
+do
+[[ $I18N != *$locn* ]] && sed -i "/\[$locn\]/d" reader/desktop/tde-ebook-reader.desktop
+done
+
+## for slack-desc -> although no translations yet
+langs="en";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 
 chown_fn
 
-cd_builddir_fn 
+cd_builddir_fn
 
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-}
 
 make_fn
 
 installdocs_fn
+
+mangzip_fn
 
 strip_fn
 
@@ -58,20 +72,20 @@ doinst_sh_fn
 echo "
 # HOW TO EDIT THIS FILE:
 # The 'handy ruler' below makes it easier to edit a package description.  Line
-# up the first '|' above the ':' following the base package name, and the '|' on
-# the right side marks the last column you can put a character in.  You must make
-# exactly 11 lines for the formatting to be correct.  It's also customary to
-# leave one space after the ':'.
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
        |-----handy-ruler------------------------------------------------------|
-$PRGNAM: soundKonverter is a frontend to various audio converters.
+$PRGNAM: TDE Ebook Reader is a TQt port of FBReader,
+$PRGNAM: supporting several e-book formats: ePub, fb2, chm, rtf, plucker, etc.
 $PRGNAM:
-$PRGNAM: The key features are:
-$PRGNAM:  - Audio conversion
-$PRGNAM:  - Replay Gain calculation
-$PRGNAM:  - CD ripping
+$PRGNAM: Direct reading from zip, tar, gzip and bzip2 archives is supported.
 $PRGNAM:
 $PRGNAM: With language support for:
-$PRGNAM: en$langs
+$PRGNAM: $langs
+$PRGNAM:
+$PRGNAM:
 $PRGNAM:
 $PRGNAM:
 " > $PKG/install/slack-desc

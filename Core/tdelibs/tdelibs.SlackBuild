@@ -136,6 +136,10 @@ patch -N -p0 << EOF || true
 +			<itemData name="difflineadd" defStyleNum="dsNormal" backgroundColor="#eeeeee" color="#0000FF" />
 EOF
 
+## correct test for sudo
+sed -i 's|^if( TDESU_BACKEND-NOTFOUND )|if( ${TDESU_BACKEND} STREQUAL "TDESU_BACKEND-NOTFOUND" )|' CMakeLists.txt
+sed -i 's|endif( TDESU_BACKEND-NOTFOUND )|endif()|' CMakeLists.txt
+
 listdocs_fn
 
 chown_fn
@@ -155,6 +159,7 @@ pkg-config jasper && JASPER="ON"
 ## just show message without failing if no spell checker is installed
 sed -i 's|tde_message_fatal( "Spell checker|message( "Spell checker|' ../CMakeLists.txt
 
+[[ $TDEVERSION != 14.1.2 ]] && pkg-config libwebp && W_WEBP=-DWITH_WEBP=ON
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DDEFAULT_SPELL_CHECKER=${DEF_SP_CHKR:-"ASPELL"} \
     -DTDE_MALLOC="OFF" \
@@ -190,7 +195,7 @@ cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_PCSC="OFF" \
     -DWITH_PKCS="OFF" \
     -DWITH_SSL="ON" \
-    -DWITH_SUDO_TDESU_BACKEND="ON" \
+    -DWITH_SUDO_TDESU_BACKEND=${W_SUDO:-"OFF"} \
     -DWITH_TDEHWLIB="ON" \
     -DWITH_TDEHWLIB_DAEMONS="ON" \
     -DWITH_TDEICONLOADER_DEBUG="OFF" \
@@ -200,6 +205,7 @@ cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_UDISKS="ON" \
     -DWITH_UPOWER="OFF" \
     -DWITH_UTEMPTER="OFF" \
+    ${W_WEBP:-} \
     -DWITH_XCOMPOSITE="ON" \
     -DWITH_XRANDR="ON"
 

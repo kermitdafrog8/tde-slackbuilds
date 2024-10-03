@@ -1,0 +1,8 @@
+The SlackBuild has some options to change build-time defaults, all of which can be changed from the toolbar in the running program, but which are included for an alternative initial presentation.
+
+1] font family and size
+2] line spacing
+3] auto hyphenation
+
+All can be commented out in the SlackBuild if not wanted.
+

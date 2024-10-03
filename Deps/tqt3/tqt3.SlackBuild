@@ -54,9 +54,6 @@ echo $'--- mkspecs/linux-g++/qmake.conf
 @@ -29 +29 @@
 -QMAKE_CXX		= g++
 +QMAKE_CXX		= $(COMPILER_CXX)
-@@ -40 +40 @@
--QMAKE_INCDIR		=
-+QMAKE_INCDIR		= $(TQTDIR)/include/tqt
 @@ -42,2 +42,2 @@
 -QMAKE_INCDIR_X11	= /usr/X11R6/include
 -QMAKE_LIBDIR_X11	= /usr/X11R6/lib
@@ -66,7 +63,7 @@ echo $'--- mkspecs/linux-g++/qmake.conf
 -QMAKE_LIBDIR_TQT		= $(TQTDIR)/lib
 -QMAKE_INCDIR_OPENGL	= /usr/X11R6/include
 -QMAKE_LIBDIR_OPENGL	= /usr/X11R6/lib
-+QMAKE_LIBDIR_TQT		= $(TQTDIR)/lib'"$LIBDIRSUFFIX"$'
++QMAKE_LIBDIR_TQT	= $(TQTDIR)/lib'"$LIBDIRSUFFIX"$'
 +QMAKE_INCDIR_OPENGL	= /usr/include/GL
 +QMAKE_LIBDIR_OPENGL	= /usr/lib'"$LIBDIRSUFFIX"$'
 @@ -49,2 +49,2 @@
@@ -164,7 +161,7 @@ echo "yes" | \
 #| cc1plus: error: one or more PCH files were found, but they were invalid
 #| <command-line>: fatal error: tqtdesignercore: No such file or directory
 ## Not a fatal error causing a build failure - qmake_image_collection.o compiles later
-## at its correct position in the Makefile OBJECTS list - but it's misleading
+## at its correct position in the Makefile OBJECTS list - but the error message is misleading
 sed -i 's|./qmake_image_collection.o:.*$|& tqtdesignercore.gch/c++|' tools/designer/designer/Makefile
 
 ## don't build tutorial and examples which won't be installed because the release version is being built
@@ -185,63 +182,89 @@ rm bin/tqm2ts
 
 installdocs_fn
 
+## Ref issue #37
+## Set up tqt3.sh to add TDE PATHs only if xinitrc -> xinitrc.tde
 mkdir -p $PKG/etc/profile.d
 #
 echo '#!'"/bin/sh
+
+# Only add TDE PATHs if TDE is set as the chosen DE
+[[ \$(readlink -e /etc/X11/xinit/xinitrc) == *xinitrc.tde ]] && {
+
 # Environment path variable for the tQt package.
 export TQTDIR=$TQTDIR
 " > $PKG/etc/profile.d/tqt3.sh
+
+echo "echo '# Add TDE library directory:
+$INSTALL_TDE/lib$LIBDIRSUFFIX
+' > /etc/ld.so.conf.d/tqt3.conf
+" >> $PKG/etc/profile.d/tqt3.sh
+
+[[ $TQTDIR != $INSTALL_TDE ]] && {
+echo "echo '# Add TQT library directory:
+$TQTDIR/lib$LIBDIRSUFFIX
+' >> /etc/ld.so.conf.d/tqt3.conf
+" >> $PKG/etc/profile.d/tqt3.sh
+}
+
+[[ $(cat $TMPVARS/PKG_CONFIG_PATH_MOD) != set ]] && PC_HASH="#"
+echo "
+# Update PKG_CONFIG_PATH for TDE:
 #
+## add path for INSTALL_TDE ..
+[[ \$PKG_CONFIG_PATH != *$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig* ]] && \\
+PKG_CONFIG_PATH=\$PKG_CONFIG_PATH:$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig
+## .. and for TQTDIR if different" >> $PKG/etc/profile.d/tqt3.sh
+
+[[ $TQTDIR != $INSTALL_TDE ]] && \
+echo "[[ \$PKG_CONFIG_PATH != *$TQTDIR/lib$LIBDIRSUFFIX/pkgconfig* ]] && \\
+PKG_CONFIG_PATH=\$PKG_CONFIG_PATH:$TQTDIR/lib$LIBDIRSUFFIX/pkgconfig" >> $PKG/etc/profile.d/tqt3.sh
+
+echo "#
+## remove duplicated paths:
+${PC_HASH:-}PKG_CONFIG_PATH=\$(echo \$PKG_CONFIG_PATH| tr : \\\\n | awk '!seen[\$0]++' | tr \\\\n :|sed 's|:\$||')
+#
+export PKG_CONFIG_PATH
+} || {
+[[ -e /etc/ld.so.conf.d/tqt3.conf ]] && {
+echo '# TDE library directory to be added:
+' > /etc/ld.so.conf.d/tqt3.conf
+}
+}" >> $PKG/etc/profile.d/tqt3.sh
+
+## set up a placeholder file to enable removal with removepkg -
+## contents will be added from tqt3.sh
+mkdir -p $PKG/etc/ld.so.conf.d
+echo '# Placeholder - TDE library directory to be added:
+' > $PKG/etc/ld.so.conf.d/tqt3.conf
+
 echo '#!'"/bin/csh
 # Environment path variable for the tQt package:
 setenv TQTDIR $TQTDIR
 " > $PKG/etc/profile.d/tqt3.csh
-#
-chmod 755 $PKG/etc/profile.d/*
 
 strip_fn
 
 mkdir_install_fn
 
-# Add this to the doinst.sh:
 cat <<EOINS >> $PKG/install/doinst.sh
-# Add TDE library directory:
-[[ \$(cat etc/ld.so.conf|head -n1) != $INSTALL_TDE/lib$LIBDIRSUFFIX ]] && \
-sed -i "1i $INSTALL_TDE/lib$LIBDIRSUFFIX" etc/ld.so.conf
-
-# Add TQt library directory:
-[[ \$(cat etc/ld.so.conf|head -n1) != $TQTDIR/lib$LIBDIRSUFFIX ]] && \
-sed -i "1i $TQTDIR/lib$LIBDIRSUFFIX" etc/ld.so.conf
-
-[[ -x /sbin/ldconfig ]] && /sbin/ldconfig
-
-EOINS
-
-[[ $(cat $TMPVARS/PKG_CONFIG_PATH_MOD) != set ]] && PC_HASH="#"
-cat <<EOINS >> $PKG/install/doinst.sh
-## This could be a rebuild or upgradepkg running installpkg twice,
-## so delete any previous routine
-sed -i '/Update PKG_CONFIG_PATH for TDE/,+11d' etc/profile.d/pkgconfig.sh
-
-echo '# Update PKG_CONFIG_PATH for TDE:
-## remove duplicated paths:
-${PC_HASH:-}PKG_CONFIG_PATH=\$(echo \$PKG_CONFIG_PATH| tr : \\\\n | awk '"'!seen[\\\$0]++'"' | tr \\\\n :|sed '"'s|:\$||'"')
-#
-## add path for INSTALL_TDE ..
-[[ ! \$PKG_CONFIG_PATH == *$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig* ]] && \\
-PKG_CONFIG_PATH=\$PKG_CONFIG_PATH:$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig
-## .. and for TQTDIR if different
-[[ ! \$PKG_CONFIG_PATH == *$TQTDIR/lib$LIBDIRSUFFIX/pkgconfig* ]] && \\
-PKG_CONFIG_PATH=\$PKG_CONFIG_PATH:$TQTDIR/lib$LIBDIRSUFFIX/pkgconfig
-#
-export PKG_CONFIG_PATH' >> etc/profile.d/pkgconfig.sh
-
 ## csh
 # Update PKG_CONFIG_PATH:
 [[ ! \$( grep $INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig etc/profile.d/pkgconfig.csh ) ]] && \\
 sed -i "s|pkgconfig$|pkgconfig:$INSTALL_TDE/lib$LIBDIRSUFFIX/pkgconfig|" etc/profile.d/pkgconfig.csh
 [[ ! \$( grep $TQTDIR/lib$LIBDIRSUFFIX/pkgconfig etc/profile.d/pkgconfig.csh ) ]] && \\
 sed -i "s|pkgconfig$|pkgconfig:$TQTDIR/lib$LIBDIRSUFFIX/pkgconfig|" etc/profile.d/pkgconfig.csh
+EOINS
+
+chmod 755 $PKG/etc/profile.d/*
+
+# Add this to the doinst.sh:
+cat <<EOINS >> $PKG/install/doinst.sh
+# May need to add ld.so.conf.d to /etc/ld.so.conf for Slackware 14.2 users:
+[[ ! \$(grep ld.so.conf.d /etc/ld.so.conf) ]] && \\
+sed -i '1 i include /etc/ld.so.conf.d/*.conf' /etc/ld.so.conf
+
+[[ -x /sbin/ldconfig ]] && /sbin/ldconfig
 EOINS
 
 doinst_sh_fn

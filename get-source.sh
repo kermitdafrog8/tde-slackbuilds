@@ -275,21 +275,36 @@ cd $BUILD_TDE_ROOT/src/cgit/$PRGNAM/
 echo -e "\n copying $PRGNAM git sources to build area ... \n"
 ## remove any old .git/worktrees records - only being used here as a build source
 rm -rf .git/worktrees/*
-## use FEAT as a command line option to checkout any other development branch ..
+## Use FEAT as a command line option to checkout any other development branch ..
 ## .. plus FEATa for admin, FEATc for cmake if required
 git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/ ${FEAT:-$DEV_BRANCH}
-
 
 cd ../admin
 echo -e "\n copying admin git sources to build area ... \n"
 rm -rf .git/worktrees/*
 git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/admin/ ${FEATa:-$DEV_BRANCH}
 
-
 cd ../cmake
 echo -e "\n copying cmake git sources to build area ... \n"
 rm -rf .git/worktrees/*
 git worktree add -f $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/cmake/ ${FEATc:-$DEV_BRANCH}
+
+echo -e "\033[39;1m"
+## The FEAT commits are based on master branch, so
+## rebase the FEAT master branch commit onto the
+## r14.1.x branch where that is being built
+[[ ${FEAT:-} ]] && feat=${FEAT:-}
+[[ ${FEATa:-} ]] && feat=${FEATa:-} && cm_ad=admin/
+[[ ${FEATc:-} ]] && feat=${FEATc:-} && cm_ad=cmake/
+[[ ${feat:-} != "" && $DEV_BRANCH == r14.1.x ]] && {
+( cd $TMP_BUILD/tmp-$PRGNAM/$PRGNAM/${cm_ad:-}
+git rebase --onto r14.1.x master $feat
+) || { echo -e "\033[39;1m
+    rebasing $feat onto the r14.1.x branch failed
+    - try doing a 14.2.0 build instead
+\033[0m" ; exit 1 ; }
+}
+echo -e "\033[0m"
 
 [[ " arts tdelibs " == *$PRGNAM* ]] && {
 cd ../libltdl

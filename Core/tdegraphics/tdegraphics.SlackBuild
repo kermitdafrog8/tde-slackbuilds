@@ -110,6 +110,10 @@ sed -i 's|tqt_TQOBJECT|TQT_TQOBJECT_H|' kmrml/kmrml/kcontrol/mainpage.cpp
 sed -i 's|TQT_|TQ_|g' kmrml/kmrml/*.cpp
 sed -i 's|TQT_|TQ_|' kmrml/kmrml/server/*.cpp
 #
+[[ $TDEVERSION == 14.1.x ]] && {
+sed -i 's|KDE_EXPORT|TDE_EXPORT|' kmrml/kmrml/*.cpp
+sed -i 's|KDE_EXPORT|TDE_EXPORT|' kmrml/kmrml/server/*.cpp
+}
 ## display deprecation message
 sed -i  's|AUTHOR_WARNING|WARNING|' kmrml/CMakeLists.txt
 }

@@ -312,6 +312,15 @@ If following the build method on the previous screen, the answer here should pro
 [[ $? == 1 ]] && echo no > $TMPVARS/KEEP_BUILD
 
 
+## new app for 14.1.3+ & 14.2.0
+# Use non-breaking space - U00a0 - in strings for this to work with 'dialog'
+[[ $(cat $TMPVARS/TDEVERSION) != 14.1.2 ]] && {
+app_1="Apps/tde-ebook-reader"
+about_1="Ebook reader .."
+status_1=off
+comment_1="\Zb\Z6 \Zn"
+}
+
 rm -f $TMPVARS/TDEbuilds
 dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Packages Selection " --item-help --checklist \
 "
@@ -410,6 +419,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/potracegui" "A GUI for potrace" off "\Zb\Z6 Requires potrace \Zn" \
 "Apps/rosegarden" "Audio sequencer and musical notation editor" off "\Zb\Z6 Requires jack-audio-connection-kit liblo and dssi for proper functionality \Zn" \
 "Apps/soundkonverter" "Frontend to various audio converters" off "\Zb\Z6   \Zn" \
+${app_1:-} ${about_1:-} ${status_1:-} ${comment_1:-} \
 "Apps/tde-style-lipstik" "Lipstik theme" off "\Zb\Z6   \Zn" \
 "Apps/tde-style-qtcurve" "QtCurve theme" off "\Zb\Z6   \Zn" \
 "Apps/tdebluez" "Bluetooth Bluez5 functionality" off "\Zb\Z6   \Zn" \
@@ -516,7 +526,7 @@ ${DLG_BOX:-0 0}
 
 ## GCC visibility option
 ## If tdelibs has been built, the header will exist:
-[[ $(grep "KDE_HAVE_GCC_VISIBILITY 1" $(cat $TMPVARS/INSTALL_TDE)/include/kdemacros.h) ]] && \
+[[ $(grep "DE_HAVE_GCC_VISIBILITY 1" $(cat $TMPVARS/INSTALL_TDE)/include/?demacros.h) ]] && \
 GCC_VIS_M=ON || GCC_VIS_M=OFF
 #
 ## only run this if any of listed Deps or tdelibs has been selected
@@ -922,7 +932,7 @@ INST_PACKAGE=yes && [[ $INST == 0 ]] && INST_PACKAGE=no
 ## If GCC_VIS has been set on the command line, use that value
 [[ $GCC_VIS ]] && export GCC_VIS || {
 ## Otherwise, if tdelibs has been built before, the header will exist, so test that, and set GCC_VIS accordingly:
-[[ $(grep "KDE_HAVE_GCC_VISIBILITY 1" $INSTALL_TDE/include/kdemacros.h) ]] && \
+[[ $(grep "DE_HAVE_GCC_VISIBILITY 1" $INSTALL_TDE/include/?demacros.h) ]] && \
 GCC_VIS=ON || GCC_VIS=OFF
 ## But, if tdelibs or any listed Deps package is being built, or re-built, override any set value with the dialog output:
 [[ -s $TMPVARS/GCC_VIS ]] && GCC_VIS=$(cat $TMPVARS/GCC_VIS)

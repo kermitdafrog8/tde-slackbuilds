@@ -32,11 +32,11 @@ If you're curious about what this might involve, [take a look at a sample build 
 URLs for this and other locations are @ https://www.trinitydesktop.org/mirrorstatus.php
 * BUILD= - sets the package build identifier, overriding the SlackBuild default of 1
 * GCC_VIS=0 - override setting gcc visibility if it has been set ON in tdelibs
-* FEAT= - test a pre-merge feature for development builds - see get-source.sh
+* FEAT= - test a pre-merge feature for development builds - see notes in get-source.sh
 * build_regextester=[yp] - build the regex tester from the tqt3 example - see the tqt3 README
 * mailmerge=n - build kword without mailmerge - see the koffice README and SlackBuild
 * KP_BTN=n - build ksnapshot without the dedicated KolourPaint button - see the tdegraphics README and SlackBuild
-
+* W_SUDO=ON - set backends for using sudo as the super user command [default is su]
 ---
 
 ***The directory structure*** for the SlackBuild scripts is in line with the Trinity release source repositories:  
@@ -133,6 +133,8 @@ Includes:
 [3] The Misc directory contains SlackBuilds for software that might already be installed from other sources. Please check because any misc builds selected here could overwrite them.
 
 [4] The README for a [native build for Raspberry Pi3](./README-Raspberry-Pi3.md) is out-of-date and cross compiling is a better option.
+
+[5] The options for including features into any build are detailed in the *.SlackBuild - under `../configure` or `cmake -D*`. Those chosen in these scripts are a selection which work for my builds, so if your installation requires a different set of options, the *.SlackBuild should be edited for the option[s] required.
 
 ---
 
