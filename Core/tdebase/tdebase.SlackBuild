@@ -95,6 +95,39 @@ echo $'
 +X-TDE-BrowserView-Built-Into=konqueror
 ' | patch -N -p0 || true
 
+## Patch for GCC 14
+
+echo $'
+--- tdm/backend/dm.c
++++ tdm/backend/dm.c
+@@ -36,6 +36,13 @@ from the copyright holder.
+ 
+ #include <tqglobal.h>
+ 
++#include <config.h>
++#ifdef HAVE_PTHREAD_SETNAME_NP
++#define _GNU_SOURCE
++#define __BSD_VISIBLE 1
++#include <pthread.h>
++#endif /* pthread_setname_np() */
++
+ #include "dm.h"
+ #include "dm_auth.h"
+ #include "dm_error.h"
+@@ -53,12 +60,6 @@ from the copyright holder.
+ # include <sys/vt.h>
+ #endif
+ 
+-#ifdef HAVE_PTHREAD_SETNAME_NP
+-#define _GNU_SOURCE
+-#define __BSD_VISIBLE 1
+-#include <pthread.h>
+-#endif /* pthread_setname_np() */
+-
+ // Limited by the number of VTs configured into the kernel or 256, whichever is less
+ #define MAX_VT_NUMBER 48
+' | patch -N -p0 || true
+
 ## allow for configuration files directory == *tde*
 ## and plugins in $INSTALL_TDE/lib$LIBDIRSUFFIX/tde
 sed -i "s|trinity|$PLUGIN_INSTALL_DIR|g" tdm/config.def || true
