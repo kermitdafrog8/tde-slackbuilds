@@ -54,9 +54,6 @@ chown_fn
 
 cd_builddir_fn
 
-# If mp4v2 is installed, use mp4 metadata sources in build, otherwise m4a is used ..
-pkg-config mp4v2 && MP4V2="ON"
-
 ## Build xine-engine?
 pkg-config libxine && XINE="ON"
 
@@ -77,7 +74,6 @@ cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_IPOD="OFF" \
     -DWITH_KONQSIDEBAR="ON" \
     -DWITH_LIBVISUAL="ON" \
-    -DWITH_MP4V2=${MP4V2:-"OFF"} \
     -DWITH_MTP="ON" \
     -DWITH_MYSQL="OFF" \
     -DWITH_NJB="OFF" \

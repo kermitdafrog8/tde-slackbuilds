@@ -35,14 +35,22 @@ untar_fn
 
 ## copy the helpfile docs to the build tree
 cp -a $SB_SRCDIR/doc .
-cp $SB_SRCDIR/dock.png src/
-## copy translations
-cp $SB_SRCDIR/translations/messages/* translations/messages/
-## remove meinproc check - there are a number of validity errors relating to the use of <sbr/> etc.,
+## remove meinproc --check - there are a number of validity errors relating to the use of <sbr/> etc.,
 ## which I feel provides a better presentation. The help file displays as intended.
 sed -i 's|--check --cache index.cache.bz2|--cache index.cache.bz2|' cmake/modules/TDEMacros.cmake
+## copy translations
+cp $SB_SRCDIR/translations/messages/* translations/messages/
+## add translatable strings to template
+echo '
+#: MainWidget.cpp:535
+msgid "Help"
+msgstr ""
 
-## change num-pad keys text
+#: MainWidget.cpp:562
+msgid "Configure"
+msgstr ""' >> translations/messages/kvkbd.pot
+
+## [2] change num-pad keys text
 [[ $(cat $TMPVARS/Kvkbd_OPTS) == *numpad* ]] && {
 echo -e "\033[36;1m"'patching for num-pad text ..'"\033[0m"
 patch -N -p0 << EOF || true
@@ -63,7 +71,7 @@ patch -N -p0 << EOF || true
 EOF
 }
 
-## set small icons to better fit on buttons for keyboard used at default size
+## [3] set small icons to better fit on buttons for keyboard used at default size
 [[ $(cat $TMPVARS/Kvkbd_OPTS) == *icons* ]] && {
 echo -e "\033[36;1m"'patching for small icons ..'"\033[0m"
 patch -N -p0 << EOF || true
@@ -91,17 +99,12 @@ EOF
 }
 
 ## configuration menu
+sed -i 's|Font \.\.\.|Font|;s|Keys color|Key color|' {src/MainWidget.cpp,translations/messages/*}
 patch -N -p0 << EOF || true
 --- src/MainWidget.cpp
 +++ src/MainWidget.cpp
-@@ -515 +515 @@
--		m->insertItem ( i18n("Font ..."), this, TQ_SLOT ( chooseFont() ) );
-+		m->insertItem ( i18n("Font"), this, TQ_SLOT ( chooseFont() ) );
 @@ -520,0 +521 @@
 +		m->insertSeparator();
-@@ -522 +523 @@
--		m->insertItem ( i18n ("Keys color"), this, TQ_SLOT ( chooseKeysColor() ) );
-+		m->insertItem ( i18n ("Key color"), this, TQ_SLOT ( chooseKeysColor() ) );
 EOF
 
 ## key spacing & sizing
@@ -137,7 +140,7 @@ patch -N -p0 << EOF || true
 +	resize ( 64,31 );
 EOF
 
-## blank character display where AltGr does not provide extra characters
+## [4] blank character display where AltGr does not provide extra characters
 [[ $(cat $TMPVARS/Kvkbd_OPTS) == *blank* ]] && {
 echo -e "\033[36;1m"'patching for blank keys ..'"\033[0m"
 patch -N -p0 << EOF || true
@@ -169,16 +172,10 @@ patch -N -p0 << EOF || true
 +//		// This is required at least on US keyboards, where altGr works as Alt.
 +//		c = sc;
 +//	}
-#
-## substitute the .notdef, VoidSymbol, with a space
---- src/Xutils.cpp
-+++ src/Xutils.cpp
-@@ -839,0 +840 @@
-+  { 0x00ffffffL, 0x0020 }, /*                VoidSymbol -> <- space */
 EOF
 }
 
-## generate keycode for Win keys with single click so that they can be used for xmodmap
+## [1] generate keycode for Win keys with single click so that they can be used for xmodmap
 [[ $(cat $TMPVARS/Kvkbd_OPTS) != *Winlock* ]] && {
 echo -e "\033[36;1m"'patching for no-lock Win keys ..'"\033[0m"
 patch -N -p0 << EOF || true

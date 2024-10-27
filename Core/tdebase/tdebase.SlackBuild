@@ -127,16 +127,6 @@ EOF
 ## rather than set HTDIG_SEARCH_BINARY which fixes the location
 sed -i 's|HINTS|&\n      /var/www/cgi-bin|' khelpcenter/searchhandlers/CMakeLists.txt
 
-## Work-around to build the handbooks, fixes tdebase issues 458 & 483
-## See tdebase issue 483, #issuecomment-51339
-[[ $TDEVERSION == 14.1.2 ]] && {
-sed -i 's|MATCHES ";${_lang};" ))|MATCHES ";1;" ))|' cmake/modules/TDEMacros.cmake
-}
-## + a related change to man source directories for development versions
-[[ $TDEVERSION != 14.1.2 ]] && {
-MAN_SRC_DIR=*/
-}
-
 ## correct test for sudo
 sed -i 's|^if( TDESU_BACKEND-NOTFOUND )|if( ${TDESU_BACKEND} STREQUAL "TDESU_BACKEND-NOTFOUND" )|' tdesu/CMakeLists.txt
 sed -i 's|endif( TDESU_BACKEND-NOTFOUND )|endif()|' tdesu/CMakeLists.txt
@@ -148,12 +138,12 @@ chown_fn
 
 cd_builddir_fn
 
-sed -i "s|/etc/trinity|$INSTALL_TDE/share/config|" ../doc/man/${MAN_SRC_DIR:-}{gentdmconf,tdm}.1
+sed -i "s|/etc/trinity|$INSTALL_TDE/share/config|" ../doc/man/*/{gentdmconf,tdm}.1
 [[ $TDE_CNF_DIR == *tde* ]] && \
-sed -i 's|trinity,kde,kde2,kde1|tde|' ../doc/man/${MAN_SRC_DIR:-}*.1 && \
-sed -i 's|trinity|tde|g' ../doc/man/${MAN_SRC_DIR:-}*.1 || \
-sed -i 's|trinity,kde,kde2,kde1|trinity|' ../doc/man/${MAN_SRC_DIR:-}*.1
-sed -i "s|http://bugs.*desktop.org|https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM/issues|" ../doc/man/${MAN_SRC_DIR:-}*.1
+sed -i 's|trinity,kde,kde2,kde1|tde|' ../doc/man/*/*.1 && \
+sed -i 's|trinity|tde|g' ../doc/man/*/*.1 || \
+sed -i 's|trinity,kde,kde2,kde1|trinity|' ../doc/man/*/*.1
+sed -i "s|http://bugs.*desktop.org|https://mirror.git.trinitydesktop.org/gitea/TDE/$PRGNAM/issues|" ../doc/man/*/*.1
 
 ## kfrontend/CMakeLists.txt runs gentdmconf to set up the tdm configuration files
 ## - after that, add the TDM configuration README
@@ -167,7 +157,7 @@ install(
 endif( )
 ' >> ../tdm/kfrontend/CMakeLists.txt
 #
-sed -i "s|/opt/.*/share/doc/tdm/README.gz|$INSTALL_TDE/share/config/tdm/README-config|" ../doc/man/${MAN_SRC_DIR:-}tdm{,ctl}.1
+sed -i "s|/opt/.*/share/doc/tdm/README.gz|$INSTALL_TDE/share/config/tdm/README-config|" ../doc/man/*/tdm{,ctl}.1
 
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_ARTS="ON" \
@@ -181,7 +171,7 @@ cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_OPENEXR="ON" \
     -DWITH_OPENGL="ON" \
     -DWITH_PAM="OFF" \
-    -DWITH_PCRE="ON" \
+    -DWITH_PCRE2="ON" \
     -DWITH_SAMBA="OFF" \
     -DWITH_SASL="OFF" \
     -DWITH_SENSORS="ON" \

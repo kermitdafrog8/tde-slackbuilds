@@ -34,8 +34,7 @@ getsource_fn
 untar_fn
 
 ## for slack-desc
-[[ $TDEVERSION != 14.1.2 ]] && PO_DIR=translations/messages
-langs="";for Lang in $I18N;do [[ -s ${PO_DIR:-po}/$Lang.po ]] && langs="$langs $Lang";done
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
 listdocs_fn
 

@@ -159,7 +159,6 @@ pkg-config jasper && JASPER="ON"
 ## just show message without failing if no spell checker is installed
 sed -i 's|tde_message_fatal( "Spell checker|message( "Spell checker|' ../CMakeLists.txt
 
-[[ $TDEVERSION != 14.1.2 ]] && pkg-config libwebp && W_WEBP=-DWITH_WEBP=ON
 cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DDEFAULT_SPELL_CHECKER=${DEF_SP_CHKR:-"ASPELL"} \
     -DTDE_MALLOC="OFF" \
@@ -191,7 +190,7 @@ cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_NETWORK_MANAGER_BACKEND="ON" \
     -DWITH_OLD_XDG_STD="OFF" \
     -DWITH_OPENEXR="ON" \
-    -DWITH_PCRE="ON" \
+    -DWITH_PCRE2="ON" \
     -DWITH_PCSC="OFF" \
     -DWITH_PKCS="OFF" \
     -DWITH_SSL="ON" \
@@ -205,7 +204,7 @@ cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
     -DWITH_UDISKS="ON" \
     -DWITH_UPOWER="OFF" \
     -DWITH_UTEMPTER="OFF" \
-    ${W_WEBP:-} \
+    -DWITH_WEBP="ON" \
     -DWITH_XCOMPOSITE="ON" \
     -DWITH_XRANDR="ON"
 

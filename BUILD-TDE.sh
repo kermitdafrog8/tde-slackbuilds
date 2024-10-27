@@ -101,7 +101,7 @@ Set the version of TDE to be built.
  
 " \
 13 75 3 \
-"14.1.2" "the R14.1.2 release - source from archives" \
+"14.1.3" "the R14.1.3 release - source from archives" \
 "14.1.x" "next release preview - source from Trinity git" \
 "14.2.0" "R14.2.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
@@ -311,16 +311,6 @@ If following the build method on the previous screen, the answer here should pro
 [[ $? == 0 ]] && echo yes > $TMPVARS/KEEP_BUILD
 [[ $? == 1 ]] && echo no > $TMPVARS/KEEP_BUILD
 
-
-## new app for 14.1.3+ & 14.2.0
-# Use non-breaking space - U00a0 - in strings for this to work with 'dialog'
-[[ $(cat $TMPVARS/TDEVERSION) != 14.1.2 ]] && {
-app_1="Apps/tde-ebook-reader"
-about_1="Ebook reader .."
-status_1=off
-comment_1="\Zb\Z6 \Zn"
-}
-
 rm -f $TMPVARS/TDEbuilds
 dialog --cr-wrap --nocancel --no-shadow --colors --title " TDE Packages Selection " --item-help --checklist \
 "
@@ -371,10 +361,9 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 " Misc/xmedcon" "A medical image conversion utility & library" off "\Zb\Z6 Buildtime option for libksquirrel \Zn" \
 "Libs/libksquirrel" "A set of image codecs for KSquirrel" off "\Zb\Z6 Required for ksquirrel. Buildtime options include l/netpbm, t/transfig [fig2dev], Misc/xmedcon \Zn" \
 "Apps/abakus" "PC calculator" off "\Zb\Z6 optional dependency l/mpfr which requires l/gmp \Zn" \
-" Misc/mp4v2" "Create and modify mp4 files" off "\Zb\Z6 Buildtime option for Amarok  \Zn" \
 " Misc/moodbar" "GStreamer plugin for Amarok for moodbar feature" off "\Zb\Z6 Requires gstreamer-1.x. Runtime option for Amarok \Zn" \
 " Misc/yauap" "A simple commandline audio player" off "\Zb\Z6 Provides an optional engine for Amarok \Zn" \
-"Apps/amarok" "A Music Player" off "\Zb\Z6 Optional dependencies - xine-lib, mp4v2, speex, moodbar, akode, yauap \Zn" \
+"Apps/amarok" "A Music Player" off "\Zb\Z6 Optional dependencies - xine-lib, speex, moodbar, akode, yauap \Zn" \
 "Apps/codeine" "Simple multimedia player" off "\Zb\Z6 \Zn" \
 "Apps/digikam" "A digital photo management application + Showfoto viewer" off "\Zb\Z6 Requires kipi-plugins libkdcraw libkexiv2 libkipi.  \Zn" \
 "Apps/dolphin" "Dolphin file manager for TDE" off "\Zb\Z6 A d3lphin.desktop file is included - see dolphin.SlackBuild.  \Zn" \
@@ -419,7 +408,7 @@ Non-TDE apps are in the Misc category and don't need the \Zb\Zr\Z4R\Znequired TD
 "Apps/potracegui" "A GUI for potrace" off "\Zb\Z6 Requires potrace \Zn" \
 "Apps/rosegarden" "Audio sequencer and musical notation editor" off "\Zb\Z6 Requires jack-audio-connection-kit liblo and dssi for proper functionality \Zn" \
 "Apps/soundkonverter" "Frontend to various audio converters" off "\Zb\Z6   \Zn" \
-${app_1:-} ${about_1:-} ${status_1:-} ${comment_1:-} \
+"Apps/tde-ebook-reader" "Ebook reader ported from FBReader" off "\Zb\Z6   \Zn" \
 "Apps/tde-style-lipstik" "Lipstik theme" off "\Zb\Z6   \Zn" \
 "Apps/tde-style-qtcurve" "QtCurve theme" off "\Zb\Z6   \Zn" \
 "Apps/tdebluez" "Bluetooth Bluez5 functionality" off "\Zb\Z6   \Zn" \
@@ -764,8 +753,8 @@ Create and/or update the git repositories local copies.
 
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
-[[ $(cat $TMPVARS/TDEVERSION) == 14.1.2 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
-## testing for cgit!=no will allow =yes, or null, which is the 14.1.2 build case
+[[ $(cat $TMPVARS/TDEVERSION) == 14.1.3 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
+## testing for cgit!=no will allow =yes, or null, which is the 14.1.3 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "

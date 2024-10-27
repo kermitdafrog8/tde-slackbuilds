@@ -40,54 +40,54 @@ msgstr ""
 msgid "kvkbd"
 msgstr ""
 
-#: MainWidget.cpp:399
+#: MainWidget.cpp:381
 msgid "Hide keyboard"
 msgstr ""
 
-#: MainWidget.cpp:409 MainWidget.cpp:753
+#: MainWidget.cpp:392 MainWidget.cpp:755
 msgid "Hide num pad"
 msgstr ""
 
-#: MainWidget.cpp:412 MainWidget.cpp:747
+#: MainWidget.cpp:397 MainWidget.cpp:749
 msgid "Show num pad"
 msgstr ""
 
-#: MainWidget.cpp:529
+#: MainWidget.cpp:515
 msgid "Font"
 msgstr ""
 
-#: MainWidget.cpp:531
+#: MainWidget.cpp:517
 msgid "Auto resize font"
 msgstr ""
 
-#: MainWidget.cpp:536
+#: MainWidget.cpp:521
 msgid "Background color"
 msgstr "Background colour"
 
-#: MainWidget.cpp:538
+#: MainWidget.cpp:522
 msgid "Key color"
 msgstr "Key colour"
 
-#: MainWidget.cpp:541
+#: MainWidget.cpp:525
 msgid "Dock widget"
 msgstr ""
 
-#: MainWidget.cpp:546
+#: MainWidget.cpp:529
 msgid "Lock on screen"
 msgstr ""
 
-#: MainWidget.cpp:552
+#: MainWidget.cpp:535
 msgid "Help"
 msgstr ""
 
-#: MainWidget.cpp:578
+#: MainWidget.cpp:562
 msgid "Configure"
 msgstr ""
 
-#: MainWidget.cpp:998
+#: MainWidget.cpp:960
 msgid "Toggle keyboard visibility"
 msgstr ""
 
-#: MainWidget.cpp:1895
+#: MainWidget.cpp:989
 msgid "Virtual keyboard"
 msgstr ""
