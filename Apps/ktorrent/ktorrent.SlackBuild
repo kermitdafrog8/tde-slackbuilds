@@ -34,31 +34,28 @@ getsource_fn
 
 untar_fn
 
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -e translations/$Lang ]] && langs="$langs $Lang";done
-sed -i "s|SUBDIRS=.*$|SUBDIRS=$langs|" translations/Makefile.am
+## for slack-desc
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
 
 sed -i '/On Debian systems/,+2d' doc/man/ktorrent.1
 
 listdocs_fn
 
-ltoolupdate_fn
-
 chown_fn
 
 cd_builddir_fn
 
-CFLAGS="$SLKRCFLAGS" \
-CXXFLAGS="$SLKRCFLAGS" \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --mandir=$INSTALL_TDE/man \
-   --disable-rpath \
-   --enable-torrent-mimetype \
-   --enable-closure
+pkg-config avahi-tqt && ZeroConf="ON"
+pkg-config geoip && GeoIp="ON" && BiGeoIp="OFF"
+
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
+    -DWITH_ZEROCONF=${ZeroConf:-"OFF"} \
+    -DWITH_SYSTEM_GEOIP=${GeoIp:-"OFF"} \
+    -DWITH_BUILTIN_GEOIP=${BiGeoIp:-"ON"} \
+    -DWITH_BUILTIN_FLAGS=${BiGeoIp:-"ON"} \
+    -DWITH_TORRENT_MIMETYPE="OFF" \
+    -DWITH_MEMLEAK_TRACING="OFF" \
+    -DWITH_PROFILING_SUPPORT="OFF"
 
 make_fn
 

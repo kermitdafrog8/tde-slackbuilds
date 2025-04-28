@@ -101,7 +101,7 @@ Set the version of TDE to be built.
  
 " \
 13 75 3 \
-"14.1.3" "the R14.1.3 release - source from archives" \
+"14.1.4" "the R14.1.4 release - source from archives" \
 "14.1.x" "next release preview - source from Trinity git" \
 "14.2.0" "R14.2.0 development - source from Trinity git" \
 2> $TMPVARS/TDEVERSION
@@ -236,7 +236,7 @@ dialog --cr-wrap --nocancel --no-shadow --colors --help-button --help-label "REA
  Multiple selections may be made - space separated.
 
  Build language packages/support for any of:
-\Zb\Z6af ar az be bg bn br bs ca cs csb cy da de el en_GB eo es es_AR et eu fa fi fr fy ga gl he hi hr hu is it ja kk km ko lt lv mk mn ms nb nds nl nn pa pl pt pt_BR ro ru rw se sk sl sr sr@Latn ss sv ta te tg th tr uk uz uz@cyrillic vi wa zh_CN zh_TW\Zn
+\Zb\Z6af ar az be bg bn br bs ca cs csb cy da de el en_GB eo es es_AR et eu fa fi fr fy ga gl he hi hr hu is it ja ka kk km ko lt lv mk mn ms nb nds nl nn pa pl pt pt_BR ro ru rw se sk sl sr sr@Latn ss sv ta te tg th tr uk uz uz@cyrillic vi wa zh_CN zh_TW\Zn
  
 " \
 25 75 \
@@ -753,8 +753,8 @@ Create and/or update the git repositories local copies.
 
 
 #rm -f $TMPVARS/PRE_DOWNLOAD  ## this is done at the head of this script
-[[ $(cat $TMPVARS/TDEVERSION) == 14.1.3 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
-## testing for cgit!=no will allow =yes, or null, which is the 14.1.3 build case
+[[ $(cat $TMPVARS/TDEVERSION) == 14.1.4 ]] && PRE_DOWNLOAD_MESSAGE="Only the source archives not already in 'src' will be downloaded." || PRE_DOWNLOAD_MESSAGE="All cgit sources for the build list packages will be cloned/updated.\nMisc archives will only be downloaded if not already in 'src'."
+## testing for cgit!=no will allow =yes, or null, which is the 14.1.4 build case
 [[ $(cat $TMPVARS/DL_CGIT) != no ]] &&  {
 dialog --cr-wrap --no-shadow --colors --defaultno --title " Only download sources " --yesno \
 "

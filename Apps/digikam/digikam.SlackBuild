@@ -33,41 +33,32 @@ getsource_fn
 
 untar_fn
 
-# set support for additional language(s) as per I18N variable
-# but only for languages available with this package
-langs="";for Lang in $I18N;do [[ -d po/$Lang ]] && langs="$langs $Lang";done
-sed -i "s|SUBDIRS =.*$|SUBDIRS =.$langs|" po/Makefile.am
-# only package help documents where they exist for the languages being included
-ldocs="" # for slack-desc
-langdocdk="digikam";for Lang in $langs;do [[ -d doc/$Lang"_digikam" ]] && langdocdk=$(echo $Lang"_digikam" $langdocdk) && ldocs="$ldocs $Lang";done
-langdocsf="showfoto";for Lang in $langs;do [[ -d doc/$Lang"_showfoto" ]] && langdocsf=$(echo $Lang"_showfoto" $langdocsf);done
-sed -i "s|SUBDIRS =.*$|SUBDIRS =. $langdocdk $langdocsf|" doc/Makefile.am
-
-## fix check for visibility support - tde-common-admin pull #20
-sed -i 's| Q_EXPORT| TQ_EXPORT|' admin/acinclude.m4.in
+## for slack-desc
+langs="";for Lang in $I18N;do [[ -s translations/messages/$Lang.po ]] && langs="$langs $Lang";done
+ldocs="";for Lang in $I18N;do [[ -d doc/$Lang ]] && ldocs="$ldocs $Lang";done
 
 listdocs_fn
-
-ltoolupdate_fn
 
 chown_fn
 
 cd_builddir_fn
 
-[[ $GCC_VIS == ON ]] && EN_GCC_VIS="--enable-gcc-hidden-visibility"
-pkg-config sqlite3 && SYS_SQL3="--without-included-sqlite3"
+# If building with additional language support, showfoto doesn't run using the language selected
+# because showfoto.mo files are not being built.
+# This duplicates the digikam .mo files and therefore takes up additional disk space where a symlink only is required
+<<'option'
+sed -i 's|BUILD_TRANSLATIONS )|&\
+project( showfoto )\
+tde_conditional_add_project_translations( BUILD_TRANSLATIONS )|' ../CMakeLists.txt
+option
 
-CFLAGS="$SLKRCFLAGS" \
-CXXFLAGS="$SLKRCFLAGS" \
-CC=$COMPILER \
-CXX=$COMPILER_CXX \
-../configure \
-   --prefix=$INSTALL_TDE \
-   --mandir=$INSTALL_TDE/man \
-   ${EN_GCC_VIS:-} \
-   ${SYS_SQL3:-} \
-   --disable-rpath \
-   --enable-closure
+# SQLITE3 is a requirement for the build
+# If a system version isn't found, the included source will be used
+# Check for system SQLite3:
+pkg-config sqlite3 && INT_SQL3="OFF"
+
+cmake ${G_NINJA:-} -C $TMPVARS/CMAKE_CACHE ${CMAKE_OPTS:-} \
+    -DWITH_LOCAL_SQLITE3=${INT_SQL3:-"ON"}
 
 make_fn
 
@@ -90,6 +81,9 @@ do
 ln -s digikam.mo showfoto.mo)
 done
 fi
+
+# The apidocs folders are empty
+rm -rf $PKG$INSTALL_TDE/share/doc/tde/HTML/en/digikam-apidocs
 
 doinst_sh_fn
 
